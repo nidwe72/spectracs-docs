@@ -1,0 +1,147 @@
+@startuml db_entities
+title Spectracs — DB entity model (spectracsPy-model · SQLite via SQLAlchemy)
+
+hide circle
+hide empty methods
+skinparam linetype ortho
+skinparam classFontSize 12
+skinparam class {
+  BackgroundColor White
+  BorderColor #333333
+  BackgroundColor<<catalog>> #EEF6EE
+  BorderColor<<catalog>> #4C7A4C
+  BackgroundColor<<reference>> #EEF6EE
+  BorderColor<<reference>> #4C7A4C
+  BackgroundColor<<join>> #FFF7E6
+  BorderColor<<join>> #B58900
+  BackgroundColor<<stub>> #F2F2F2
+  BorderColor<<stub>> #999999
+}
+
+' Every entity has  id : String  (PK, uuid) from DbBaseEntityMixin.
+
+' ============ Application config ============
+class ApplicationConfig {
+  + id : String (PK)
+}
+
+class ApplicationConfigToSpectrometerProfile <<join>> {
+  + application_config_id : String (PK, FK)
+  + spectrometer_profile_id : String (PK, FK)
+  + isDefault : Boolean
+}
+
+' ============ Core: device profile + calibration ============
+class SpectrometerProfile {
+  + id : String (PK)
+  + serial : String
+  + spectrometerId : String (FK)
+  + spectrometerCalibrationProfileId : String (FK)
+}
+
+class SpectrometerCalibrationProfile {
+  + id : String (PK)
+  + regionOfInterestX1 : Integer
+  + regionOfInterestY1 : Integer
+  + regionOfInterestX2 : Integer
+  + regionOfInterestY2 : Integer
+  + interpolationCoefficientA : Float
+  + interpolationCoefficientB : Float
+  + interpolationCoefficientC : Float
+  + interpolationCoefficientD : Float
+}
+
+class SpectralLine {
+  + id : String (PK)
+  + pixelIndex : Integer
+  + spectrometerCalibrationProfile_id : String (FK)
+  + spectralLineMasterDataId : String (FK)
+}
+
+class SpectralLineMasterData <<reference>> {
+  + id : String (PK)
+  + name : String
+  + colorName : String
+  + mainColorName : String
+  + nanometer : Float
+}
+
+' ============ Catalog: spectrometer + parts ============
+class Spectrometer <<catalog>> {
+  + id : String (PK)
+  + modelName : String
+  + spectrometerSensorId : String (FK)
+  + spectrometerVendorId : String (FK)
+  + spectrometerStyleId : String (FK)
+}
+
+class SpectrometerSensor <<catalog>> {
+  + id : String (PK)
+  + vendorId : String
+  + vendorName : String
+  + sellerName : String
+  + modelId : String
+  + description : String
+  + codeName : String
+  + isVirtual : Boolean
+  + spectrometerSensorChipId : String (FK)
+}
+
+class SpectrometerSensorChip <<catalog>> {
+  + id : String (PK)
+  + vendorName : String
+  + productName : String
+}
+
+class SpectrometerStyle <<catalog>> {
+  + id : String (PK)
+  + styleId : String
+  + styleName : String
+  + description : String
+}
+
+class SpectrometerVendor <<catalog>> {
+  + id : String (PK)
+  + vendorName : String
+  + vendorId : String
+}
+
+' ============ Measurement (unused stub) ============
+class MeasurementProfile <<stub>> {
+  + id : String (PK)
+  + spectrometerProfileId : String (FK)
+}
+
+' ============ Relationships ============
+ApplicationConfig "1" *-- "0..*" ApplicationConfigToSpectrometerProfile : spectrometerProfilesMapping
+ApplicationConfigToSpectrometerProfile "0..*" --> "1" SpectrometerProfile : spectrometerProfile
+
+SpectrometerProfile "0..*" --> "1" Spectrometer : spectrometer (shared)
+SpectrometerProfile "1" *-- "0..1" SpectrometerCalibrationProfile : calibration (owned, no cascade declared)
+
+SpectrometerCalibrationProfile "1" *-- "0..*" SpectralLine : spectralLines (cascade all, delete-orphan)
+SpectralLine "0..*" --> "1" SpectralLineMasterData : masterData (reference)
+
+Spectrometer "0..*" --> "1" SpectrometerSensor : sensor
+Spectrometer "0..*" --> "1" SpectrometerVendor : vendor
+Spectrometer "0..*" --> "1" SpectrometerStyle : style
+SpectrometerSensor "0..*" --> "1" SpectrometerSensorChip : chip
+
+MeasurementProfile "0..*" --> "1" SpectrometerProfile : spectrometerProfile
+
+note bottom of MeasurementProfile
+  STUB / unused. The entity exists but is never instantiated,
+  persisted, or shown; the "Measurement profiles" button is not wired.
+  Real measurements live in the in-memory SpectralJob / Spectrum
+  (NOT persisted). DbSpectrum is an empty stub (no mapping).
+end note
+
+legend right
+  Composition (<b>*--</b>) = owned: deleting the parent deletes the child.
+  Arrow (<b>--></b>) = FK reference to a SHARED row (do NOT delete with a profile).
+  <b><<catalog>></b> / <b><<reference>></b> = shared lookup data.
+  <b><<join>></b> = association row (registration mapping).
+  <b><<stub>></b> = defined but unused.
+endlegend
+
+@enduml

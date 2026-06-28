@@ -1,0 +1,38 @@
+@startuml spectral_workflow_concept
+title Spectracs — Spectral evaluation workflow: concept vs. implementation (recovered 2026-06-28)
+
+skinparam shadowing false
+skinparam ArrowColor #555555
+skinparam defaultTextAlignment center
+
+legend top right
+  |= color |= status |
+  |<#CDE7CE> | implemented |
+  |<#FFF2CC> | partial / prototype only |
+  |<#F8CECC> | missing |
+endlegend
+
+start
+#CDE7CE:Acquire **REFERENCE** (isopropanol)\n~50 frames (burst);
+note right: SpectrumSampleType.REFERENCE\nSpectralJob.spectraBySampleTypes
+#CDE7CE:Acquire **SAMPLE** (isopropanol + pumpkin-oil drops)\n~50 frames (burst);
+note right: SpectrumSampleType.SAMPLE
+#FFF2CC:Reduce frames → one spectrum\n(**median** intended · **mean** today);
+note right: SpectrumUtil.mean = numpy.mean\ngraph PLOT_SPECTRA_MEAN
+#F8CECC:**ABSORPTION**   A(λ) = −log10( SAMPLE / REFERENCE );
+note right: not implemented anywhere
+#FFF2CC:**PROCESSING**   baseline · smooth · rebin · normalize;
+note right: app: SpectrumUtil.removeBaseline (morphological), smooth (SavGol)\nprototype: Zhang baseline + spectres rebin (spectrasTest.py)
+partition "**EVALUATION**  (intended: pluggable 'evaluation profile')" {
+  #FFF2CC:**Spectrum → color → HUE**\nSD → XYZ (CIE 1931, D65) → xy → RGB → HLS;
+  note right: WORKS in spectrasTest.py\n(colour-science + luxpy + colorsys)\nNOT integrated into the app
+  #F8CECC:Judge HUE vs "perfect green"\n→ too brown / too green / perfect;
+  note right: only a ΔE primitive exists\n(SpectralColorUtil.getColorDifference, CIE2000)
+  #F8CECC:LDA classifier (Fisher);
+  note right: abandoned — oil spectra lack\ndiscriminating peaks; never coded
+}
+#FFF2CC:Render + signal result to frontend;
+note right: spectra render (pyqtgraph); no evaluation render
+stop
+
+@enduml

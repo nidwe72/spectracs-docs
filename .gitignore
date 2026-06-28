@@ -1,0 +1,10 @@
+# PlantUML renderer — large binary, download separately (see README)
+plantuml.jar
+
+# Python / editor cruft
+__pycache__/
+*.pyc
+*.bak
+*.bak.*
+.idea/
+.DS_Store
