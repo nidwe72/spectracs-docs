@@ -10,9 +10,11 @@ for optical spectroscopy with a DIY spectroscope).
   Diagrams: [`db_entities.svg`](db_entities.svg), [`runtime_models.svg`](runtime_models.svg).
 - **[`SPECTRAL_WORKFLOW_CONCEPT.md`](SPECTRAL_WORKFLOW_CONCEPT.md)** — the spectral **evaluation
   workflow**: the pumpkin-seed-oil QM purpose, the two-audience (master / end-user) model, the
-  one-workflow-many-plugins architecture, the `PluginState` data model and entry points, and the
-  trust/security model. Diagrams: [`spectral_workflow_concept.svg`](spectral_workflow_concept.svg),
-  [`plugin_model.svg`](plugin_model.svg).
+  one-workflow-many-plugins architecture, the §9 object model (static 5-phase spine, plugin-created
+  steps, the workflow-as-persisted-record), and the trust/security model. Diagrams:
+  [`plugin_model.svg`](plugin_model.svg),
+  [`workflow_object_model.svg`](workflow_object_model.svg).
+- **[`ROADMAP.md`](ROADMAP.md)** — the working backlog / agreed next steps to build (resume point).
 - `*.puml` — PlantUML sources for the diagrams.
 - `spectracs.gaphor` — an older (2023) Gaphor UML model, kept for reference.
 

@@ -1,5 +1,5 @@
 @startuml plugin_model
-title Spectracs — Two audiences · serial key · plugin model (concept, 2026-06-28)
+title Spectracs — Two audiences · serial key · plugin model (concept, rev 2026-06-28)
 
 skinparam shadowing false
 skinparam componentStyle rectangle
@@ -8,42 +8,46 @@ skinparam defaultTextAlignment center
 actor "Master (you)" as M
 actor "End user\n(oil producer)" as E
 
-component "SERIAL\n= key  → (future) unique username" as S #FFFACD
+component "AppUser\nserial = username" as S #FFFACD
 
-package "Resolved from the serial (future: downloaded on login)" {
+package "Config — bound to the AppUser (downloaded on login)" {
   component "SpectrometerProfile\n(device + calibration)" as P #CDE7CE
-  component "Plugin Module\n(typically one)" as PM #FFE6CC
+  component "Plugin\n(signed code; typically one)" as PM #FFE6CC
 }
 
-package "SpectralWorkflow — ONE, generic, shared by all scenarios" #EAF2FB {
-  component "ACQUISITION\n(entry point)" as A
-  component "PROCESSING\n(entry point)" as PR
-  component "EVALUATION\n(entry point)" as EV
-  component "RENDER → RESULT" as R
-  A --> PR
-  PR --> EV
-  EV --> R
+package "SpectralWorkflow — ONE static spine, shared by every scenario\n(persisted: it IS the run record, has a User)" #EAF2FB {
+  component "ACQUISITION" as A
+  component "PROCESSING" as PR
+  component "EVALUATION" as EV
+  component "METADATA" as MD
+  component "PUBLISHING" as PB
+  A -> PR
+  PR -> EV
+  EV -> MD
+  MD -> PB
 }
 
-package "Plugin Module variants (fill the entry points)" {
+package "Plugin variants — one phase-hook per phase, each CREATES that phase's steps" {
   component "Pumpkin\nevaluation = spectrum → hue → green/brown" as PU #FFF2CC
   component "Olive\nevaluation = LDA classification" as OL #FFF2CC
 }
 
-M --> P : creates + calibrates
-M --> PM : authors + publishes
-E --> S : login / enter serial
-S --> P : keys
-S --> PM : keys
-PM ..> A : fills
-PM ..> PR : fills
-PM ..> EV : fills
+M --> P  : creates + calibrates
+M --> PM : authors + signs + publishes
+E --> S  : login / enter serial
+S --> P  : binds
+S --> PM : binds
+PM ..> A  : creates steps
+PM ..> PR : creates steps
+PM ..> EV : creates steps
+PM ..> MD : creates steps (or skips)
+PM ..> PB : creates steps
 PU --|> PM
 OL --|> PM
 
-note bottom of R
-  The end user sees ONLY this result (e.g. a color swatch + verdict).
-  No spectra, no profiles, no calibration.
+note bottom of PB
+  Host owns Next-navigation + persistence; the plugin never persists.
+  End user sees ONLY the result (swatch + verdict) / the PDF.
 end note
 
 @enduml

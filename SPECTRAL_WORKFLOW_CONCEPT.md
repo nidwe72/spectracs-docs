@@ -3,8 +3,8 @@
 > Recovered 2026-06-28 by reading the code three years after it was written. Captures the **original
 > intent** behind `SpectralWorkflow` / `SpectraContainer` / the evaluation idea, and reconciles it
 > against what is **actually implemented**. Companion diagrams:
-> [`spectral_workflow_concept.svg`](spectral_workflow_concept.svg) (the pipeline) and
-> [`plugin_model.svg`](plugin_model.svg) (the two-audience / plugin model, §7–8).
+> [`plugin_model.svg`](plugin_model.svg) (two-audience / plugin model, §7–8) and
+> [`workflow_object_model.svg`](workflow_object_model.svg) (the §9 object model).
 > See also [`DB_ENTITIES.md`](DB_ENTITIES.md) and [`runtime_models.svg`](runtime_models.svg).
 >
 > **⚠ Maintenance rule:** §§7–11 are the **to-be design**, not yet built. When the object model or the
@@ -47,7 +47,7 @@ source spectra → operations → pluggable evaluation → render. That engine i
             RENDER + signal result to the frontend
 ```
 
-(Colored status version: `spectral_workflow_concept.svg`.)
+(Per-stage build status: see the table in §3.)
 
 ## 3. Concept → implementation status
 
@@ -96,7 +96,8 @@ numpy is pinned `<2`.)
 ```
 SpectralWorkflow                      ← the generic phase engine          (UNWIRED)
   phases : { SpectralWorkflowPhaseType → SpectralWorkflowPhase }
-                                         types defined: ACQUIREMENT, ACQUIREMENT_VIEW only
+                                         types defined: ACQUIREMENT, ACQUIREMENT_VIEW only (dead;
+                                         ACQUIREMENT_VIEW dropped in §9 — viewing is a step property)
      SpectralWorkflowPhase
         steps : { id → SpectralWorkflowStep }
            SpectraContainer            ← a step's data: source spectra + derived spectra
@@ -109,9 +110,11 @@ SpectralWorkflow                      ← the generic phase engine          (UNW
 pipeline needs (a calibration/processing/evaluation step would read `sourceSpectraContainer`, run an
 operation, and store results in `spectra`). It is unwired and has a duplicate-`__init__` bug.
 
-> **Superseded:** the settled, simplified data model is in **§9** — named bags + `inputs[]` +
-> `producedBy`, with the recursive `spectraContainers` tree dropped and `sourceSpectraContainer`
-> replaced by a list `inputs`.
+> **Superseded:** the settled object model is in **§9** (revised 2026-06-28) — a static 5-phase spine
+> with plugin-created steps; `SpectraContainer` = named bags + `inputs[]` + `producedBy(step)`;
+> `SpectralJob` folded into the acquisition container and **deleted**; `SpectralWorkflow` itself is the
+> persisted record. The recursive `spectraContainers` tree is dropped and `sourceSpectraContainer`
+> becomes the list `inputs`.
 
 ## 6. Gaps to realize the concept (no code yet — for planning)
 
@@ -152,9 +155,11 @@ spectra, profiles, calibration, or evaluation setup.
 
 **Corrected understanding (supersedes any "module = a separate workflow" reading):**
 
-- **`SpectralWorkflow` is single and generic** — one fixed phase pipeline
-  (ACQUISITION → PROCESSING → EVALUATION → RENDER) shared by *every* scenario. Each phase exposes an
-  **entry point**.
+- **`SpectralWorkflow` is single and generic** — one fixed phase **spine**, the same for *every*
+  scenario: **ACQUISITION → PROCESSING → EVALUATION → METADATA → PUBLISHING**. The spine (the set of
+  phase *types*) is **static**; what varies per scenario is the **steps inside each phase**, which the
+  plugin creates (§9). Each phase exposes one **entry point**; *rendering is no longer a phase* — it is a
+  property of a step (a step may carry a view).
 - A **Plugin Module** is the per-scenario implementation that **fills those entry points** (how to
   acquire / process / **evaluate**). Same skeleton, different organs:
   - **Pumpkin module** → evaluation = spectrum → **hue** → green/brown verdict (the `spectrasTest.py`
@@ -170,9 +175,50 @@ This is what `SpectralWorkflow` / `SpectraContainer` were scaffolded for; the **
 does not exist in code yet** (no plugin system — the "Evaluation profiles" Settings button is the
 nearest dead placeholder).
 
-# 9. Settled data model & plugin entry points (design — supersedes the as-built §5 `SpectraContainer`)
+# 9. Settled object model & plugin entry points (design — supersedes the as-built §5)
 
-## 9.1 Container — one stage of a run
+> **Revised 2026-06-28.** Replaces the earlier `PluginState`-threaded draft. The model now rests on a
+> **static phase spine** with **plugin-created steps**, and the `SpectralWorkflow` *itself* is the
+> persisted record. `SpectralJob`, `PluginState`, and the separate "measurement-record" entity are all
+> gone (§9.1, §9.4, §9.5). Class diagram: [`workflow_object_model.svg`](workflow_object_model.svg).
+> Illustrative plugin code: **Appendix A**.
+
+## 9.1 The static spine, the dynamic steps
+
+The model turns on one split:
+
+- **Static — the phase *types*.** Every scenario walks the same fixed spine of five phases. This is the
+  `SpectralWorkflowPhaseType` enum and it never changes:
+
+  ```
+  ACQUISITION → PROCESSING → EVALUATION → METADATA → PUBLISHING
+  ```
+
+- **Dynamic — the *steps* inside a phase.** The plugin decides, per scenario, how many steps a phase has
+  and what each does. A phase is a fixed slot; its `steps` are created at runtime by the plugin's hook
+  for that phase (§9.4). A phase whose hook creates zero steps is **auto-skipped** by the host (no tab, no
+  `Next` stop) — this is the general opt-out: any phase, METADATA included, is skipped via an empty/no-op hook.
+
+So `SpectralWorkflowPhase` is "static" only in that the *set of phases* is fixed — its **`steps` are
+plugin-controlled**. Rendering is **not** a phase: the old `ACQUIREMENT_VIEW` and `RESULT` were really
+*views*, so here "does this show a tab?" is a property of a **step** (§9.3). The absorption plot is a
+PROCESSING step with a view; the colour swatch is the EVALUATION step's view.
+
+```
+SpectralWorkflow                       ← the run AND the persisted record (§9.5); has a User
+  phases : { phaseType → SpectralWorkflowPhase }    # fixed 5 — the static spine
+     SpectralWorkflowPhase
+        entryPoint : the plugin hook for this phase (§9.4)
+        steps      : [ SpectralWorkflowStep ]        # plugin-created; one tab each if it has a view
+           SpectralWorkflowStep (§9.3)
+              container        : SpectraContainer?    # spectral data (§9.2)
+              evaluationResult : EvaluationResult?
+              document / email : Pdf? / Email?
+              persist          : bool                 # per-step save mark (§9.5)
+              view / widget    : transient — host-built, not saved
+```
+
+## 9.2 Container — one stage of a run
 
 A **`SpectraContainer`** is a dict of **named bags** of spectra that remembers its lineage:
 
@@ -180,132 +226,182 @@ A **`SpectraContainer`** is a dict of **named bags** of spectra that remembers i
 SpectraContainer:
     spectra    : { role(str) → [Spectrum] }   # named bags: "reference","sample","absorption",…
     inputs     : [SpectraContainer]            # provenance = operands (a LIST — absorption needs 2)
-    producedBy : Operation / Step              # who/what produced this container
+    producedBy : SpectralWorkflowStep          # the step that produced this container
 ```
 
-This is the **same shape as today's `SpectralJob.spectraBySampleTypes`**, generalized so the role can
-be a *derived* label (not just a captured sample type) and the container records its lineage. The
-as-built recursive `spectraContainers` **tree is dropped** (never needed) and the singular
-`sourceSpectraContainer` **becomes `inputs: [ ]`** (a list).
+This is the **same shape as the now-retired `SpectralJob.spectraBySampleTypes`** — which is why
+**`SpectralJob` is folded into `SpectraContainer` and deleted**. `SpectralJob` was nothing but *the
+container an ACQUISITION step produces*: bags keyed by `SpectrumSampleType`, each holding the burst of
+~50 raw captures. The "many captures → mean/median" reduction it implied is **not** acquisition's job —
+it is the first PROCESSING step (the acquisition tab *previews* that mean live, drawn over the ~50 raw
+captures, but the median step is its canonical, persisted producer). The as-built recursive
+`spectraContainers` tree is dropped; the singular
+`sourceSpectraContainer` becomes the list `inputs`.
 
-Example run (pumpkin), each container linking back to the last:
-
-```
-C0 { reference:[50], sample:[50] }  inputs=—   producedBy=Acquisition
-C1 { reference:[1],  sample:[1] }    inputs=[C0] producedBy=MedianOp
-C2 { absorption:[A] }                inputs=[C1] producedBy=AbsorptionOp   (A=−log10(sample/reference))
-C3 { absorption:[A'] }               inputs=[C2] producedBy=BaselineOp
-```
-
-`inputs` (operands) + `producedBy` (operator) give full **provenance** back to the raw frames; a
-plugin can walk it to reach the physical measurements.
-
-## 9.2 Two spectra sources for a plugin
-
-1. the **live measurement** — the container chain above; and
-2. the plugin's **own reference data** — pumpkin: the "perfect-green" color; olive: the LDA
-   **training-set spectra** — **bundled/downloaded with the plugin**, *not* part of the measurement.
-
-## 9.3 The entry points — all threaded through `PluginState`
-
-Every phase has the **same uniform signature** `(PluginState) → PluginState`: each reads earlier slots
-and fills its own. `PluginState` is the single object that accumulates the whole run:
+Example run (pumpkin); `producedBy` is now the *step*:
 
 ```
-PluginState:
-    device      : Device
-    acquisition : AcquisitionSpec           # filled by acquire (the measurement steps; §9.4)
-    metadata    : dict | None                # filled by the METADATA phase (declarative form; §9.5)
-    container   : SpectraContainer | None    # current spectra (+ provenance via .inputs)
-    result      : Result | None              # filled by evaluate (DATA, not a widget)
-    view        : ViewSpec | None            # filled by render (DECLARATIVE, not a QWidget)
-    widget      : QWidget | None             # filled by the HOST from `view` (plugins ship no Qt)
+C0  { reference:[50] }            inputs=—           producedBy=Acq/REFERENCE step  ┐ two acquisition
+C0' { sample:[50] }               inputs=—           producedBy=Acq/SAMPLE step     ┘ steps, one bag each
+C1  { reference:[1], sample:[1] } inputs=[C0,C0']    producedBy=Proc/median step
+C2  { absorption:[A] }            inputs=[C1]        producedBy=Proc/absorption step (A=−log10(sample/reference))
+C3  { absorption:[A'] }           inputs=[C2]        producedBy=Proc/baseline step
 ```
 
-| Phase | Plugin fills | Pumpkin | Olive |
-|---|---|---|---|
-| **acquire** | `state.acquisition` = ordered `[MeasurementStep]` (§9.4) | REFERENCE + SAMPLE ×50 | SAMPLE ×50 |
-| **process** | `state.container` via an ordered **recipe** of Operations | median → absorption → baseline | median → baseline → normalize |
-| **evaluate** | `state.result` (a `Result`, using `self.referenceData()`) | hue vs perfect-green | LDA vs training set |
-| **render** | `state.view` (a declarative `ViewSpec`) | `ColorSwatchView` | `ClassLabelView` |
-| **metadata** | `state.metadata` from a plugin-declared form (§9.5) | remark + roasting temp | scenario fields |
+Each ACQUISITION step owns a **single-bag** container; the absorption step pulls
+`inputs=[referenceStep.container, sampleStep.container]`. `inputs` + `producedBy` give full
+**provenance** back to the raw frames.
 
-- **Two layers.** Phases speak `PluginState → PluginState` (outer); the **Operations** inside `process`
-  speak `SpectraContainer → SpectraContainer` (inner, reusable). The engine runs the recipe and stamps
-  `inputs`/`producedBy` automatically → free provenance. Operations (median, absorption, baseline,
-  normalize, smooth) are a **shared library**; the plugin only *lists* them.
-- **Qt-free plugins.** `evaluate` produces **data** (`Result`); `render` produces a **declarative**
-  `ViewSpec`; the **host** turns `view` → real `QWidget` (`state.widget`). Plugins never import Qt.
-- **Discipline:** each phase fills *its own* slot and only reads earlier ones (keeps `PluginState` from
-  degrading into a god-object).
+## 9.3 The Step — carrier of data + view
 
-## 9.4 Acquisition spec — declarative, drives the master GUI
+A `SpectralWorkflowStep` has **no entry point of its own** (that lives on the phase, §9.4). It carries one
+unit of work and at most one tab:
 
-`acquire` declares an **ordered list of measurement steps**; the host renders one tab per step (order +
-label + mandatory enforced). The plugin never pokes the GUI.
+```
+SpectralWorkflowStep:
+    # durable — saved as part of the workflow (§9.5)
+    container        : SpectraContainer?    # spectra (saved per the `persist` mark)
+    evaluationResult : EvaluationResult?     # a CONTAINER of renderable view-models (ColorSwatch, Label, Verdict, …)
+    document         : Pdf?                   # PUBLISHING — file-on-disk + DB reference (built by a host report util)
+    email            : Email?                 # PUBLISHING — POSTPONED (transport/recipient TBD)
+    persist          : bool                   # per-step save mark
+    # transient — host-built, never saved
+    view             : ViewSpec?              # declarative; the host turns it into a tab
+    widget           : QWidget?               # the realised tab; rebuilt from durable data on reopen
+```
+
+A step is either **interactive** (its view *collects* input — a live-video acquisition tab, a metadata
+form) or **computed** (its data is produced by the phase hook — absorption, evaluation, PDF). A purely
+headless step (e.g. median) may carry no view at all.
+
+## 9.4 Phase entry points — one per phase; they *create the steps*
+
+Each phase has exactly **one plugin entry point**. Running it **creates that phase's `steps`**, fills
+their durable data — or, for interactive phases, *declares* the input steps the host will fill — and the
+host then renders one tab per viewable step. The hook is handed the **`SpectralWorkflow`** itself and
+reaches every earlier phase's steps through it, so there is **no separate `PluginState`**: the workflow
+*is* the accumulating state.
+
+A plugin is **one class with five hooks**, one per phase type, plus its bundled reference data:
 
 ```python
-def acquire(self, state):
-    state.acquisition = AcquisitionSpec([
-        MeasurementStep(role=REFERENCE, label="Isopropanol (reference)", frames=50, mandatory=True),
-        MeasurementStep(role=SAMPLE,    label="Pumpkin oil",            frames=50, mandatory=True),
-    ])
-    return state
+class SpectralPlugin:
+    def acquisition(self, workflow): ...   # DECLARE the ACQUISITION steps (interactive video tabs)
+    def processing(self, workflow):  ...   # CREATE+FILL the PROCESSING steps (median, absorption, …)
+    def evaluation(self, workflow):  ...   # CREATE+FILL the EVALUATION step (criteria live in this code)
+    def metadata(self, workflow):    ...   # DECLARE the METADATA step (a form; empty hook = phase skipped)
+    def publishing(self, workflow):  ...   # CREATE+FILL the PUBLISHING steps (PDF; email postponed)
+```
+
+- **Interactive phases** (ACQUISITION, METADATA): the hook *declares* steps and their view kind (video,
+  form); the **host fills them from the user** — captures frames into the container, writes the form
+  values.
+- **Computed phases** (PROCESSING, EVALUATION, PUBLISHING): the hook *creates and fills* the steps when
+  the host runs it on **Next**. The reusable **Operations** (median, absorption, baseline, normalize,
+  smooth — each `SpectraContainer → SpectraContainer`) remain a shared library the plugin composes.
+
+The host owns navigation (the main-buttons-bar **Next**) and runs each phase's hook at the right moment.
+
+**Acquisition declaration** — example of an interactive hook; the host renders one tab per step:
+
+```python
+def acquisition(self, workflow):
+    phase = workflow.getPhase(ACQUISITION)
+    phase.addStep(MeasurementStep(role=REFERENCE, label="Isopropanol (reference)", frames=50, mandatory=True))
+    phase.addStep(MeasurementStep(role=SAMPLE,    label="Pumpkin oil",            frames=50, mandatory=True))
 # olive: a single SAMPLE step; a 3-step case can prepend a BLANK step. The label is the tab title.
 ```
 
-## 9.5 The run as a phase sequence (screens + headless + host persistence)
+**The plugin's criteria & reference data:** beyond the **live measurement** (the container chain it
+builds), each plugin needs its own decision criteria — pumpkin's "perfect-green" hue + threshold bands,
+olive's LDA training set. **The plugin code itself is the source of truth**: criteria are constants/logic
+in the plugin, and larger assets (the LDA model) are bundled with it. There is **no separate
+`referenceData()` hook** — the `evaluation` hook just uses what the plugin carries.
 
-The entry points generalize into an **ordered list of phases** the host runs — owning navigation (the
-main-buttons-bar **Next**) and persistence. Phases alternate **screens** (the plugin declares a
-view/form; the host renders it) with **headless compute** (the host runs it on `Next`). This matches the
-existing `SpectralWorkflowPhase` scaffolding — we just grow the phase types beyond today's
-`ACQUIREMENT` / `ACQUIREMENT_VIEW`.
+## 9.5 Persistence — the workflow *is* the record
 
-Pumpkin run:
+What gets saved is the **`SpectralWorkflow` itself**: simultaneously the live runtime object and the
+stored measurement record. It gains a **`User`** (the username / serial). There is **no** separate
+"measurement-run" entity, and **no** `MeasurementProfile` / `DbSpectrum`.
+
+- **Durable** (saved): the phase/step structure, each step's `container` spectra **subject to its
+  `persist` mark**, `evaluationResult`, `document` (PDF), `email`, the METADATA values, the `User`, and a
+  timestamp.
+- **Transient** (dropped on save, **rebuilt on reopen**): each step's `view` / `widget`. Reopening a
+  saved workflow re-renders the tabs *from* the durable data — exactly "view the result and how it was
+  obtained."
+
+Save rules:
+- **Only the reduced MEAN spectra are persisted** (one per sample type). The raw acquisition bursts
+  (~50 each) are **transient** — the acquisition tab plots all 50 captures with their **mean overlaid
+  above them** for live feedback, but the raw frames are **never saved**.
+- **Later derived spectra → opt-in**: the plugin sets `persist=True` on the ones worth keeping — notably
+  the **absorption** spectrum, the basis of the evaluation.
+- **`evaluationResult` → persisted** (the renderable view-models that make up the result). *How the host
+  turns those view-models into the result tab — the GUI integration — is **deferred**.*
+- **`document` (PDF) → built by a host report utility** from the completed workflow, **stored in the
+  filesystem** with only a **reference kept in the DB** (no BLOB). Contents/personalization TBD.
+- **Email → postponed** (transport, recipient, send-record — section C, deferred).
+
+**Two deletions this locks in** (dead placeholders, superseded by the above):
+- **`DbSpectrum`** — literally `class DbSpectrum: pass`, never a table. Deleted.
+- **`MeasurementProfile`** — an `id` + FK-to-`SpectrometerProfile` stub behind a dead Settings button.
+  Its meaning ("the configured thing a user runs") is now the **config binding** below. Deleted.
+
+**Plugin boundary (refined).** Plugins stay Qt-free and **never call persistence** — the **host (the
+client invoking the plugin) persists**. The plugin *does* now read and create pieces of a *persistable*
+workflow — a conscious softening of the old "DB-free" line, acceptable under the first-party-trusted
+model of §11: the plugin manipulates the entities; the host saves them.
+
+**Config binding (who runs what)** — separate from the run record, the *configuration* hangs off the
+user:
 
 ```
-[ACQUIREMENT]      capture REFERENCE + SAMPLE                screen: measurement tabs (§9.4)
-   │ Next → PROCESSING (median→absorption→baseline)          headless
-[ACQUIREMENT_VIEW] show the ABSORPTION spectrum              screen: spectrum plot (ViewSpec)
+AppUser → { SpectrometerProfile ,  Plugin }
+            (the calibrated unit)   (NEW entity: the signed plugin code + version — §11)
+```
+
+`AppUser` (the auth entities, `SPEC_user_auth_login.md`) has roles today but no link to a profile or
+plugin — both references are new wiring. Serial = username (§7); login downloads the profile + the plugin.
+
+**Cost (on record).** The `model/spectral/` classes (`SpectralWorkflow`, `…Phase`, `…Step`,
+`SpectraContainer`, `Spectrum`) are plain Python today, not SQLAlchemy. Making the workflow the record
+means **promoting them to persistable entities** (mapping them like the rest of `databaseEntity/`).
+
+## 9.6 The pumpkin run, end to end
+
+```
+[ACQUISITION] hook declares 2 steps → REFERENCE + SAMPLE video tabs; host captures ~50 frames each
+   │            (tab plots all 50 with their mean overlaid above; only the mean is persisted)
    │ Next
-[METADATA]         remark + roasting temp (both mandatory)   screen: plugin-declared FORM
-   │ Next → EVALUATION (hue → verdict)                       headless
-[RESULT]           color swatch + verdict                    screen: ColorSwatchView
-   │ Finish → PERSIST (spectra + metadata + result)          headless — HOST, never the plugin
+[PROCESSING]  hook creates steps: median (→ mean spectra) → absorption (−log10 s/r, persist=True)
+   │           → optional baseline; the absorption step carries a spectrum-plot view (a tab)
+[EVALUATION]  hook creates 1 step: hue(absorption) vs perfect-green → evaluationResult; swatch view
+   │ Next
+[METADATA]    hook declares 1 form step: remark + roasting-temp (both mandatory); host fills it
+   │ Next
+[PUBLISHING]  hook creates 2 steps: PDF (view = PDF tab, persist) + email-to-lab (send record)
+   │ Finish → HOST persists the workflow (durable subset) against User + timestamp
 ```
 
-- **METADATA entry point** — declarative, like acquisition: the plugin declares fields; the host builds
-  the controls, enforces `mandatory`, and writes values into `state.metadata`:
-
-  ```python
-  def metadataSpec(self):
-      return MetadataForm([
-          Field("remark",              kind=TEXT,   label="Remark",             mandatory=True),
-          Field("roastingTemperature", kind=NUMBER, label="Roasting temp (°C)", mandatory=True),
-      ])
-  ```
-
-- **Persistence = host, not the plugin** (plugins are DB-free). At `Finish` the host saves the whole
-  `PluginState` (spectra + `metadata` + `result`) against the serial/profile + a timestamp. ⚠️ This is
-  **unbuilt today** — `DbSpectrum` is an empty stub and `MeasurementProfile` is unused — so it needs a
-  **measurement-record schema** (this is where `MeasurementProfile` finally earns its purpose; see
-  `DB_ENTITIES.md`).
-
-**Open — decide before building this part:**
-1. **Phase order** — METADATA before RESULT/evaluation (as drawn, so the saved record is complete), or RESULT first?
-2. **Who owns the phase sequence** — **plugin-declared** (olive can differ: no absorption view, other metadata) *(leaning)*, or a fixed host sequence the plugin only fills?
-3. **Persistence scope** — store the raw 50+50 frames, or only the derived spectra (medians, absorption)? And revive `MeasurementProfile`/`DbSpectrum`, or model a fresh "measurement run" entity?
+**Resolved (2026-06-28):**
+1. **Save scope** — **only the reduced mean spectra are persisted**; the raw ~50-frame bursts are
+   transient (shown live with the mean overlaid, never saved). Later derived spectra (e.g. absorption)
+   persist on the plugin's `persist` mark.
+2. **Promotion approach** — **map the `model/spectral/` classes to SQLAlchemy directly** (one class is
+   both the runtime object and the DB row); the workflow *is* the record.
+3. **Phase skipping** — METADATA is kept, after EVALUATION. Any phase is **skippable** via an empty/no-op
+   hook (zero steps) → the host shows no tab and does not stop there.
 
 # 10. Plugin architecture — the SDK and the host/plugin split
 
-A Plugin Module is **one class** (`SpectralPlugin`) with the four `PluginState`-threaded hooks plus
-`referenceData()`. It imports from **exactly one** curated namespace — the **Plugin SDK** — which is both
-the convenient toolbox and the boundary of what a plugin can reach:
+A Plugin Module is **one class** (`SpectralPlugin`) with **five per-phase hooks** (§9.4). It imports from
+**exactly one** curated namespace — the **Plugin SDK** — which is both the convenient toolbox and the
+boundary of what a plugin can reach:
 
 ```
 spectracs.plugin_sdk
-  ├─ data   : Spectrum, SpectraContainer, PluginState, SpectrumSampleType, Result types
+  ├─ data   : SpectralWorkflow, SpectraContainer, Spectrum, SpectrumSampleType, EvaluationResult types
   ├─ ops    : MedianOp, AbsorptionOp, BaselineOp, NormalizeOp, SmoothOp   (container → container)
   ├─ util   : ColorUtil (spectrum → hue), …            ← the step-1 color utility lands here
   └─ views  : ColorSwatchView, ClassLabelView, SpectrumPlotView   (declarative ViewSpecs)
@@ -316,19 +412,21 @@ from spectracs.plugin_sdk import SpectralPlugin, MeasurementStep, AcquisitionSpe
     MedianOp, AbsorptionOp, BaselineOp, ColorUtil, ColorResult, ColorSwatchView, REFERENCE, SAMPLE
 ```
 
-Reference data (the plugin's *second* spectra source — pumpkin's perfect-green, olive's training set) is
-**bundled inside the plugin** and returned by `referenceData()`.
+Decision criteria and reference assets (pumpkin's perfect-green hue + thresholds, olive's LDA model) live
+**in / bundled with the plugin code itself** — the plugin is the source of truth; there is no
+`referenceData()` hook.
 
 Layering:
 
 ```
 HOST  (trusted — full access to Qt, DB, filesystem, device)
-  ├─ Workflow engine     runs phases, threads PluginState
+  ├─ Workflow engine     runs the phase hooks, owns the SpectralWorkflow, PERSISTS it
   ├─ Plugin SDK          the ONLY surface a plugin imports
-  ├─ View renderer       ViewSpec → real QWidget → state.widget
+  ├─ View renderer       step.view (ViewSpec) → real QWidget → step.widget
   └─ Plugin loader       loads + SIGNATURE-VERIFIES downloaded plugins
-PLUGIN  (trusted, but Qt-free & DB-free by construction)
+PLUGIN  (trusted; Qt-free; never persists — the host does, §9.5)
   imports only spectracs.plugin_sdk · pure logic + declarative specs
+  reads/creates the (persistable) workflow entities; the host saves them
 ```
 
 # 11. Trust & security model
@@ -345,6 +443,10 @@ PLUGIN  (trusted, but Qt-free & DB-free by construction)
 
 # 12. Agreed build sequence (discussion-locked; implement on explicit request only)
 
+> The fuller, current next-steps backlog (login UI, profile↔user binding, user CRUD, virtual-spectrometer
+> picture sets, the pumpkin workflow milestone) lives in [`ROADMAP.md`](ROADMAP.md). The three steps below
+> are the original spine of that plan.
+
 1. **Extract the color utility** — lift the proven `spectrasTest.py` hue pipeline into a utility/logic
    class (`ColorUtil.spectrumToHue(...)`; eventual home `spectracs.plugin_sdk.util.ColorUtil`, §10) so
    the essential, hard-won color math is **safe and reusable**. Stands alone (no dependency on roles or
@@ -353,7 +455,134 @@ PLUGIN  (trusted, but Qt-free & DB-free by construction)
    `spectres`, `BaselineRemoval`, `rgbxy`, `pyspectra`, `pandas`; check what's installed and whether
    `colour` + `colorsys` can cover most of it.
 2. **Login + user roles** — the master ↔ end-user role gate (show/hide).
-3. **Actually run the "workflow"** — wire `SpectralWorkflow` with its **phase sequence** (§9.5) + the
-   plugin entry points, end-to-end, with **pumpkin color** as the first concrete plugin. Includes
-   host-owned **Next** navigation, the **METADATA** form, and host **persistence** — which needs a new
-   **measurement-record schema** (the currently-unbuilt part; `DbSpectrum`/`MeasurementProfile`).
+3. **Actually run the "workflow"** — wire `SpectralWorkflow` with its **static 5-phase spine** (§9) + the
+   five plugin phase hooks, end-to-end, with **pumpkin color** as the first concrete plugin. Includes
+   host-owned **Next** navigation, the **METADATA** form, and host **persistence of the workflow itself**
+   (§9.5) — which means **promoting the `model/spectral/` classes to persistable entities**, **deleting**
+   `DbSpectrum` + `MeasurementProfile`, and adding the `AppUser → {SpectrometerProfile, Plugin}` binding
+   plus the new `Plugin` entity.
+
+---
+
+# Appendix A — Illustrative plugin sketches (NON-NORMATIVE)
+
+> **Illustrative only.** The SDK names below are for *feel*, not a finalized API — they show how the §9
+> model reads as plugin code and confirm the abstraction holds for both scenarios. GUI integration of
+> `EvaluationResult` (rendering the view-models into tabs) is **deferred**.
+
+**Same 5-phase spine, different organs** — the only things that genuinely move are *the steps a phase
+creates* and *the criterion in `evaluation`*:
+
+| Phase | Pumpkin (colour QM) | Olive (classifier) | What differs |
+|---|---|---|---|
+| ACQUISITION | REFERENCE + SAMPLE (2 steps) | SAMPLE only (1 step) | # of steps |
+| PROCESSING | median → **absorption** → baseline | median → clean (no absorption — no reference to divide by) | which ops |
+| EVALUATION | spectrum → hue → green/brown verdict | LDA → class label | the criterion |
+| METADATA | remark + roasting temp | *(empty hook → skipped)* | present vs skipped |
+| PUBLISHING | PDF (email later) | PDF (email later) | same |
+
+```python
+from spectracs.plugin_sdk import (
+    SpectralPlugin, ACQUISITION, PROCESSING, EVALUATION, METADATA, PUBLISHING,
+    MeasurementStep, Step, MetadataForm, Field, TEXT, NUMBER, REFERENCE, SAMPLE,
+    MedianOp, AbsorptionOp, BaselineOp, NormalizeOp,            # shared container->container ops
+    ColorUtil,                                                  # the spectrasTest.py hue math
+    EvaluationResult, ColorSwatch, ColorSample, Label, Verdict, # renderable view-models
+    SpectrumPlotView, PdfView, ReportUtil,                      # ReportUtil = host: workflow->PDF on disk
+)
+
+
+class PumpkinOilPlugin(SpectralPlugin):
+    name          = "Pumpkin-seed-oil colour QM"
+    serialPattern = "PMP-*"
+
+    # -- the criterion: the plugin code IS the source of truth --
+    PERFECT_GREEN_HUE = 0.28
+    GREEN_BAND        = (0.22, 0.34)          # inside -> GREEN/PERFECT; below -> BROWN; above -> UNDER
+
+    def acquisition(self, workflow):          # interactive -- host fills from the camera
+        p = workflow.phase(ACQUISITION)
+        p.addStep(MeasurementStep(REFERENCE, label="Isopropanol (reference)", frames=50, mandatory=True))
+        p.addStep(MeasurementStep(SAMPLE,    label="+ pumpkin oil (sample)",  frames=50, mandatory=True))
+        # host plots all 50 captures/tab with the mean overlaid; only the mean persists
+
+    def processing(self, workflow):           # headless -- runs on Next
+        ref = workflow.container(ACQUISITION, REFERENCE)        # {reference:[50]}
+        smp = workflow.container(ACQUISITION, SAMPLE)            # {sample:[50]}
+        p   = workflow.phase(PROCESSING)
+        mean = p.compute("mean",       [MedianOp()],     inputs=[ref, smp])         # {reference:[1], sample:[1]}
+        absn = p.compute("absorption", [AbsorptionOp()], inputs=[mean],             # A = -log10(sample/reference)
+                         persist=True, view=SpectrumPlotView("Absorption A(lambda)"))
+        p.compute("baseline", [BaselineOp(), NormalizeOp()], inputs=[absn])         # cleaned curve for evaluation
+
+    def evaluation(self, workflow):
+        spectrum = workflow.container(PROCESSING, "baseline").spectrum("absorption")
+        hls      = ColorUtil.spectrumToHue(spectrum)            # hue / lightness / saturation / rgb
+        result   = EvaluationResult([
+            ColorSwatch(rgb=hls.rgb,                                    label="Measured colour"),
+            ColorSample(rgb=ColorUtil.hueToRgb(self.PERFECT_GREEN_HUE), label="Perfect green"),
+            Label(f"hue {hls.hue:.3f} - L {hls.lightness:.2f} - S {hls.saturation:.2f}"),
+            Verdict(self._judge(hls.hue)),                       # GREEN / PERFECT / BROWN / UNDER
+        ])
+        workflow.phase(EVALUATION).addStep(Step("colour", result=result))
+
+    def _judge(self, hue):
+        lo, hi = self.GREEN_BAND
+        if hue < lo:  return "BROWN"
+        if hue > hi:  return "UNDER"
+        return "PERFECT" if abs(hue - self.PERFECT_GREEN_HUE) < 0.03 else "GREEN"
+
+    def metadata(self, workflow):
+        workflow.phase(METADATA).addForm(MetadataForm([
+            Field("remark",              TEXT,   label="Remark",             mandatory=True),
+            Field("roastingTemperature", NUMBER, label="Roasting temp (C)",  mandatory=True),
+        ]))
+
+    def publishing(self, workflow):
+        pdf = ReportUtil.build(workflow)                         # host util -> PDF on disk, returns a Pdf ref
+        workflow.phase(PUBLISHING).addStep(Step("report", document=pdf, persist=True, view=PdfView(pdf)))
+        # email step -> POSTPONED
+
+
+class OliveOilPlugin(SpectralPlugin):
+    name          = "Olive-oil classifier"
+    serialPattern = "OLV-*"
+    _LDA_MODEL    = "olive_lda.pkl"           # bundled WITH the plugin (source of truth)
+
+    def acquisition(self, workflow):
+        workflow.phase(ACQUISITION).addStep(                    # one step -- no reference
+            MeasurementStep(SAMPLE, label="Olive oil (sample)", frames=50, mandatory=True))
+
+    def processing(self, workflow):
+        smp = workflow.container(ACQUISITION, SAMPLE)
+        p   = workflow.phase(PROCESSING)
+        mean = p.compute("mean",  [MedianOp()],                inputs=[smp])
+        p.compute("clean", [BaselineOp(), NormalizeOp()],      inputs=[mean],        # NO absorption (no reference)
+                  persist=True, view=SpectrumPlotView("Sample spectrum"))
+
+    def evaluation(self, workflow):
+        spectrum          = workflow.container(PROCESSING, "clean").spectrum("sample")
+        label, confidence = self._classify(spectrum)           # LDA lives in the plugin
+        result = EvaluationResult([
+            Label(f"Class: {label}"),
+            Label(f"Confidence: {confidence:.0%}"),
+            Verdict(label),
+        ])
+        workflow.phase(EVALUATION).addStep(Step("class", result=result))
+
+    def metadata(self, workflow):
+        pass                                                    # empty -> METADATA phase auto-skipped
+
+    def publishing(self, workflow):
+        pdf = ReportUtil.build(workflow)
+        workflow.phase(PUBLISHING).addStep(Step("report", document=pdf, persist=True, view=PdfView(pdf)))
+
+    def _classify(self, spectrum):
+        ...                                                     # load bundled LDA, project, return (class, confidence)
+```
+
+**What the sketch confirms:** the spine never appears in plugin code (the host walks it and calls each
+hook); `compute(name, ops, inputs, …)` is the whole inner engine (it auto-stamps `inputs`/`producedBy`);
+olive's empty `metadata()` exercises phase-skipping and its missing absorption is exactly why
+steps-per-phase had to be dynamic; and the criterion is just plugin methods + constants/bundled assets
+(`_judge` / `_classify`) — "the plugin is the source of truth," concretely.

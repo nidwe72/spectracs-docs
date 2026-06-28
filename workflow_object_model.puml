@@ -1,0 +1,170 @@
+@startuml workflow_object_model
+title Spectracs — SpectralWorkflow object model (to-be design, §9, rev 2026-06-28)
+
+hide circle
+hide empty methods
+skinparam linetype ortho
+skinparam classFontSize 12
+skinparam class {
+  BackgroundColor White
+  BorderColor #333333
+  BackgroundColor<<persisted>> #CDE7CE
+  BorderColor<<persisted>> #2E7D32
+  BackgroundColor<<sdk>> #FFE6CC
+  BorderColor<<sdk>> #B36A00
+  BackgroundColor<<enum>> #FFF7E6
+  BorderColor<<enum>> #B58900
+  BackgroundColor<<postponed>> #F2F2F2
+  BorderColor<<postponed>> #999999
+  BackgroundColor<<view>> #EAF2FB
+  BorderColor<<view>> #3A6EA5
+}
+
+' ===================== config — who runs what =====================
+class AppUser <<persisted>> {
+  + username  (= serial)
+  + roles : [AppUserRole]
+}
+class SpectrometerProfile <<persisted>> {
+  + serial
+  + device + calibration
+}
+class Plugin <<persisted>> {
+  + identifier / version
+  + signedCode : bytes
+  --
+  the bundle; signature-verified on load
+}
+AppUser --> SpectrometerProfile : profile
+AppUser --> Plugin : plugin
+
+' ===================== the run = the persisted record =====================
+class SpectralWorkflow <<persisted>> {
+  + phases : PhaseType -> Phase  (static spine of 5)
+  + currentPhase
+  + createdAt
+}
+SpectralWorkflow --> AppUser : user
+AppUser "1" --> "0..*" SpectralWorkflow : runs
+
+enum SpectralWorkflowPhaseType <<enum>> {
+  ACQUISITION
+  PROCESSING
+  EVALUATION
+  METADATA
+  PUBLISHING
+}
+
+class SpectralWorkflowPhase <<persisted>> {
+  + type : PhaseType
+  + steps : [Step]  (plugin-created; empty = skipped)
+}
+SpectralWorkflow "1" o-- "5" SpectralWorkflowPhase : phases
+SpectralWorkflowPhase --> SpectralWorkflowPhaseType : type
+
+class SpectralWorkflowStep <<persisted>> {
+  .. durable ..
+  + container : SpectraContainer?
+  + evaluationResult : EvaluationResult?
+  + document : Pdf?
+  + email : Email?
+  + persist : bool
+  .. transient (host-built, not saved) ..
+  + view : ViewSpec?
+  + widget : QWidget?
+}
+SpectralWorkflowPhase "1" o-- "0..*" SpectralWorkflowStep : steps
+
+' ===================== spectral data =====================
+class SpectraContainer <<persisted>> {
+  + spectra : role -> [Spectrum]  (named bags)
+  + inputs : [SpectraContainer]  (operands)
+  + producedBy : Step
+}
+class Spectrum <<persisted>> {
+  + valuesByNanometers : nm -> float
+  + sampleType : SpectrumSampleType
+}
+enum SpectrumSampleType <<enum>> {
+  REFERENCE
+  SAMPLE
+  DARK
+  BLANK
+}
+SpectralWorkflowStep --> SpectraContainer : container
+SpectraContainer "1" o-- "0..*" Spectrum : spectra
+SpectraContainer --> "0..*" SpectraContainer : inputs
+SpectraContainer --> SpectralWorkflowStep : producedBy
+Spectrum --> SpectrumSampleType : sampleType
+
+' ===================== evaluation result = a bag of view-models =====================
+class EvaluationResult <<persisted>> {
+  + items : [ResultView]
+}
+class ResultView <<view>>
+class ColorSwatch <<view>> {
+  + rgb
+  + label
+}
+class ColorSample <<view>> {
+  + rgb
+  + label
+}
+class Label <<view>> {
+  + text
+}
+class Verdict <<view>> {
+  + value  (GREEN / PERFECT / BROWN / ...)
+}
+SpectralWorkflowStep --> EvaluationResult : evaluationResult
+EvaluationResult "1" o-- "0..*" ResultView : items
+ResultView <|-- ColorSwatch
+ResultView <|-- ColorSample
+ResultView <|-- Label
+ResultView <|-- Verdict
+
+' ===================== publishing artifacts =====================
+class Pdf <<persisted>> {
+  + filePath  (file on disk)
+  --
+  DB keeps only the reference, not the bytes
+}
+class Email <<postponed>> {
+  + recipient
+  + subject
+  + sentAt
+  + status
+}
+SpectralWorkflowStep --> Pdf : document
+SpectralWorkflowStep --> Email : email
+
+' ===================== the plugin (SDK class) + ops =====================
+class SpectralPlugin <<sdk>> {
+  + acquisition(workflow)
+  + processing(workflow)
+  + evaluation(workflow)
+  + metadata(workflow)
+  + publishing(workflow)
+  --
+  Qt-free; never persists; criteria live in this code
+}
+class Operation <<sdk>> {
+  + apply(SpectraContainer) : SpectraContainer
+}
+note bottom of Operation
+  shared library: MedianOp, AbsorptionOp,
+  BaselineOp, NormalizeOp, SmoothOp
+end note
+Plugin ..> SpectralPlugin : loads (verified)
+SpectralPlugin ..> SpectralWorkflow : fills (creates steps)
+SpectralPlugin ..> Operation : composes
+
+legend right
+  <b><<persisted>></b> saved — the workflow IS the record
+  <b><<sdk>></b>       plugin-facing, Qt-free
+  <b><<view>></b>      renderable result model (host -> QWidget)
+  <b><<enum>></b>      enumeration
+  <b><<postponed>></b> deferred (email transport TBD)
+endlegend
+
+@enduml

@@ -12,8 +12,6 @@ skinparam class {
   BorderColor<<signal>> #3A6EA5
   BackgroundColor<<enum>> #FFF7E6
   BorderColor<<enum>> #B58900
-  BackgroundColor<<unwired>> #F2F2F2
-  BorderColor<<unwired>> #999999
 }
 
 ' ===================== LIVE: the measurement at runtime =====================
@@ -87,48 +85,6 @@ class VirtualSpectrometerSettings <<live>> {
   Singleton — holds the "Set picture" image for the virtual device
 }
 
-' ===================== UNWIRED: SpectralWorkflow family =====================
-class SpectralWorkflow <<unwired>> {
-  + currentPhase : SpectralWorkflowPhase
-  + phases : Dict[SpectralWorkflowPhaseType, SpectralWorkflowPhase]
-}
-
-class SpectralWorkflowPhase <<unwired>> {
-  + type : SpectralWorkflowPhaseType
-  + workflow : SpectralWorkflow
-  + steps : Dict[str, SpectralWorkflowStep]
-  + id : str
-}
-
-enum SpectralWorkflowPhaseType <<enum>> {
-  ACQUIREMENT
-  ACQUIREMENT_VIEW
-}
-
-class AcquirementSpectralWorkflowPhase <<unwired>> {
-}
-
-class AcquireViewSpectralWorkflowPhase <<unwired>> {
-}
-
-class SpectralWorkflowStep <<unwired>> {
-  + phase : SpectralWorkflowPhase
-  + id : str
-}
-
-class AcquireViewSpectralWorkflowStep <<unwired>> {
-  + getSpectralSampleTypes() : [SAMPLE, REFERENCE]
-}
-
-class SpectraContainer <<unwired>> {
-  + spectra : Dict[str, Spectrum]
-  + spectraContainers : Dict[str, SpectraContainer]
-  + sourceSpectraContainer : SpectraContainer
-  + workflowStep : SpectralWorkflowStep
-  --
-  nestable spectra tree (also has a duplicate __init__ bug)
-}
-
 ' ===================== Relationships — LIVE =====================
 SpectralJob "1" o-- "0..*" Spectrum : spectraBySampleTypes
 Spectrum --> SpectrumSampleType : sampleType
@@ -139,32 +95,19 @@ VideoSignal <|-- SpectrometerCalibrationProfileHoughLinesVideoSignal
 SpectralVideoThreadSignal --> SpectralJob : spectralJob
 DbEntityChangedSignal <|-- SpectrometerProfileSignal
 
-' ===================== Relationships — UNWIRED =====================
-SpectralWorkflow "1" o-- "0..*" SpectralWorkflowPhase : phases
-SpectralWorkflow --> SpectralWorkflowPhase : currentPhase
-SpectralWorkflowPhase --> SpectralWorkflowPhaseType : type
-SpectralWorkflowPhase "1" o-- "0..*" SpectralWorkflowStep : steps
-SpectralWorkflowPhase <|-- AcquirementSpectralWorkflowPhase
-SpectralWorkflowPhase <|-- AcquireViewSpectralWorkflowPhase
-SpectralWorkflowStep <|-- AcquireViewSpectralWorkflowStep
-SpectraContainer "1" o-- "0..*" Spectrum : spectra
-SpectraContainer "1" o-- "0..*" SpectraContainer : spectraContainers (tree)
-SpectraContainer --> SpectraContainer : sourceSpectraContainer
-SpectraContainer --> SpectralWorkflowStep : workflowStep
-
 note as N1
-  <b>SpectralWorkflow family + SpectraContainer = UNWIRED.</b>
-  Nothing in the app instantiates SpectralWorkflow or SpectraContainer;
-  the phase/step classes only reference each other. Aspirational
-  multi-phase acquisition model, never connected to the capture path
-  (parallels the unused MeasurementProfile DB stub).
+  <b>The SpectralWorkflow family + SpectraContainer used to be sketched here
+  as unwired scaffolding.</b> They are being REDESIGNED in
+  SPECTRAL_WORKFLOW_CONCEPT.md §9 → see <b>workflow_object_model.svg</b>:
+  a 5-phase static spine, plugin hooks that create steps, and the workflow
+  as the PERSISTED record (gains a User). SpectralJob folds into
+  SpectraContainer; DbSpectrum + MeasurementProfile are deleted.
 end note
-N1 .. SpectralWorkflow
+N1 .. SpectralJob
 
 legend right
   <b><<signal>></b>  = Qt signal payload (live, cross-thread)
   <b><<enum>></b>    = enumeration
-  <b><<unwired>></b> = defined but never instantiated by the app
   white = live runtime object
 endlegend
 
