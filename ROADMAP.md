@@ -13,9 +13,9 @@ roles/workflow dependency) and becomes the body of `PumpkinPlugin.evaluation`. T
 (`colour-science` / `luxpy` / `spectres` / `BaselineRemoval` / `rgbxy` / `pyspectra` / `pandas` → check
 what is actually needed; `colour` + `colorsys` may cover most).
 
-## 2. Login — header UI placement  *(login logic done in Step 2a; this is layout only)*
+## 2. Login — header UI placement  *(**IMPLEMENTED 2026-06-29** — spec `spectracsPy/docs/SPEC_login_header_placement.md`; account-icon control right of the left-aligned logo, full-width status bar, `userSessionSignal` bus refresh; login control removed from Settings. Both states render-verified.)*
 - Move the **Login** control to the **right of the "spectracs" logo** — the common app-header pattern;
-  **logo aligned left**.
+  **logo aligned left**. *(Spec: an account/person **icon** control, best-practice header pattern.)*
 - The **status / progress bar** (below the logo) should span the **full screen width**.
 
 ## 3. SpectrometerProfile ↔ user binding + deletion  *(master user)*
