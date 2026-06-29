@@ -1,0 +1,65 @@
+@startuml roadmap_map
+' Spectracs — Roadmap big-picture map: build items, status, and dependencies.
+' Companion to ROADMAP.md (the prose backlog). This view answers "what is next and
+' what blocks what", which the structural diagrams (db_entities / plugin_model /
+' runtime_models / workflow_object_model) intentionally do not.
+' Regenerate:  java -jar plantuml.jar -tsvg roadmap_map.puml
+
+title Spectracs — Roadmap map\nstatus + dependencies (as of 2026-06-29)
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName Sans
+skinparam ArrowColor #5A7D8C
+skinparam ArrowFontColor #5A7D8C
+skinparam rectangle {
+  FontColor #222222
+  BorderColor #5A5A5A
+  roundCorner 12
+}
+
+legend right
+  |= colour |= meaning |
+  | <#C8E6C9>    | done |
+  | <#FFE0B2>    | next / unblocked |
+  | <#ECEFF1>    | later (blocked by a dependency) |
+  | <#E1BEE7>    | deferred design thread |
+endlegend
+
+rectangle "FOUNDATIONS" as F #FFFFFF {
+  rectangle "**#1  spectrum -> colour**\n✅ done\nSpectrumUtil + SpectrumToColor;\nbecomes PumpkinPlugin.evaluation" as R1 #C8E6C9
+  rectangle "**#2  login in header**\n✅ done\naccount control + full-width status bar" as R2 #C8E6C9
+}
+
+rectangle "USER & AUTH  (master user)" as UA #FFFFFF {
+  rectangle "**#4  User CRUD**\n▶ next — independent\nadd / edit / delete AppUser\n(master-only screen)" as R4 #FFE0B2
+  rectangle "**#3  Profile <-> User binding + deletion**\n⬚ later\nserial -> AppUser; AppUser -> {Profile, Plugin};\ndelete SpectrometerProfile" as R3 #ECEFF1
+}
+
+rectangle "VIRTUAL DEVICE" as VD #FFFFFF {
+  rectangle "**#5  three picture sets**\n▶ next — independent\ncalibration / REFERENCE / SAMPLE images\n(LED-synth ref, target-hue sample)" as R5 #FFE0B2
+}
+
+rectangle "WORKFLOW & PLUGIN   (the goal)" as G #FFFFFF {
+  rectangle "**#6a  ABSORPTION display**\n▶ next — can start in parallel\nACQUISITION -> PROCESSING, render one\nreal step end-to-end (proves the spine)" as R6a #FFE0B2
+  rectangle "**#6  pumpkin-oil workflow + plugin**\n⬚ later\nnested-wizard GUI design + full phases" as R6 #ECEFF1
+}
+
+rectangle "CROSS-CUTTING  (deferred design threads)" as CC #FFFFFF {
+  rectangle "persistable-workflow DB schema\nprereq for persistence in #3 / #6" as CCa #E1BEE7
+  rectangle "EvaluationResult -> GUI integration" as CCb #E1BEE7
+  rectangle "PDF report + email" as CCc #E1BEE7
+}
+
+' ---- dependency / unblocks edges ----
+R1 --> R6  : evaluation body
+R4 --> R3  : users must exist first
+R3 --> R6  : AppUser -> {Profile, Plugin}
+R5 --> R6  : realistic end-to-end
+R6a ..> R6 : milestone feeds full build
+CCa ..> R3
+CCa ..> R6
+R6 ..> CCb
+R6 ..> CCc
+
+@enduml

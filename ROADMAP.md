@@ -1,5 +1,9 @@
 # Spectracs — Roadmap (working backlog)
 
+> **Big-picture view:** [`roadmap_map.svg`](roadmap_map.svg) — a status + dependency graph of the
+> items below (what is done, what is next/unblocked, what blocks what). Generated from
+> [`roadmap_map.puml`](roadmap_map.puml); regenerate with `java -jar plantuml.jar -tsvg roadmap_map.puml`.
+>
 > Captured **2026-06-28** to resume next session. The **workflow object model is settled** — see
 > [`SPECTRAL_WORKFLOW_CONCEPT.md`](SPECTRAL_WORKFLOW_CONCEPT.md) §8–§9 +
 > [`workflow_object_model.svg`](workflow_object_model.svg). The items below are the agreed **next steps

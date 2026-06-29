@@ -15,6 +15,8 @@ for optical spectroscopy with a DIY spectroscope).
   [`plugin_model.svg`](plugin_model.svg),
   [`workflow_object_model.svg`](workflow_object_model.svg).
 - **[`ROADMAP.md`](ROADMAP.md)** — the working backlog / agreed next steps to build (resume point).
+  Diagram: [`roadmap_map.svg`](roadmap_map.svg) — status + dependency graph (what is done, what is
+  next/unblocked, what blocks what).
 - `*.puml` — PlantUML sources for the diagrams.
 - `spectracs.gaphor` — an older (2023) Gaphor UML model, kept for reference.
 
