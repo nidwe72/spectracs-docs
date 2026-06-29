@@ -6,7 +6,7 @@
 > to build**. **Implement on explicit request only** (spec-first workflow). Roughly ordered;
 > dependencies noted at the bottom.
 
-## 1. Extract the spectrum → colour logic  *(agreed — build step 1)*
+## 1. Extract the spectrum → colour logic  *(**IMPLEMENTED 2026-06-29** — spec `spectracsPy/docs/SPEC_spectrum_processing.md`; 11 unit tests pass. Remaining: wire into `PumpkinPlugin.evaluation`, #6)*
 Lift the proven `spectrasTest.py` hue pipeline into a reusable logic module / utility
 (`ColorUtil.spectrumToHue(...)`; eventual home `spectracs.plugin_sdk.util.ColorUtil`). Stands alone (no
 roles/workflow dependency) and becomes the body of `PumpkinPlugin.evaluation`. Trim the dependency set
