@@ -12,6 +12,11 @@
 >
 > **UI conventions:** `spectracsPy/docs/DESIGN_GUIDE.md` (page layout, button variants, tables, QSS) +
 > `spectracsPy/docs/DEV_WORKFLOW.md` (click-through review — drive-and-observe UI verification).
+>
+> **Pipeline design (bridges #5+#6):** `spectracsPy/docs/SPEC_measurement_evaluation_concept.md`
+> (the sound, LED-independent measure→T=S/R→colour→verdict pipeline) + `SPEC_pipeline_playground.md`
+> (master-only tabbed LED→oil dev bench; its image-path synthesis also builds #5's three image slots).
+> Physics/data: `KB_spectroscopy_physics.md`, `KB_led_and_oil_spectra.md`, sibling `spectracs-references/`.
 
 ## 1. Extract the spectrum → colour logic  *(**IMPLEMENTED 2026-06-29** — spec `spectracsPy/docs/SPEC_spectrum_processing.md`; 11 unit tests pass. Remaining: wire into `PumpkinPlugin.evaluation`, #6)*
 Lift the proven `spectrasTest.py` hue pipeline into a reusable logic module / utility
