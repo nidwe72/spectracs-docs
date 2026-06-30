@@ -5,7 +5,7 @@
 ' runtime_models / workflow_object_model) intentionally do not.
 ' Regenerate:  java -jar plantuml.jar -tsvg roadmap_map.puml
 
-title Spectracs — Roadmap map\nstatus + dependencies (as of 2026-06-29)
+title Spectracs — Roadmap map\nstatus + dependencies (as of 2026-06-30)
 
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
@@ -27,32 +27,42 @@ legend right
 endlegend
 
 rectangle "FOUNDATIONS" as F #FFFFFF {
-  rectangle "**#1  spectrum -> colour**\n✅ done\nSpectrumUtil + SpectrumToColor;\nbecomes PumpkinPlugin.evaluation" as R1 #C8E6C9
+  rectangle "**#1  spectrum -> colour**\n✅ done\nSpectrumUtil + SpectralColorUtil.spectrumToColor" as R1 #C8E6C9
   rectangle "**#2  login in header**\n✅ done\naccount control + full-width status bar" as R2 #C8E6C9
+  rectangle "**Measurement & evaluation concept**\n✅ done\nSOUND pipeline: T=S/R (LED-independent),\ncolour(T) under D65, hue -> roast verdict\n(concept + physics KB)" as CONCEPT #C8E6C9
+}
+
+rectangle "PIPELINE PLAYGROUND  (proof-of-concept)" as PG #FFFFFF {
+  rectangle "**Pipeline Playground (PoC)**\n✅ done — master-only dev bench\nLED-synth REFERENCE + oil SAMPLE +\nabsorption + colour + verdict; CFL calibration;\n7-tab bench; regression test + documentation PDF" as PLAY #C8E6C9
 }
 
 rectangle "USER & AUTH  (master user)" as UA #FFFFFF {
-  rectangle "**#4  User CRUD**\n▶ next — independent\nadd / edit / delete AppUser\n(master-only screen)" as R4 #FFE0B2
-  rectangle "**#3  Profile <-> User binding + deletion**\n⬚ later\nserial -> AppUser; AppUser -> {Profile, Plugin};\ndelete SpectrometerProfile" as R3 #ECEFF1
+  rectangle "**#4  User CRUD**\n✅ done\nadd / edit / delete AppUser (master-only)" as R4 #C8E6C9
+  rectangle "**#3  Profile <-> User binding + deletion**\n▶ next — unblocked (#4 done)\nserial -> AppUser; AppUser -> {Profile, Plugin};\ndelete SpectrometerProfile" as R3 #FFE0B2
 }
 
 rectangle "VIRTUAL DEVICE" as VD #FFFFFF {
-  rectangle "**#5  three picture sets**\n▶ next — independent\ncalibration / REFERENCE / SAMPLE images\n(LED-synth ref, target-hue sample)" as R5 #FFE0B2
+  rectangle "**#5  three picture sets**\n▶ next — synthesis proven in Playground\ncalibration / REFERENCE / SAMPLE image slots\n+ rasterise-to-ROI image round-trip remain" as R5 #FFE0B2
 }
 
 rectangle "WORKFLOW & PLUGIN   (the goal)" as G #FFFFFF {
-  rectangle "**#6a  ABSORPTION display**\n▶ next — can start in parallel\nACQUISITION -> PROCESSING, render one\nreal step end-to-end (proves the spine)" as R6a #FFE0B2
+  rectangle "**#6a  ABSORPTION display**\n▶ next — pipeline + absorption display\nproven in Playground; wire into the\nSpectralWorkflow spine / plugin remains" as R6a #FFE0B2
   rectangle "**#6  pumpkin-oil workflow + plugin**\n⬚ later\nnested-wizard GUI design + full phases" as R6 #ECEFF1
 }
 
 rectangle "CROSS-CUTTING  (deferred design threads)" as CC #FFFFFF {
   rectangle "persistable-workflow DB schema\nprereq for persistence in #3 / #6" as CCa #E1BEE7
-  rectangle "EvaluationResult -> GUI integration" as CCb #E1BEE7
-  rectangle "PDF report + email" as CCc #E1BEE7
+  rectangle "EvaluationResult -> GUI integration\n(first take: Playground results tab + PDF)" as CCb #E1BEE7
+  rectangle "PDF report + email\n(PDF prototype: Playground eval test)" as CCc #E1BEE7
+  rectangle "LED-combination optimisation\n(future: search a flatter reference)" as CCd #E1BEE7
 }
 
 ' ---- dependency / unblocks edges ----
 R1 --> R6  : evaluation body
+CONCEPT --> PLAY : implemented by
+PLAY --> R5 : synthesis recipe
+PLAY ..> R6a : pipeline proven
+PLAY ..> CCd : the tool to explore
 R4 --> R3  : users must exist first
 R3 --> R6  : AppUser -> {Profile, Plugin}
 R5 --> R6  : realistic end-to-end

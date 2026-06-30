@@ -21,10 +21,17 @@ from a spectrum instead of by eye.
 Measurement protocol:
 1. **REFERENCE** — pure isopropanol in a transparent lidded cup; ~50 captures, averaged.
 2. **SAMPLE** — same cup with a few drops of pumpkin oil added; ~50 captures, averaged.
-3. Compute the **absorption spectrum** from the two.
+3. Compute **transmittance** `T = SAMPLE / REFERENCE` (and **absorbance** `A = −log10 T` for the plot).
 4. **Evaluate** it — originally two ideas: (a) reduce to one **color/hue** and compare to a reference
    "perfect green"; (b) classify with **LDA** (Linear Discriminant Analysis / Fisher's method, the
    Iris-flower classifier). LDA was abandoned — oil spectra have **no discriminating peaks**.
+
+> **⚠ Correction (see `spectracsPy/docs/SPEC_measurement_evaluation_concept.md`):** the colour is computed
+> from the **transmission `T`** (under a fixed D65), **not** from the absorbance — colouring `A` would give
+> the complement, and colouring the raw `SAMPLE` would depend on the LEDs. The reference-normalisation
+> (`T = S/R`) is also what makes the verdict **LED-independent**. Phrasings below that say
+> "hue(absorption)" should read **hue of the transmission**; absorbance stays the right object for the
+> absorption *plot* and peak analysis.
 
 The need for *two* evaluation strategies (color-sample and LDA) is what motivated a **generic engine**:
 source spectra → operations → pluggable evaluation → render. That engine is `SpectralWorkflow`.
