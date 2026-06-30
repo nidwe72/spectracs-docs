@@ -9,6 +9,9 @@
 > [`workflow_object_model.svg`](workflow_object_model.svg). The items below are the agreed **next steps
 > to build**. **Implement on explicit request only** (spec-first workflow). Roughly ordered;
 > dependencies noted at the bottom.
+>
+> **UI conventions:** `spectracsPy/docs/DESIGN_GUIDE.md` (page layout, button variants, tables, QSS) +
+> `spectracsPy/docs/DEV_WORKFLOW.md` (click-through review — drive-and-observe UI verification).
 
 ## 1. Extract the spectrum → colour logic  *(**IMPLEMENTED 2026-06-29** — spec `spectracsPy/docs/SPEC_spectrum_processing.md`; 11 unit tests pass. Remaining: wire into `PumpkinPlugin.evaluation`, #6)*
 Lift the proven `spectrasTest.py` hue pipeline into a reusable logic module / utility
@@ -28,7 +31,7 @@ what is actually needed; `colour` + `colorsys` may cover most).
 - The `SpectrometerProfile` is then **added to the `AppUser`** — the §9.5 config binding
   `AppUser → { SpectrometerProfile, Plugin }`. Needs the new `AppUser`↔`SpectrometerProfile` link.
 
-## 4. User CRUD (master user)
+## 4. User CRUD (master user)  *(**IMPLEMENTED 2026-06-30** — spec `spectracsPy/docs/SPEC_user_crud.md`; master-only `UserListViewModule` (QTableView) + `UserViewModule` editor over Pyro; new `UserAdminLogicModule` + 4 `@expose` RPCs; single role, hard delete, last-master guard, password min 8, server-unavailable banner. Façade + UI + live RPC round-trip verified.)*
 - Master user can **add a user** (and edit / delete) — an `AppUser` management screen. Feeds #3's
   "select a user" and the master/end-user role gate.
 
