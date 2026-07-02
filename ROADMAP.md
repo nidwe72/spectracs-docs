@@ -10,6 +10,18 @@
 > to build**. **Implement on explicit request only** (spec-first workflow). Roughly ordered;
 > dependencies noted at the bottom.
 >
+> **✅ INTEGRATION MILESTONE — IMPLEMENTED 2026-07-02 (delivers #5 + #6; 37 tests green):**
+> [`spectracsPy/docs/SPEC_pumpkin_integration.md`](../spectracsPy/docs/SPEC_pumpkin_integration.md).
+> Three tracks, all built — **A** virtual-device 3-image folder + shared-vmax/linear encoder + round-trip
+> (delivers #5); **B** plugin substrate (server-side `DbPlugin` + `AppUser` binding + seed +
+> `plugin_sdk` + `EvaluationResult`); **C** `SpectralWorkflowEngine` (auto-calibrates from `calibration.png`)
+> + `PumpkinOilPlugin` + **interactive** nested-wizard GUI (per-step **Measure**, real spectrum plots,
+> Back/Cancel/Next→Save) (delivers #6). **Floor goal reached:** log in as `pumpkinTestUser` → load an image
+> folder → wizard drives ACQUISITION(measure)→PROCESSING(absorption)→EVALUATION → colour/verdict.
+> 5-phase spine kept, METADATA+PUBLISHING skipped; the `AppUser → {Plugin, device}` config binding is real +
+> seeded (host runs the plugin *via the logged-in user*, device = stable `Virtuax` code-name, D15). Deferred:
+> workflow-**record** persistence (Save is a no-op → Home). See the spec's "Known limits / follow-ups".
+>
 > **UI conventions:** `spectracsPy/docs/DESIGN_GUIDE.md` (page layout, button variants, tables, QSS) +
 > `spectracsPy/docs/DEV_WORKFLOW.md` (click-through review — drive-and-observe UI verification).
 >
@@ -34,21 +46,24 @@ what is actually needed; `colour` + `colorsys` may cover most).
   **logo aligned left**. *(Spec: an account/person **icon** control, best-practice header pattern.)*
 - The **status / progress bar** (below the logo) should span the **full screen width**.
 
-## 3. SpectrometerProfile ↔ user binding + deletion  *(master user)*  *(**▶ NEXT — unblocked: #4 done**)*
-- Master user can **delete** `SpectrometerProfile`(s).
-- Replace the free-text **serial** with a **selection of an `AppUser`** (serial = username).
-- The `SpectrometerProfile` is then **added to the `AppUser`** — the §9.5 config binding
-  `AppUser → { SpectrometerProfile, Plugin }`. Needs the new `AppUser`↔`SpectrometerProfile` link.
+## 3. SpectrometerProfile ↔ user binding + deletion  *(master user)*  *(**▶ NEXT — binding half done in the integration milestone**)*
+- The **`AppUser → {Plugin, device}` config binding is DONE + seeded** (integration Track B.1a): `AppUser`
+  gained `pluginId` (FK) + `spectrometerDevice`; the host runs the plugin via the logged-in user. The device
+  is bound by stable code-name (`Virtuax`), not a profile id (D15).
+- **Still to do (the master-facing UI half):** master can **delete** `SpectrometerProfile`(s); replace the
+  free-text **serial** with a **selection of an `AppUser`**; a master screen to pick user↔profile. These
+  remain #3's own work.
 
 ## 4. User CRUD (master user)  *(**IMPLEMENTED 2026-06-30** — spec `spectracsPy/docs/SPEC_user_crud.md`; master-only `UserListViewModule` (QTableView) + `UserViewModule` editor over Pyro; new `UserAdminLogicModule` + 4 `@expose` RPCs; single role, hard delete, last-master guard, password min 8, server-unavailable banner. Façade + UI + live RPC round-trip verified.)*
 - Master user can **add a user** (and edit / delete) — an `AppUser` management screen. Feeds #3's
   "select a user" and the master/end-user role gate.
 
-## 5. Virtual spectrometer — three picture sets  *(synthesis **proven** in the Pipeline Playground; image slots remain)*
-> The Playground already synthesises the REFERENCE (LED set) and SAMPLE (oil model) spectra and runs a
-> fresh CFL calibration — but **spectra-only** (no image round-trip). What remains for #5: grow
-> `VirtualSpectrometerSettings` from one `QImage` to **three** slots, and rasterise the synthesised SPD
-> onto the ROI via the calibration polynomial so the existing acquisition reads it back.
+## 5. Virtual spectrometer — three picture sets  *(**✅ IMPLEMENTED 2026-07-02** — integration Track A; see `SPEC_pumpkin_integration.md`)*
+> **Done:** `VirtualSpectrometerSettings` now holds three role-keyed images (CALIBRATION/REFERENCE/SAMPLE)
+> + `activeRole`; a folder picker loads a named set; `SpectrumToVirtualImageUtil` rasterises the synthesised
+> SPD onto the ROI via the calibration polynomial (shared vmax, linear), and the existing acquisition reads
+> it back (round-trip test within ±3° hue). Baked demo sets live in
+> `spectracs-references/pumpkin_oil/virtual_captures/`.
 
 Today the virtual device holds **one** stored `QImage`. Need **three**:
 - a **calibration** image,
@@ -61,16 +76,14 @@ Synthesis ideas (so the virtual device produces meaningful spectra end-to-end):
 - **SAMPLE** — compute an image that yields a **target hue** colour, so the evaluation produces a known,
   checkable result.
 
-## 6. Pumpkin-oil workflow + plugin — first phases (in parallel)
-- **Refine the GUI concept first.** The end-user view is a **wizard of phases, each phase a set of step
-  tabs** → effectively a **nested wizard** (outer = phases advanced by `Next`; inner = the step tabs of
-  the current phase). This needs a concrete UI design before building.
-- **First milestone:** a plugin that builds the **ABSORPTION spectrum** (ACQUISITION → PROCESSING) and
-  **displays it in the GUI**. Proves the static spine + the `SpectraContainer` chain + one real rendered
-  step, end-to-end. *(The absorption→colour→verdict **pipeline + display is already proven** in the
-  Pipeline Playground on synthetic data; what remains here is wiring it through the real `SpectralWorkflow`
-  spine / plugin hooks. The reusable ops exist: `TransmissionLogicModule`, `AbsorptionLogicModule`,
-  `SpectrumUtil.transmission/absorption`, `VerdictLogicModule`.)*
+## 6. Pumpkin-oil workflow + plugin  *(**✅ IMPLEMENTED 2026-07-02** — integration Tracks B + C; see `SPEC_pumpkin_integration.md`)*
+> **Done:** the nested-wizard GUI (outer phase rail + inner step tabs), `SpectralWorkflowEngine` running the
+> 5-phase spine (METADATA+PUBLISHING skipped), `PumpkinOilPlugin` (5 hooks over `plugin_sdk`), interactive
+> ACQUISITION (per-step **Measure**), PROCESSING absorption plot, EVALUATION colour swatches + verdict —
+> all through the real spine on the virtual device. Absorption *display* (the original "first milestone")
+> and the full colour/verdict flow are both live.
+> **Follow-ups (not this milestone):** workflow-record persistence (Save→save), METADATA form + PUBLISHING
+> (PDF/email), plugin signature verification, real-hardware re-measure invalidation.
 
 ## Still-deferred design threads (pick up when their build item needs them)
 - **Persistable-workflow schema** in [`DB_ENTITIES.md`](DB_ENTITIES.md): map `model/spectral/` classes to

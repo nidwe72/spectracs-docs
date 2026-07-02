@@ -5,7 +5,7 @@
 ' runtime_models / workflow_object_model) intentionally do not.
 ' Regenerate:  java -jar plantuml.jar -tsvg roadmap_map.puml
 
-title Spectracs — Roadmap map\nstatus + dependencies (as of 2026-06-30)
+title Spectracs — Roadmap map\nstatus + dependencies (as of 2026-07-02)
 
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
@@ -38,21 +38,21 @@ rectangle "PIPELINE PLAYGROUND  (proof-of-concept)" as PG #FFFFFF {
 
 rectangle "USER & AUTH  (master user)" as UA #FFFFFF {
   rectangle "**#4  User CRUD**\n✅ done\nadd / edit / delete AppUser (master-only)" as R4 #C8E6C9
-  rectangle "**#3  Profile <-> User binding + deletion**\n▶ next — unblocked (#4 done)\nserial -> AppUser; AppUser -> {Profile, Plugin};\ndelete SpectrometerProfile" as R3 #FFE0B2
+  rectangle "**#3  Profile <-> User binding + deletion**\n▶ next — BINDING HALF DONE (integration Track B)\nAppUser -> {Plugin, device} seeded ✅;\nmaster UI (serial->AppUser, delete profile) remains" as R3 #FFE0B2
 }
 
 rectangle "VIRTUAL DEVICE" as VD #FFFFFF {
-  rectangle "**#5  three picture sets**\n▶ next — synthesis proven in Playground\ncalibration / REFERENCE / SAMPLE image slots\n+ rasterise-to-ROI image round-trip remain" as R5 #FFE0B2
+  rectangle "**#5  three picture sets**\n✅ done — integration Track A\n3 role image slots + folder picker;\nSPD->ROI encoder (shared vmax) + round-trip test" as R5 #C8E6C9
 }
 
 rectangle "WORKFLOW & PLUGIN   (the goal)" as G #FFFFFF {
-  rectangle "**#6a  ABSORPTION display**\n▶ next — pipeline + absorption display\nproven in Playground; wire into the\nSpectralWorkflow spine / plugin remains" as R6a #FFE0B2
-  rectangle "**#6  pumpkin-oil workflow + plugin**\n⬚ later\nnested-wizard GUI design + full phases" as R6 #ECEFF1
+  rectangle "**#6a  ABSORPTION display**\n✅ done — real absorption plot in the wizard\n(PROCESSING phase, via SpectralWorkflow spine)" as R6a #C8E6C9
+  rectangle "**#6  pumpkin-oil workflow + plugin**\n✅ done — integration Tracks B+C\nplugin_sdk + PumpkinOilPlugin + engine +\ninteractive nested-wizard (Measure, plots, verdict)" as R6 #C8E6C9
 }
 
 rectangle "CROSS-CUTTING  (deferred design threads)" as CC #FFFFFF {
   rectangle "persistable-workflow DB schema\nprereq for persistence in #3 / #6" as CCa #E1BEE7
-  rectangle "EvaluationResult -> GUI integration\n(first take: Playground results tab + PDF)" as CCb #E1BEE7
+  rectangle "EvaluationResult -> GUI integration\n✅ done — EvaluationResultRenderer in the wizard\n(swatches + verdict)" as CCb #C8E6C9
   rectangle "PDF report + email\n(PDF prototype: Playground eval test)" as CCc #E1BEE7
   rectangle "LED-combination optimisation\n(future: search a flatter reference)" as CCd #E1BEE7
 }
