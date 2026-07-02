@@ -1,5 +1,5 @@
 @startuml db_entities
-title Spectracs — DB entity model (spectracsPy-model · SQLite via SQLAlchemy)
+title Spectracs — DB entity model\nAPP DB (spectracsPy.db) + SERVER DB (spectracsPyServer.db) · SQLite via SQLAlchemy
 
 hide circle
 hide empty methods
@@ -16,11 +16,17 @@ skinparam class {
   BorderColor<<join>> #B58900
   BackgroundColor<<stub>> #F2F2F2
   BorderColor<<stub>> #999999
+  BackgroundColor<<server>> #EEF0FB
+  BorderColor<<server>> #4C5FAF
+  BackgroundColor<<planned>> #FDF3F7
+  BorderColor<<planned>> #B84C7A
 }
 
 ' Every entity has  id : String  (PK, uuid) from DbBaseEntityMixin.
+' The two DBs are SEPARATE SQLite files (separate metadata); cross-DB links are SOFT string
+' references (no enforceable FK) — drawn dashed (..>).
 
-' ============ Application config ============
+' ============ Application config (APP DB) ============
 class ApplicationConfig {
   + id : String (PK)
 }
@@ -31,7 +37,7 @@ class ApplicationConfigToSpectrometerProfile <<join>> {
   + isDefault : Boolean
 }
 
-' ============ Core: device profile + calibration ============
+' ============ Core: device profile + calibration (APP DB) ============
 class SpectrometerProfile {
   + id : String (PK)
   + serial : String
@@ -66,7 +72,7 @@ class SpectralLineMasterData <<reference>> {
   + nanometer : Float
 }
 
-' ============ Catalog: spectrometer + parts ============
+' ============ Catalog: spectrometer + parts (APP DB) ============
 class Spectrometer <<catalog>> {
   + id : String (PK)
   + modelName : String
@@ -106,10 +112,87 @@ class SpectrometerVendor <<catalog>> {
   + vendorId : String
 }
 
-' ============ Measurement (unused stub) ============
-class MeasurementProfile <<stub>> {
+' ==== Workflow = the persisted record (APP DB) — SPEC_workflow_persistence.md, Option A / §9.5 (PLANNED) ====
+' The runtime model/spectral classes ARE the entities (one class = runtime object + DB row).
+class SpectralWorkflow <<planned>> {
   + id : String (PK)
-  + spectrometerProfileId : String (FK)
+  + username : String        ' soft ref -> AppUser (stamped at Save)
+  + userId : String          ' soft ref (the Home list FILTER key)
+  + pluginCodeRef : String   ' soft ref -> DbPlugin.codeRef
+  + timestampIso : String    ' sort key
+}
+
+class SpectralWorkflowPhase <<planned>> {
+  + id : String (PK)
+  + workflowId : String (FK)
+  + type : String            ' ACQUISITION | PROCESSING | EVALUATION | METADATA | PUBLISHING
+}
+
+class SpectralWorkflowStep <<planned>> {
+  + id : String (PK)
+  + phaseId : String (FK)
+  + role : String            ' REFERENCE | SAMPLE (acquisition steps)
+  + label : String
+  + persist : Boolean
+}
+
+class SpectraContainer <<planned>> {
+  + id : String (PK)
+  + stepId : String (FK)      ' producedBy
+}
+
+class Spectrum <<planned>> {
+  + id : String (PK)
+  + containerId : String (FK)
+  + role : String            ' REFERENCE | SAMPLE | ABSORPTION | TRANSMISSION (bag key)
+  + sampleType : String
+  + valuesJson : String      ' the {nm:value} map, via Spectrum.toJson()/fromJson()
+}
+
+class EvaluationResult <<planned>> {
+  + id : String (PK)
+  + stepId : String (FK)
+  + resultJson : String      ' view-models via EvaluationResult.toJson() (VerdictView: roastState+hueDegrees)
+}
+
+class SpectralWorkflowMetadata <<planned>> {
+  + id : String (PK)
+  + workflowId : String (FK)
+  + name : String            ' field key; pumpkin: title | temperature | dateOfRoasting
+  + label : String           ' plugin-declared, denormalized (self-describing)
+  + type : String            ' TEXT | NUMBER | DATE
+  + value : String           ' DATE = ISO yyyy-mm-dd
+  + showInWorkflowsTable : Boolean      ' plugin-declared; true -> a Home-list column (pumpkin: title only)
+  + order : Integer
+}
+
+' ============ Auth + plugin binding (SERVER DB — separate file) ============
+class AppUser <<server>> {
+  + id : String (PK)
+  + username : String (unique)
+  + passwordHash : String
+  + displayName : String
+  + enabled : Boolean
+  + pluginId : String (FK)          ' -> DbPlugin (same server DB)
+  + spectrometerDevice : String     ' stable device code-name, e.g. "Virtuax"
+}
+
+class AppUserRole <<server>> {
+  + id : String (PK)
+  + name : String (unique)
+}
+
+class AppUserToAppUserRole <<server>> {
+  + app_user_id : String (PK, FK)
+  + app_user_role_id : String (PK, FK)
+}
+
+class DbPlugin <<server>> {
+  + id : String (PK)
+  + title : String
+  + codeRef : String
+  + version : String
+  + pdfRef : String
 }
 
 ' ============ Relationships ============
@@ -127,21 +210,43 @@ Spectrometer "0..*" --> "1" SpectrometerVendor : vendor
 Spectrometer "0..*" --> "1" SpectrometerStyle : style
 SpectrometerSensor "0..*" --> "1" SpectrometerSensorChip : chip
 
-MeasurementProfile "0..*" --> "1" SpectrometerProfile : spectrometerProfile
+' Workflow-is-the-record graph (Option A): parent owns children (cascade)
+SpectralWorkflow "1" *-- "0..*" SpectralWorkflowPhase : phases (by type)
+SpectralWorkflowPhase "1" *-- "0..*" SpectralWorkflowStep : steps
+SpectralWorkflowStep "1" *-- "0..1" SpectraContainer : container
+SpectralWorkflowStep "1" *-- "0..1" EvaluationResult : evaluationResult
+SpectraContainer "1" *-- "0..*" Spectrum : spectra (by role)
+SpectralWorkflow "1" *-- "0..*" SpectralWorkflowMetadata : metadataFields (cascade)
 
-note bottom of MeasurementProfile
-  STUB / unused. The entity exists but is never instantiated,
-  persisted, or shown; the "Measurement profiles" button is not wired.
-  Real measurements live in the in-memory SpectralJob / Spectrum
-  (NOT persisted). DbSpectrum is an empty stub (no mapping).
+' Server-side auth + plugin binding (single server DB -> real FKs)
+AppUser "1" *-- "0..*" AppUserToAppUserRole : roles
+AppUserToAppUserRole "0..*" --> "1" AppUserRole : appUserRole
+AppUser "0..*" --> "1" DbPlugin : plugin (FK)
+
+' Cross-DB SOFT references (string id / code-name, no enforceable FK) — dashed
+SpectralWorkflow ..> AppUser : username / userId
+SpectralWorkflow ..> DbPlugin : pluginCodeRef
+AppUser ..> SpectrometerSensor : spectrometerDevice = codeName
+
+note bottom of SpectralWorkflow
+  PLANNED (SPEC_workflow_persistence.md, Option A / concept §9.5). The workflow IS the record:
+  the runtime model/spectral classes ARE the app-DB entities (one class = runtime object + DB row).
+  Leaf maps are JSON columns ON their entity: Spectrum.valuesJson = Spectrum.toJson();
+  EvaluationResult.resultJson = EvaluationResult.toJson(). No separate Db* twins.
+  Cleanup: the dead DbSpectrum + MeasurementProfile stubs are DELETED.
+  view / widget (Step), captured burst (Spectrum) = transient, NOT mapped.
+  Metadata: plugin-declared generic (EAV) rows; relationship = metadataFields
+  (NOT "metadata" — SQLAlchemy-reserved); showInWorkflowsTable -> a Home-list column.
 end note
 
 legend right
   Composition (<b>*--</b>) = owned: deleting the parent deletes the child.
-  Arrow (<b>--></b>) = FK reference to a SHARED row (do NOT delete with a profile).
-  <b><<catalog>></b> / <b><<reference>></b> = shared lookup data.
+  Arrow (<b>--></b>) = FK reference to a SHARED row (same DB).
+  Dashed (<b>..></b>) = SOFT cross-DB reference (string id / code-name, no FK).
+  <b><<catalog>></b> / <b><<reference>></b> = shared lookup data (app DB).
   <b><<join>></b> = association row (registration mapping).
-  <b><<stub>></b> = defined but unused.
+  <b><<server>></b> = SERVER DB (spectracsPyServer.db, separate file).
+  <b><<planned>></b> = designed (SPEC_workflow_persistence.md), not yet built.
 endlegend
 
 @enduml

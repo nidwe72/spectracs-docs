@@ -1,5 +1,5 @@
 @startuml workflow_object_model
-title Spectracs — SpectralWorkflow object model (to-be design, §9, rev 2026-06-28)
+title Spectracs — SpectralWorkflow object model\nas-built + persistence Option A (concept §9 / §9.5), rev 2026-07-02
 
 hide circle
 hide empty methods
@@ -10,6 +10,8 @@ skinparam class {
   BorderColor #333333
   BackgroundColor<<persisted>> #CDE7CE
   BorderColor<<persisted>> #2E7D32
+  BackgroundColor<<server>> #EEF0FB
+  BorderColor<<server>> #4C5FAF
   BackgroundColor<<sdk>> #FFE6CC
   BorderColor<<sdk>> #B36A00
   BackgroundColor<<enum>> #FFF7E6
@@ -20,32 +22,44 @@ skinparam class {
   BorderColor<<view>> #3A6EA5
 }
 
-' ===================== config — who runs what =====================
-class AppUser <<persisted>> {
-  + username  (= serial)
+' ===================== config — who runs what (SERVER DB) =====================
+class AppUser <<server>> {
+  + username (unique)
   + roles : [AppUserRole]
+  + pluginId -> DbPlugin (FK, same server DB)
+  + spectrometerDevice  (device code-name, e.g. "Virtuax")
+}
+class DbPlugin <<server>> {
+  + title / codeRef / version
+  --
+  imported by codeRef after login; signature-verify = deferred (§11)
 }
 class SpectrometerProfile <<persisted>> {
   + serial
   + device + calibration
 }
-class Plugin <<persisted>> {
-  + identifier / version
-  + signedCode : bytes
-  --
-  the bundle; signature-verified on load
-}
-AppUser --> SpectrometerProfile : profile
-AppUser --> Plugin : plugin
+AppUser --> DbPlugin : plugin (FK)
+AppUser ..> SpectrometerProfile : device (soft, by code-name)
 
-' ===================== the run = the persisted record =====================
+' ===================== the run = the persisted record (APP DB, Option A) =====================
 class SpectralWorkflow <<persisted>> {
+  + username / userId      (soft ref -> AppUser, stamped at Save)
+  + pluginCodeRef          (soft ref -> DbPlugin.codeRef)
+  + timestampIso           (sort key)
   + phases : PhaseType -> Phase  (static spine of 5)
-  + currentPhase
-  + createdAt
+  + metadataFields : [SpectralWorkflowMetadata]   (NOT "metadata" — reserved)
+  + currentPhase           : transient
 }
-SpectralWorkflow --> AppUser : user
-AppUser "1" --> "0..*" SpectralWorkflow : runs
+SpectralWorkflow ..> AppUser : username / userId (soft, cross-DB)
+
+class SpectralWorkflowMetadata <<persisted>> {
+  + name / label / type / value   (type: TEXT | NUMBER | DATE)
+  + showInWorkflowsTable   (true -> a Home-list column)
+  --
+  generic (EAV) rows; self-describing so view/edit needs no plugin
+  pumpkin: title (TEXT, home column), temperature (NUMBER °C), dateOfRoasting (DATE)
+}
+SpectralWorkflow "1" o-- "0..*" SpectralWorkflowMetadata : metadataFields (cascade)
 
 enum SpectralWorkflowPhaseType <<enum>> {
   ACQUISITION
@@ -64,10 +78,9 @@ SpectralWorkflowPhase --> SpectralWorkflowPhaseType : type
 
 class SpectralWorkflowStep <<persisted>> {
   .. durable ..
+  + role / label / frames / mandatory
   + container : SpectraContainer?
   + evaluationResult : EvaluationResult?
-  + document : Pdf?
-  + email : Email?
   + persist : bool
   .. transient (host-built, not saved) ..
   + view : ViewSpec?
@@ -78,11 +91,14 @@ SpectralWorkflowPhase "1" o-- "0..*" SpectralWorkflowStep : steps
 ' ===================== spectral data =====================
 class SpectraContainer <<persisted>> {
   + spectra : role -> [Spectrum]  (named bags)
-  + inputs : [SpectraContainer]  (operands)
+  + inputs : [SpectraContainer]  (operands; persist later)
   + producedBy : Step
 }
 class Spectrum <<persisted>> {
   + valuesByNanometers : nm -> float
+  --
+  persists as valuesJson (JSON column) via Spectrum.toJson()/fromJson()
+  captured ~N-frame burst = transient (NOT saved)
   + sampleType : SpectrumSampleType
 }
 enum SpectrumSampleType <<enum>> {
@@ -100,43 +116,41 @@ Spectrum --> SpectrumSampleType : sampleType
 ' ===================== evaluation result = a bag of view-models =====================
 class EvaluationResult <<persisted>> {
   + items : [ResultView]
+  --
+  persists as resultJson (JSON column) via EvaluationResult.toJson()/fromJson()
 }
 class ResultView <<view>>
-class ColorSwatch <<view>> {
+class ColorSwatchView <<view>> {
   + rgb
   + label
 }
-class ColorSample <<view>> {
-  + rgb
-  + label
-}
-class Label <<view>> {
+class LabelView <<view>> {
   + text
 }
-class Verdict <<view>> {
-  + value  (GREEN / PERFECT / BROWN / ...)
+class VerdictView <<view>> {
+  + roastState  (PERFECT / UNDER / OVER-ROASTED)
+  + hueDegrees
+}
+class SpectrumPlotView <<view>> {
+  + spectrum
+  + title
 }
 SpectralWorkflowStep --> EvaluationResult : evaluationResult
 EvaluationResult "1" o-- "0..*" ResultView : items
-ResultView <|-- ColorSwatch
-ResultView <|-- ColorSample
-ResultView <|-- Label
-ResultView <|-- Verdict
+ResultView <|-- ColorSwatchView
+ResultView <|-- LabelView
+ResultView <|-- VerdictView
+ResultView <|-- SpectrumPlotView
 
-' ===================== publishing artifacts =====================
-class Pdf <<persisted>> {
-  + filePath  (file on disk)
-  --
-  DB keeps only the reference, not the bytes
+' ===================== publishing artifacts (deferred) =====================
+class Pdf <<postponed>> {
+  + filePath
 }
 class Email <<postponed>> {
-  + recipient
-  + subject
-  + sentAt
-  + status
+  + recipient / subject / sentAt / status
 }
-SpectralWorkflowStep --> Pdf : document
-SpectralWorkflowStep --> Email : email
+SpectralWorkflowStep ..> Pdf : document (later)
+SpectralWorkflowStep ..> Email : email (later)
 
 ' ===================== the plugin (SDK class) + ops =====================
 class SpectralPlugin <<sdk>> {
@@ -146,25 +160,35 @@ class SpectralPlugin <<sdk>> {
   + metadata(workflow)
   + publishing(workflow)
   --
-  Qt-free; never persists; criteria live in this code
+  Qt-free; imports only plugin_sdk; criteria live in this code
 }
 class Operation <<sdk>> {
   + apply(SpectraContainer) : SpectraContainer
 }
 note bottom of Operation
-  shared library: MedianOp, AbsorptionOp,
-  BaselineOp, NormalizeOp, SmoothOp
+  plugin_sdk ops (as-built): MeanOp, TransmissionOp,
+  AbsorptionOp, VerdictOp (+ EvaluationColorUtil)
 end note
-Plugin ..> SpectralPlugin : loads (verified)
+class MetadataField <<sdk>> {
+  + name / label / type / showInWorkflowsTable / order
+  --
+  metadata() returns [MetadataField]; the wizard builds
+  the editable METADATA form from these (and, on reopen,
+  from the persisted self-describing rows)
+}
+DbPlugin ..> SpectralPlugin : loads (by codeRef)
 SpectralPlugin ..> SpectralWorkflow : fills (creates steps)
 SpectralPlugin ..> Operation : composes
+SpectralPlugin ..> MetadataField : declares (metadata hook)
+MetadataField ..> SpectralWorkflowMetadata : persisted as
 
 legend right
-  <b><<persisted>></b> saved — the workflow IS the record
+  <b><<persisted>></b> saved (APP DB) — the workflow IS the record (Option A)
+  <b><<server>></b>    SERVER DB (auth + plugin binding); cross-DB refs are soft (dashed)
   <b><<sdk>></b>       plugin-facing, Qt-free
   <b><<view>></b>      renderable result model (host -> QWidget)
-  <b><<enum>></b>      enumeration
-  <b><<postponed>></b> deferred (email transport TBD)
+  leaf maps persist as JSON columns: Spectrum.valuesJson, EvaluationResult.resultJson
+  <b><<postponed>></b> deferred (PDF/email publishing)
 endlegend
 
 @enduml
