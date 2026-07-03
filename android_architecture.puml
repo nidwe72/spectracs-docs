@@ -1,0 +1,86 @@
+@startuml android_architecture
+title Spectracs — Android deployment architecture (K2: real scipy in-app · two APKs) · DESIGN 2026-07-02
+
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam defaultTextAlignment center
+skinparam linetype ortho
+skinparam nodeFontSize 13
+skinparam packageFontSize 12
+
+' ============================================================ THE DEVICE
+node "Android phone — arm64-v8a\n(first target: virtual spectrometer, no hardware)" as PHONE #FBFBFB {
+
+  ' -------------------------------------------------- MAIN APP (APK #1)
+  package "MAIN APP · APK #1  (buildozer + python-for-android)" as MAIN #EAF2FB {
+    component "PySide6 UI\n(single QStackedWidget nav)" as UI #FFFFFF
+    component "Virtual spectrometer\n(synthetic image source)" as VIRT #FFF9C4
+    component "Processing pipeline\nROI → peaks → calibrate → spectrum → colour → verdict" as PIPE #FFFFFF
+    component "numpy · opencv (cv2)\ncolour / colormath / luxpy / rgbxy" as NP #E8F5E9
+    component "**scipy** (REAL package)\nsignal · ndimage · linalg(LAPACK)\n→ find_peaks, savgol, LDA, airPLS…" as SCIPY #FFE0B2
+    database "spectracsPy.db\n(app data · SQLite)" as DBM #FFFFFF
+
+    VIRT --> PIPE : frames
+    PIPE --> NP
+    PIPE --> SCIPY
+    PIPE --> DBM
+    UI --> PIPE
+  }
+
+  ' -------------------------------------------------- SERVER APP (APK #2)
+  package "SERVER APP · APK #2  (foreground service)" as SERVER #F5F5F5 {
+    component "Foreground service\n(persistent notification\nkeeps process alive)" as FGS #FFFFFF
+    component "Pyro5 daemon\n@ 127.0.0.1:<fixed port>" as PYRO #FFFFFF
+    component "SQLAlchemy · bcrypt\n(login / user CRUD / master data)\nNO scipy" as SRVLOGIC #FFFFFF
+    database "spectracsPyServer.db\n(user store · SQLite)" as DBS #FFFFFF
+
+    FGS --> PYRO
+    PYRO --> SRVLOGIC
+    SRVLOGIC --> DBS
+  }
+
+  UI ..> PYRO : Pyro5 over loopback\nlogin · syncSpectrometers · master data\n(client degrades gracefully if absent)
+}
+
+note bottom of SERVER
+  Two <b>literal</b> APKs, isolated sandboxes ⇒ two separate DBs.
+  Android forbids cross-app silent start ⇒ <b>user launches the server app</b>.
+  Fully local showcase — no reliance on a public (sciens.at) service.
+end note
+
+' ============================================================ DEFERRED CAPTURE TIER
+package "DEFERRED — real-hardware capture (Phase 7; not in first target)" as DEFER #EEEEEE {
+  node "DIY spectrometer\n(built-in USB / UVC camera)" as DIY #E0E0E0
+  cloud "Raspberry-Pi tier\n(idea — capture over network)" as RPI #E0E0E0
+}
+
+DIY ..> UI : UVC-over-OTG\nUsbManager fd → libusb → libuvc\n(uses.feature usb.host; NOT CAMERA perm)
+RPI ..> UI : network client\n(reuses Pyro/HTTP pattern)
+
+note right of DEFER
+  Deferred: no device available now, and the RPi tier
+  could carry capture (and heavy compute) over the network,
+  making OTG unnecessary. Decide UVC-over-OTG vs RPi then.
+end note
+
+' ============================================================ BUILD TOOLCHAIN
+note as TOOLS #FFF7E6
+  <b>Toolchain</b>: raw buildozer + python-for-android (NOT pyside6-android-deploy — it can't do
+  services / a 2nd app / custom recipes). Chaquopy rejected (not a Qt runtime).
+  <b>scipy on Android</b>: p4a scipy recipe = Meson + OpenBLAS + flang. scipy 1.18 removed all its
+  own Fortran. <b>Phase-0 GATE</b>: a minimal PySide6+scipy APK on a real phone must prove
+  <i>import scipy</i> + find_peaks/svd run under the PySide6 runtime (no public precedent yet).
+end note
+TOOLS .. MAIN
+
+legend right
+  <b>Colour key</b>
+  <back:#EAF2FB> main app </back>   <back:#F5F5F5> server app </back>
+  <back:#FFE0B2> scipy (kept — the load-bearing bet) </back>
+  <back:#E8F5E9> numpy / opencv / pure-python compute </back>
+  <back:#FFF9C4> image source (virtual, first target) </back>
+  <back:#EEEEEE> deferred / future </back>
+  ..>  Pyro5 / IPC / capture link
+endlegend
+
+@enduml
