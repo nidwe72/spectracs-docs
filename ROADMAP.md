@@ -53,6 +53,12 @@ what is actually needed; `colour` + `colorsys` may cover most).
 - **Still to do (the master-facing UI half):** master can **delete** `SpectrometerProfile`(s); replace the
   free-text **serial** with a **selection of an `AppUser`**; a master screen to pick user↔profile. These
   remain #3's own work.
+- **⚠ DIRECTION CHANGED 2026-07-05 (Edwin):** key on **SERIAL, not username/`AppUser`**. The master authors,
+  *per serial*, the `{ device, calibration, plugin }` bundle; the end user registers by entering the label
+  serial. This **reverses** the "replace serial with an `AppUser` selection" line above and supersedes the
+  "username = future serial" idea. The serial is a stable natural key that also resolves D15's dangling-id
+  workaround. Full object model → new `SPEC_connection_and_calibration_ux` (see the real-hardware-capture
+  section below + `spectracsPy/docs/SPEC_real_camera_capture.md` §9.4).
 
 ## 4. User CRUD (master user)  *(**IMPLEMENTED 2026-06-30** — spec `spectracsPy/docs/SPEC_user_crud.md`; master-only `UserListViewModule` (QTableView) + `UserViewModule` editor over Pyro; new `UserAdminLogicModule` + 4 `@expose` RPCs; single role, hard delete, last-master guard, password min 8, server-unavailable banner. Façade + UI + live RPC round-trip verified.)*
 - Master user can **add a user** (and edit / delete) — an `AppUser` management screen. Feeds #3's
@@ -85,6 +91,55 @@ Synthesis ideas (so the virtual device produces meaningful spectra end-to-end):
 > **Follow-ups (not this milestone):** workflow-record persistence (Save→save), METADATA form + PUBLISHING
 > (PDF/email), plugin signature verification, real-hardware re-measure invalidation.
 
+## Real-hardware capture & connection/calibration  *(NEW 2026-07-05 — spec-first, design only)*
+
+Real USB-camera capture is **verified on hardware** (ELP `32e4:8830` captured a real CFL mercury-line
+spectrum; resolver picks the camera by USB VID:PID). Design lives in
+[`spectracsPy/docs/SPEC_real_camera_capture.md`](../spectracsPy/docs/SPEC_real_camera_capture.md) (+ hardware
+construction in `KB_spectroscopy_physics.md` §7). Two tracks below feed one milestone. **Implement on
+explicit request only.**
+
+> **PRIORITY (Edwin, 2026-07-05): SETUP track (CX) FIRST, against the VIRTUAL spectrometer; CAPTURE track
+> (RC, real camera) is POSTPONED.** The virtual-spectrometer functionality already exists, so the master
+> setup + end-user registration flows can be built and **GUI-tested without any real hardware**. The
+> milestone is therefore first reached **on the virtual device** (master authors a serial-object → end user
+> self-registers with the serial → **connect** → measurement on the virtual spectrometer); the **real-device**
+> measurement follows once RC-R0…R3 land.
+>
+> **First-sweep build order (Edwin): (1) full DB migration `CX-DB` → (2) master-user GUIs → (3) end-user GUIs;
+> connect-spectrometer is part of this sweep** (can auto-connect; details TBD). Master = **three GUIs**: Plugin
+> (`DbPlugin` CRUD), SpectrometerProfile (device + **auto-calibrate on file-set assignment**), SpectrometerSetup
+> (bind profile + plugin). End-user = **Register** link on login → self-register (username/password/email/first/
+> last + serial) → auto-login. Full detail: `spectracsPy/docs/SPEC_connection_and_calibration_ux.md` §4–§5.
+
+```
+ ID      Step                                                    Delivers                         Depends on     Kind
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ RC      SPEC_real_camera_capture (resolver, backend, params)    the design (HW-verified)         —              DESIGN ✔
+ RC-R0   SensorCaptureIndexResolver as app code (VID:PID→index)  right camera, not hardcoded 0    RC             build
+ RC-R1   CaptureBackend owns cv2; VideoThread routes through it  one capture path; drop MJPG-force RC-R0         build
+ RC-R2   Real device selection in calibration + λ-cal views      calibration off the real cam     RC-R1          build
+ RC-R3   Real capture in workflow "Measure" + live-burst→graph   real measurement UX              RC-R2          build
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ CX      SPEC_connection_and_calibration_ux (serial-as-key)      the object model + UX design     RC (context)   DESIGN ✔ drafted
+ CX-M    Master setup UI: serial → {device, calibration(CFL),    master authors a unit            CX, #4         build
+         plugin}  (+ strip AppUser.pluginId/spectrometerDevice)
+ CX-E    End-user register-by-serial → resolves bundle → session end user activates a unit        CX, CX-M       build
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ ★ MS    MILESTONE: real measurement after user setup           see below                        RC-R3+CX-M+CX-E goal
+```
+
+**★ Next milestone — a real measurement after the user has been set up.** End-to-end on the **real** device:
+1. **Master** logs in and sets up a spectrometer unit: assigns a **serial**, links its device/sensor,
+   produces a **calibration profile** (calibrate against the **CFL** lamp), and assigns the **plugin**.
+2. A **new end user is registered** and **enters the serial** (from the unit's label) → the app resolves
+   the unit's { device, calibration, plugin } bundle.
+3. The end user runs a **real measurement** on the ELP camera (live-during-burst → spectrum graph) → the
+   plugin evaluation renders. No virtual device involved.
+
+`CX` (the `SPEC_connection_and_calibration_ux` design) is the **natural next step** (Edwin). Note it
+**reverses Roadmap #3's** user-selection direction → key on **serial**, not username (see #3's ⚠ note).
+
 ## Still-deferred design threads (pick up when their build item needs them)
 - **Persistable-workflow schema** in [`DB_ENTITIES.md`](DB_ENTITIES.md): map `model/spectral/` classes to
   SQLAlchemy, add the `Plugin` entity + `AppUser` bindings, record the `DbSpectrum` + `MeasurementProfile`
@@ -98,6 +153,18 @@ Synthesis ideas (so the virtual device produces meaningful spectra end-to-end):
   PUBLISHING phase, though that will use a reusable Qt renderer over the real `EvaluationResult`.)*
 - **LED-combination optimisation** *(future)* — use the Playground's LED synthesis to search LED sets for
   an even flatter, gap-free reference light source. Separate task; current LED set is fine.
+- **Pumpkin-oil evaluation → peak-ratio algorithm** *(later task, 2026-07-05)* — switch the
+  `PumpkinOilPlugin` evaluation (currently spectrum→hue/colour) to a **peak-ratio** method. Design discussion
+  (in German) captured externally: `https://share.google/x0Ij7iuZQR8Q` (Gemini thread). To be specced in
+  English when picked up; affects `PumpkinOilPlugin.evaluation` (plugin-local, does not touch capture).
+- **Pumpkin-oil authenticity / genuineness check** *(later task, 2026-07-05)* — a mechanism that verifies the
+  measured oil is **really genuine pumpkin oil** (authenticity / adulteration detection), not just a colour/
+  verdict. Plugin-side evaluation feature, postponed; relates to the peak-ratio algorithm switch above.
+- **LIMS integration** *(future, product)* — integrate with a **lab information management system** (push
+  measurement results / pull sample context). Implies the client is **online-required** in normal operation.
+- **Rental-fee / licensing gate** *(future, product)* — a **monthly rental-fee / license check** gates use;
+  another reason operation is online-required. Ties to the connection/registration flow (`SPEC_real_camera_capture.md`
+  §9.4-a2) — the serial-bundle resolve is a natural place to also verify licence.
 
 ## Dependencies / suggested order
 - **#1, #2, #4 — done.** The measurement/evaluation concept + Pipeline Playground PoC — done.
