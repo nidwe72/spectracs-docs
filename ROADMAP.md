@@ -46,7 +46,7 @@ what is actually needed; `colour` + `colorsys` may cover most).
   **logo aligned left**. *(Spec: an account/person **icon** control, best-practice header pattern.)*
 - The **status / progress bar** (below the logo) should span the **full screen width**.
 
-## 3. SpectrometerProfile ↔ user binding + deletion  *(master user)*  *(**▶ NEXT — binding half done in the integration milestone**)*
+## 3. SpectrometerProfile ↔ user binding + deletion  *(master user)*  *(**✅ SUPERSEDED + IMPLEMENTED as CX / milestone 5a, 2026-07-05** — re-keyed on SERIAL (not `AppUser`); see the "Real-hardware capture & connection/calibration" section below + `SPEC_connection_and_calibration_ux.md` §10)*
 - The **`AppUser → {Plugin, device}` config binding is DONE + seeded** (integration Track B.1a): `AppUser`
   gained `pluginId` (FK) + `spectrometerDevice`; the host runs the plugin via the logged-in user. The device
   is bound by stable code-name (`Virtuax`), not a profile id (D15).
@@ -99,6 +99,13 @@ spectrum; resolver picks the camera by USB VID:PID). Design lives in
 construction in `KB_spectroscopy_physics.md` §7). Two tracks below feed one milestone. **Implement on
 explicit request only.**
 
+> **✅ MILESTONE 5a IMPLEMENTED + pushed 2026-07-05** — the setup track (CX Phases A/B/C) is built and
+> verified on the virtual device: serial-keyed object model (server-DB migration), master authoring GUIs
+> (Plugin / Spectrometer profiles + auto-calibrate / Spectrometer setups under Settings → Administration),
+> end-user self-registration (Register on the login dialog → auto-login), and a header connection indicator.
+> Seeded test users: `masterUser/masterUser`, `pumpkinTestUser/pumpkinTestUser` (→ `TEST-0001`). As-built +
+> deviations: `spectracsPy/docs/SPEC_connection_and_calibration_ux.md` §10. **Next: 5b (real device, RC track).**
+>
 > **PRIORITY (Edwin, 2026-07-05): SETUP track (CX) FIRST, against the VIRTUAL spectrometer; CAPTURE track
 > (RC, real camera) is POSTPONED.** The virtual-spectrometer functionality already exists, so the master
 > setup + end-user registration flows can be built and **GUI-tested without any real hardware**. The
@@ -121,10 +128,10 @@ explicit request only.**
  RC-R2   Real device selection in calibration + λ-cal views      calibration off the real cam     RC-R1          build
  RC-R3   Real capture in workflow "Measure" + live-burst→graph   real measurement UX              RC-R2          build
  ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
- CX      SPEC_connection_and_calibration_ux (serial-as-key)      the object model + UX design     RC (context)   DESIGN ✔ drafted
- CX-M    Master setup UI: serial → {device, calibration(CFL),    master authors a unit            CX, #4         build
+ CX      SPEC_connection_and_calibration_ux (serial-as-key)      the object model + UX design     RC (context)   DESIGN ✔ + BUILT
+ CX-M    Master setup UI: serial → {device, calibration(CFL),    master authors a unit            CX, #4         DONE ✓
          plugin}  (+ strip AppUser.pluginId/spectrometerDevice)
- CX-E    End-user register-by-serial → resolves bundle → session end user activates a unit        CX, CX-M       build
+ CX-E    End-user register-by-serial → resolves bundle → session end user activates a unit        CX, CX-M       DONE ✓
  ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
  ★ MS    MILESTONE: real measurement after user setup           see below                        RC-R3+CX-M+CX-E goal
 ```
