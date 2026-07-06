@@ -111,8 +111,24 @@ explicit request only.**
 > Seeded test users: `masterUser/masterUser`, `pumpkinTestUser/pumpkinTestUser` (→ `TEST-0001`). As-built +
 > deviations: `spectracsPy/docs/SPEC_connection_and_calibration_ux.md` §10. **Next: 5b (real device, RC track).**
 >
-> **PRIORITY (Edwin, 2026-07-05): SETUP track (CX) FIRST, against the VIRTUAL spectrometer; CAPTURE track
-> (RC, real camera) is POSTPONED.** The virtual-spectrometer functionality already exists, so the master
+> **✅ SM1 — capture track resumed + IMPLEMENTED 2026-07-06/07 (first step toward real-live usage).**
+> **RC-R0 + RC-R1 are DONE**, delivered as a new **"Capture images" dev view** (Settings → Development,
+> master-only): `SensorCaptureIndexResolver` (VID:PID→cv2 index via Linux sysfs), `CaptureBackend` owns cv2
+> (no forced MJPG, tolerant reads), live stream + save-PNG (feeds building virtual filesets). Plus two things
+> that came out of using it on the ELP: **per-camera exposure** seeded at the sensor catalog
+> (`SpectrometerSensorUtil`, ELP CFL=78) — fixing the over-exposure that clipped the mercury green and
+> **merged the doublet**, so calibration **detect-peaks now resolves the green on real hardware** — and
+> **our own auto-exposure** (a bisection to just-below-clip: checkbox default-on, one-shot on stream start,
+> manual slider, status-bar progress; explicitly **not** the camera's broken built-in). Decided for
+> measurement (details later): auto-expose the **reference**, reuse that exposure on the **sample** (same
+> exposure → clean T=S/R, preserves absorption). Windows auto-resolve = own deferred milestone. Specs:
+> `SPEC_dev_capture_view.md`, `SPEC_real_camera_capture.md` §4/§9.3, `KB_spectroscopy_physics.md` §7.
+> **Next: SM2 = real calibration (RC-R2)** — wire the resolver into ROI/Hough **and** detect-peaks for a
+> complete real `SpectrometerSetup`.
+>
+> **PRIORITY (Edwin, 2026-07-05, now partly overtaken): SETUP track (CX) FIRST, against the VIRTUAL
+> spectrometer; CAPTURE track (RC) was postponed — RESUMED 2026-07-06, RC-R0/R1 now done (see SM1 above).**
+> The virtual-spectrometer functionality already exists, so the master
 > setup + end-user registration flows can be built and **GUI-tested without any real hardware**. The
 > milestone is therefore first reached **on the virtual device** (master authors a serial-object → end user
 > self-registers with the serial → **connect** → measurement on the virtual spectrometer); the **real-device**
@@ -128,10 +144,13 @@ explicit request only.**
  ID      Step                                                    Delivers                         Depends on     Kind
  ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
  RC      SPEC_real_camera_capture (resolver, backend, params)    the design (HW-verified)         —              DESIGN ✔
- RC-R0   SensorCaptureIndexResolver as app code (VID:PID→index)  right camera, not hardcoded 0    RC             build
- RC-R1   CaptureBackend owns cv2; VideoThread routes through it  one capture path; drop MJPG-force RC-R0         build
- RC-R2   Real device selection in calibration + λ-cal views      calibration off the real cam     RC-R1          build
- RC-R3   Real capture in workflow "Measure" + live-burst→graph   real measurement UX              RC-R2          build
+ SM1     "Capture images" dev view (Settings>Development):       real live capture + the shared   RC             DONE ✓
+         resolver + backend(no MJPG) + save-PNG + per-camera     capture foundation (RC-R0+R1)
+         exposure (ELP=78) + OUR auto-exposure (bisect/slider)
+ RC-R0   SensorCaptureIndexResolver (VID:PID→cv2 index, sysfs)   right camera, not hardcoded 0    RC             DONE ✓
+ RC-R1   CaptureBackend owns cv2; VideoThread routes through it  one capture path; drop MJPG-force RC-R0         DONE ✓
+ RC-R2   Real device selection: ROI/Hough + detect-peaks (=SM2)  complete calib off the real cam  RC-R1          ▶ NEXT
+ RC-R3   Real capture in workflow "Measure" + live-burst→graph   real measurement UX (=SM3)       RC-R2          build
  ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
  CX      SPEC_connection_and_calibration_ux (serial-as-key)      the object model + UX design     RC (context)   DESIGN ✔ + BUILT
  CX-M    Master setup UI: serial → {device, calibration(CFL),    master authors a unit            CX, #4         DONE ✓
@@ -165,6 +184,13 @@ explicit request only.**
   PUBLISHING phase, though that will use a reusable Qt renderer over the real `EvaluationResult`.)*
 - **LED-combination optimisation** *(future)* — use the Playground's LED synthesis to search LED sets for
   an even flatter, gap-free reference light source. Separate task; current LED set is fine.
+- **Exposure / capture follow-ups (from SM1, 2026-07-07)** — auto-exposure is proven in the dev view; still
+  open: **wire it into the real calibration (SM2) and measurement (SM3) flows**; the **LED-array measurement
+  exposure** value (dial it live in the dev view once the LED source is on hand); camera **response linearity
+  / gamma** check for quantitative T (same-exposure ref/sample keeps the ratio robust regardless); **gain**
+  as a v2 lever when exposure alone can't reach target; a **focus-assist dev tool** (sharpness algorithm to
+  beat the eye — the instrument is already focused, this is a quality aid, matters for calibration). Detail:
+  `spectracsPy/docs/SPEC_real_camera_capture.md` §9.3, `SPEC_dev_capture_view.md` §6.
 - **Pumpkin-oil evaluation → peak-ratio algorithm** *(later task, 2026-07-05)* — switch the
   `PumpkinOilPlugin` evaluation (currently spectrum→hue/colour) to a **peak-ratio** method. Design discussion
   (in German) captured externally: `https://share.google/x0Ij7iuZQR8Q` (Gemini thread). To be specced in
