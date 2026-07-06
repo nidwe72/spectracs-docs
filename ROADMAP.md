@@ -169,9 +169,16 @@ explicit request only.**
   verdict. Plugin-side evaluation feature, postponed; relates to the peak-ratio algorithm switch above.
 - **LIMS integration** *(future, product)* — integrate with a **lab information management system** (push
   measurement results / pull sample context). Implies the client is **online-required** in normal operation.
-- **Rental-fee / licensing gate** *(future, product)* — a **monthly rental-fee / license check** gates use;
-  another reason operation is online-required. Ties to the connection/registration flow (`SPEC_real_camera_capture.md`
-  §9.4-a2) — the serial-bundle resolve is a natural place to also verify licence.
+- **Rental-fee / licensing gate** *(product — payment MILESTONE 1 IMPLEMENTED 2026-07-06)* — a **monthly
+  rental-fee / license check** gates use; another reason operation is online-required. Ties to the
+  connection/registration flow (`SPEC_real_camera_capture.md` §9.4-a2) — the serial-bundle resolve is a
+  natural place to also verify licence. Spec:
+  [`spectracsPy/docs/SPEC_paypal_payment.md`](../spectracsPy/docs/SPEC_paypal_payment.md). **✅ Milestone 1
+  DONE + click-through verified:** single one-off **€1 sandbox** PayPal payment end-to-end — server-DB
+  `Transaction` entity, PayPal Orders v2 (sandbox, stdlib-only), per-user **Account settings** screen
+  (Profile + Payment tabs) off the header account menu (desktop), server-side secret in an un-versioned
+  `.env`. Product model = monthly rental fee (pay even without use). **Next milestones:** M2 recurring
+  €200/month (Subscriptions API), M3 live go-live, M4 Android. Implement on explicit request only.
 
 ## Dependencies / suggested order
 - **#1, #2, #4 — done.** The measurement/evaluation concept + Pipeline Playground PoC — done.
