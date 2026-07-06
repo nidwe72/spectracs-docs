@@ -25,6 +25,11 @@
 > **UI conventions:** `spectracsPy/docs/DESIGN_GUIDE.md` (page layout, button variants, tables, QSS) +
 > `spectracsPy/docs/DEV_WORKFLOW.md` (click-through review — drive-and-observe UI verification).
 >
+> **GUI polish (IMPLEMENTED 2026-07-06):** `spectracsPy/docs/SPEC_gui_cosmetic_tweaks.md` — Settings moved
+> from the Home footer into the logged-in account menu; the "save physically captured images" row removed;
+> the virtual-spectrometer fileset made **master-only** (master authors the fileset → end user measures).
+> Android account-menu handling deferred (verify the QMenu-crash assumption first).
+>
 > **Pipeline PoC (IMPLEMENTED 2026-06-30, bridges #5+#6):** the **measurement & evaluation concept**
 > (`spectracsPy/docs/SPEC_measurement_evaluation_concept.md` — sound, LED-independent
 > measure→T=S/R→colour→verdict) and the **Pipeline Playground**

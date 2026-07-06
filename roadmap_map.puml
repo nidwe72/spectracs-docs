@@ -5,7 +5,7 @@
 ' runtime_models / workflow_object_model) intentionally do not.
 ' Regenerate:  java -jar plantuml.jar -tsvg roadmap_map.puml
 
-title Spectracs — Roadmap map\nstatus + dependencies (as of 2026-07-02)
+title Spectracs — Roadmap map\nstatus + dependencies (as of 2026-07-06)
 
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
@@ -50,6 +50,17 @@ rectangle "WORKFLOW & PLUGIN   (the goal)" as G #FFFFFF {
   rectangle "**#6  pumpkin-oil workflow + plugin**\n✅ done — integration Tracks B+C\nplugin_sdk + PumpkinOilPlugin + engine +\ninteractive nested-wizard (Measure, plots, verdict)" as R6 #C8E6C9
 }
 
+rectangle "CONNECTION & CAPTURE" as CX #FFFFFF {
+  rectangle "**CX — connection & calibration UX (milestone 5a)**\n✅ done (on the VIRTUAL device) 2026-07-05\nserial-keyed setup (server-DB migration); master\nauthoring GUIs (Plugin / Profile+auto-calibrate / Setup);\nend-user self-register by serial; header connection indicator" as CXA #C8E6C9
+  rectangle "**Real camera capture (milestone 5b)**\n▶ next\nVID:PID->cv2 resolver, CaptureBackend, real\ncalibration + measurement (RC-R0..R3) on the ELP cam" as RC #FFE0B2
+  rectangle "**★ real measurement after user setup**\ngoal: master sets up a serial unit -> end user\nregisters by serial -> real measurement + evaluation" as MS #ECEFF1
+}
+
+rectangle "SAAS / BILLING  (product)" as SAAS #FFFFFF {
+  rectangle "**PayPal payment — milestone 1**\n✅ done + click-through verified 2026-07-06\nsingle 1,00 € SANDBOX payment end-to-end:\nTransaction (server DB) + Orders v2 (stdlib) +\nAccount settings screen (Profile / Payment tabs)" as PAY #C8E6C9
+  rectangle "**recurring rental fee — M2**\nlater: €200/month PayPal Subscriptions\n(pay even without use); then M3 live, M4 Android" as PAY2 #ECEFF1
+}
+
 rectangle "CROSS-CUTTING  (deferred design threads)" as CC #FFFFFF {
   rectangle "persistable-workflow DB schema\nprereq for persistence in #3 / #6" as CCa #E1BEE7
   rectangle "EvaluationResult -> GUI integration\n✅ done — EvaluationResultRenderer in the wizard\n(swatches + verdict)" as CCb #C8E6C9
@@ -71,5 +82,16 @@ CCa ..> R3
 CCa ..> R6
 R6 ..> CCb
 R6 ..> CCc
+
+' ---- connection & capture ----
+R3 ..> CXA : re-keyed on SERIAL (not username)
+R6 --> CXA : plugin+device bound per serial
+CXA --> RC : setup before real capture
+RC --> MS : real device
+CXA --> MS : user setup
+
+' ---- saas / billing ----
+R4 --> PAY : needs AppUser (Transaction FK)
+PAY --> PAY2 : proves the pipe
 
 @enduml
