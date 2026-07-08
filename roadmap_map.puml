@@ -5,7 +5,7 @@
 ' runtime_models / workflow_object_model) intentionally do not.
 ' Regenerate:  java -jar plantuml.jar -tsvg roadmap_map.puml
 
-title Spectracs — Roadmap map\nstatus + dependencies (as of 2026-07-07)
+title Spectracs — Roadmap map\nstatus + dependencies (as of 2026-07-08)
 
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
@@ -53,8 +53,9 @@ rectangle "WORKFLOW & PLUGIN   (the goal)" as G #FFFFFF {
 rectangle "CONNECTION & CAPTURE" as CX #FFFFFF {
   rectangle "**CX — connection & calibration UX (milestone 5a)**\n✅ done (on the VIRTUAL device) 2026-07-05\nserial-keyed setup (server-DB migration); master\nauthoring GUIs (Plugin / Profile+auto-calibrate / Setup);\nend-user self-register by serial; header connection indicator" as CXA #C8E6C9
   rectangle "**SM1 — Capture-images dev view**\n✅ done 2026-07-07  (RC-R0 + RC-R1)\nVID:PID->cv2 resolver + CaptureBackend (no MJPG-force);\nSettings>Development live view + save PNG;\nper-camera exposure (ELP CFL=78) + OUR auto-exposure\n(bisection, slider, status-bar progress)" as SM1 #C8E6C9
-  rectangle "**SM2 — real calibration off the ELP**\n▶ next  (RC-R2)\nresolver into ROI/Hough + detect-peaks ->\ncomplete SpectrometerSetup on real hardware\n(detect-peaks already resolves the green @ exp 78)" as SM2 #FFE0B2
-  rectangle "**SM3 — real measurement**\n(RC-R3)\nreal capture in workflow Measure (live-burst->graph);\nmeasurement auto-exposure: expose REF, reuse on SAMPLE" as SM3 #ECEFF1
+  rectangle "**SM2 — real calibration off the ELP**\n✅ done 2026-07-08  (RC-R2)\nROI/Hough + detect-peaks on the real cam;\ncalibration auto-exposure + green doublet (542.4)\n+ blue-line ROI (max-channel)" as SM2 #C8E6C9
+  rectangle "**Dev measurement bench**\n✅ done + verified 2026-07-08\nmaster Swiss-knife: REF+SAMPLE -> T -> A (no verdict);\nDevSpectralPlugin (transient); seeded masterUserExakta;\nproves the real capture+extraction path" as BENCH #C8E6C9
+  rectangle "**SM3 — real measurement**\n▶ next  (RC-R3)\nreal capture in workflow Measure (live-burst->graph);\nmeasurement auto-exposure: expose REF, reuse on SAMPLE" as SM3 #FFE0B2
   rectangle "**★ real measurement after user setup**\ngoal: master sets up a serial unit -> end user\nregisters by serial -> real measurement + evaluation" as MS #ECEFF1
 }
 
@@ -90,6 +91,10 @@ R3 ..> CXA : re-keyed on SERIAL (not username)
 R6 --> CXA : plugin+device bound per serial
 SM1 --> SM2 : resolver + backend + exposure
 CXA --> SM2 : serial unit to calibrate
+SM1 --> BENCH : capture + auto-exposure
+SM2 --> BENCH : real calibration
+CXA --> BENCH : calibrated serial unit
+BENCH ..> SM3 : proves capture+extraction
 SM2 --> SM3 : calibrated real device
 SM3 --> MS : real measurement
 CXA --> MS : user setup

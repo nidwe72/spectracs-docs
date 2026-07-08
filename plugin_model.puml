@@ -30,6 +30,7 @@ package "SpectralWorkflow — ONE static spine, shared by every scenario\n(persi
 package "Plugin variants — one phase-hook per phase, each CREATES that phase's steps" {
   component "Pumpkin\nevaluation = spectrum → hue → green/brown" as PU #FFF2CC
   component "Olive\nevaluation = LDA classification" as OL #FFF2CC
+  component "DevSpectral (master bench)\nREF+SAMPLE → T → A · NO evaluation\ninjected TRANSIENTLY (not serial-bound)" as DV #D9EAD3
 }
 
 M --> P  : creates + calibrates
@@ -44,6 +45,8 @@ PM ..> MD : creates steps (or skips)
 PM ..> PB : creates steps
 PU --|> PM
 OL --|> PM
+DV --|> PM
+M ..> DV : runs directly in the dev measurement bench
 
 note bottom of PB
   Host owns Next-navigation + persistence; the plugin never persists.

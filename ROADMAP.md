@@ -126,6 +126,26 @@ explicit request only.**
 > **Next: SM2 = real calibration (RC-R2)** — wire the resolver into ROI/Hough **and** detect-peaks for a
 > complete real `SpectrometerSetup`.
 >
+> **✅ SM2 — real calibration off the ELP DONE 2026-07-08 (RC-R2), via the DEV MEASUREMENT BENCH work.**
+> Calibrating a real `SpectrometerSetup` on the ELP now works end-to-end. Fixes that landed:
+> **auto-exposure in calibration authoring** (`AutoExposureCaptureHelper` pre-pass before the ROI/Hough +
+> detect-peaks bursts — they previously opened the camera bloomed at index 0 with no AE); **green doublet
+> resolved** (parameterized `SmoothSpectrumLogicModule` + light calibration smoothing so the 50-frame mean
+> isn't over-smoothed, plus a best-effort 6th anchor `MERCURY_MANGO_GREEN_LEFT` 542.4 via a local search left
+> of the dominant green); **ROI left-bound** now uses the brightest *channel* (max r,g,b) not `qGray`, so a
+> visible **blue** line is no longer clipped out of the ROI.
+>
+> **✅ DEV MEASUREMENT BENCH — IMPLEMENTED + click-through verified 2026-07-08.** A master "Swiss-knife"
+> real-camera bench (Settings → Development): a generic sibling of the end-user plugin wizard that runs the
+> *same* pipeline — acquire REFERENCE + SAMPLE (live preview + auto-exposure, exposure locked on ref and
+> reused for sample) → transmission `T=S/R` → absorption `A=−log10(S/R)` — **without** a use-case verdict.
+> Backed by a transiently-injected **`DevSpectralPlugin`**; capture owned by the view, extraction shared
+> (`ImageSpectrumAcquisitionLogicModule`). Seeded **`masterUserExakta`** bound to the real ELP serial;
+> login/bench re-install the calibrated profile into `ApplicationSettings` via the server RPC
+> (`ActiveSpectrometerProfileLogicModule`). Transmission geometry only (sample between bulb and camera);
+> reflectance is future. Spec: [`spectracsPy/docs/SPEC_dev_measure_bench.md`](../spectracsPy/docs/SPEC_dev_measure_bench.md).
+> **Next: SM3 = real measurement in the end-user workflow** (live-burst → graph; reuse the bench's capture).
+>
 > **PRIORITY (Edwin, 2026-07-05, now partly overtaken): SETUP track (CX) FIRST, against the VIRTUAL
 > spectrometer; CAPTURE track (RC) was postponed — RESUMED 2026-07-06, RC-R0/R1 now done (see SM1 above).**
 > The virtual-spectrometer functionality already exists, so the master
@@ -149,8 +169,10 @@ explicit request only.**
          exposure (ELP=78) + OUR auto-exposure (bisect/slider)
  RC-R0   SensorCaptureIndexResolver (VID:PID→cv2 index, sysfs)   right camera, not hardcoded 0    RC             DONE ✓
  RC-R1   CaptureBackend owns cv2; VideoThread routes through it  one capture path; drop MJPG-force RC-R0         DONE ✓
- RC-R2   Real device selection: ROI/Hough + detect-peaks (=SM2)  complete calib off the real cam  RC-R1          ▶ NEXT
- RC-R3   Real capture in workflow "Measure" + live-burst→graph   real measurement UX (=SM3)       RC-R2          build
+ RC-R2   Real device selection: ROI/Hough + detect-peaks (=SM2)  complete calib off the real cam  RC-R1          DONE ✓
+         (+ calibration auto-exposure, green doublet, blue ROI)  (via dev measurement bench)
+ RC-R3   Real capture in workflow "Measure" + live-burst→graph   real measurement UX (=SM3)       RC-R2          ▶ NEXT
+         (bench proves the real capture+extraction path)
  ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
  CX      SPEC_connection_and_calibration_ux (serial-as-key)      the object model + UX design     RC (context)   DESIGN ✔ + BUILT
  CX-M    Master setup UI: serial → {device, calibration(CFL),    master authors a unit            CX, #4         DONE ✓
@@ -184,8 +206,9 @@ explicit request only.**
   PUBLISHING phase, though that will use a reusable Qt renderer over the real `EvaluationResult`.)*
 - **LED-combination optimisation** *(future)* — use the Playground's LED synthesis to search LED sets for
   an even flatter, gap-free reference light source. Separate task; current LED set is fine.
-- **Exposure / capture follow-ups (from SM1, 2026-07-07)** — auto-exposure is proven in the dev view; still
-  open: **wire it into the real calibration (SM2) and measurement (SM3) flows**; the **LED-array measurement
+- **Exposure / capture follow-ups (from SM1, 2026-07-07)** — auto-exposure is proven in the dev view;
+  **✅ now also wired into real calibration (SM2, 2026-07-08)** via `AutoExposureCaptureHelper`; still
+  open: **wire it into the measurement (SM3) flow**; the **LED-array measurement
   exposure** value (dial it live in the dev view once the LED source is on hand); camera **response linearity
   / gamma** check for quantitative T (same-exposure ref/sample keeps the ratio robust regardless); **gain**
   as a v2 lever when exposure alone can't reach target; a **focus-assist dev tool** (sharpness algorithm to
