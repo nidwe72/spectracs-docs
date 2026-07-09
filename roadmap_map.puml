@@ -5,7 +5,7 @@
 ' runtime_models / workflow_object_model) intentionally do not.
 ' Regenerate:  java -jar plantuml.jar -tsvg roadmap_map.puml
 
-title Spectracs — Roadmap map\nstatus + dependencies (as of 2026-07-08)
+title Spectracs — Roadmap map\nstatus + dependencies (as of 2026-07-09)
 
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
@@ -54,9 +54,15 @@ rectangle "CONNECTION & CAPTURE" as CX #FFFFFF {
   rectangle "**CX — connection & calibration UX (milestone 5a)**\n✅ done (on the VIRTUAL device) 2026-07-05\nserial-keyed setup (server-DB migration); master\nauthoring GUIs (Plugin / Profile+auto-calibrate / Setup);\nend-user self-register by serial; header connection indicator" as CXA #C8E6C9
   rectangle "**SM1 — Capture-images dev view**\n✅ done 2026-07-07  (RC-R0 + RC-R1)\nVID:PID->cv2 resolver + CaptureBackend (no MJPG-force);\nSettings>Development live view + save PNG;\nper-camera exposure (ELP CFL=78) + OUR auto-exposure\n(bisection, slider, status-bar progress)" as SM1 #C8E6C9
   rectangle "**SM2 — real calibration off the ELP**\n✅ done 2026-07-08  (RC-R2)\nROI/Hough + detect-peaks on the real cam;\ncalibration auto-exposure + green doublet (542.4)\n+ blue-line ROI (max-channel)" as SM2 #C8E6C9
-  rectangle "**Dev measurement bench**\n✅ done + verified 2026-07-08\nmaster Swiss-knife: REF+SAMPLE -> T -> A (no verdict);\nDevSpectralPlugin (transient); seeded masterUserExakta;\nproves the real capture+extraction path" as BENCH #C8E6C9
+  rectangle "**Dev measurement bench**\n✅ done + verified 2026-07-08\nmaster Swiss-knife: REF+SAMPLE -> T -> A (no verdict);\nDevSpectralPlugin (transient); seeded masterUserExakta;\nproves the real capture+extraction path\n+ 2026-07-09 build-out: EVALUATION phase, acquisition\ntabs (Captured-image/Spectrum), per-frame progress +\nlive spectra, metric fields, phone-width responsiveness" as BENCH #C8E6C9
   rectangle "**SM3 — real measurement**\n▶ next  (RC-R3)\nreal capture in workflow Measure (live-burst->graph);\nmeasurement auto-exposure: expose REF, reuse on SAMPLE" as SM3 #FFE0B2
   rectangle "**★ real measurement after user setup**\ngoal: master sets up a serial unit -> end user\nregisters by serial -> real measurement + evaluation" as MS #ECEFF1
+}
+
+rectangle "EVALUATION  (peak-ratio — the verdict)" as EV #FFFFFF {
+  rectangle "**Peak-ratio evaluation (P0–P4)**\n✅ done 2026-07-09 — render-only in the bench\ngeneric SpectrumFeatureUtil ops + DevSpectralPlugin\ncomposition (hard-coded pumpkin bands);\ngreenness / pigment / browning / clarity;\nprovisional verdict (no thresholds yet)" as PR #C8E6C9
+  rectangle "**P5 — calibrate on real oils**\n▶ next: save metrics + known good/bad oils ->\nquant->qual bounds -> real verdict edges\n(no thresholds ship before this)" as PR5 #FFE0B2
+  rectangle "**P6 — pumpkin plugin uses peak-ratio**\nlater: PumpkinOilPlugin composes the SAME ops\n(A/B vs hue); promote consts to shared feature-config" as PR6 #ECEFF1
 }
 
 rectangle "SAAS / BILLING  (product)" as SAAS #FFFFFF {
@@ -98,6 +104,13 @@ BENCH ..> SM3 : proves capture+extraction
 SM2 --> SM3 : calibrated real device
 SM3 --> MS : real measurement
 CXA --> MS : user setup
+
+' ---- evaluation (peak-ratio) ----
+BENCH --> PR : EVALUATION phase added
+CONCEPT ..> PR : physically-specific successor to hue
+PR --> PR5 : render -> calibrate
+PR5 --> PR6 : real edges -> plugin verdict
+R6 ..> PR6 : the pumpkin plugin wires it in
 
 ' ---- saas / billing ----
 R4 --> PAY : needs AppUser (Transaction FK)
