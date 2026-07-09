@@ -38,6 +38,22 @@
 > regression test + documentation PDF (`tests/test_pumpkin_oil_spectrum_to_color_eval.py`). It proves the
 > concept end-to-end on synthetic data and de-risks #5 (synthesis) and #6 (absorption/evaluation).
 > Physics/data: `KB_spectroscopy_physics.md`, `KB_led_and_oil_spectra.md`, sibling `spectracs-references/`.
+>
+> **Peak-ratio evaluation + bench build-out (IMPLEMENTED 2026-07-09):**
+> [`spectracsPy/docs/SPEC_pumpkin_peak_ratio_eval.md`](../spectracsPy/docs/SPEC_pumpkin_peak_ratio_eval.md)
+> (see **§0 Concept & rationale**) — the physically-specific successor to the hue verdict: reads the pigment
+> bands (Soret-flank blue + ~575 nm Q-band + green anchor → a *greenness* ratio) so it separates *why* an oil
+> is off (browned vs faded vs turbid). **P0–P4 done, render-only first sweep** in the dev measurement bench:
+> generic `SpectrumFeatureUtil` ops + `DevSpectralPlugin.evaluation` composing them with hard-coded pumpkin
+> constants → a real EVALUATION phase showing greenness / pigment / browning / clarity. **Next: P5** (save +
+> calibrate on real known-good/bad oils → verdict edges — *no thresholds ship before this*), then **P6** (wire
+> the independent `PumpkinOilPlugin`). Same session (`SPEC_dev_measure_bench.md` §12–18,
+> `SPEC_dev_capture_view.md` §11): extended 400–700 nm analysis window + shared ROI overlay; bench acquisition
+> as Reference/Sample steps with Captured-image/Spectrum tabs + per-frame progress bar + live spectra;
+> metric-field rendering (gray label chip + read-only field + click-tooltip); phone-width responsiveness
+> (plots shrink, images fit, word-wrapped labels — no scrollbars). Physics grounded in Fruhwirth & Hermetter
+> (2007), now stored in `spectracs-references/articles/`; KB updated (`KB_led_and_oil_spectra.md` §2 pigment
+> peaks + the "our bench reproduces Fig. 3A" mapping). **Cosmetic polish** on the bench still open (minor).
 
 ## 1. Extract the spectrum → colour logic  *(**IMPLEMENTED 2026-06-29** — spec `spectracsPy/docs/SPEC_spectrum_processing.md`; 11 unit tests pass. Remaining: wire into `PumpkinPlugin.evaluation`, #6)*
 Lift the proven `spectrasTest.py` hue pipeline into a reusable logic module / utility
