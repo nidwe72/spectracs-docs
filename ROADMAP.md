@@ -53,7 +53,18 @@
 > metric-field rendering (gray label chip + read-only field + click-tooltip); phone-width responsiveness
 > (plots shrink, images fit, word-wrapped labels — no scrollbars). Physics grounded in Fruhwirth & Hermetter
 > (2007), now stored in `spectracs-references/articles/`; KB updated (`KB_led_and_oil_spectra.md` §2 pigment
-> peaks + the "our bench reproduces Fig. 3A" mapping). **Cosmetic polish** on the bench still open (minor).
+> peaks + the "our bench reproduces Fig. 3A" mapping).
+>
+> **Bench cosmetic + UX polish (IMPLEMENTED 2026-07-10):**
+> [`spectracsPy/docs/SPEC_bench_small_screen_refinements.md`](../spectracsPy/docs/SPEC_bench_small_screen_refinements.md)
+> — small/phone-width refinements driven by click-through: step-tabs framing (S1), capture progress → status
+> bar (S2), Evaluation *Metrics | Spectrum* split (S4), bold ratio labels via a `MetricFieldViewStyle` composite
+> (S5), removed hint/status line (S7); then a **frame-hierarchy pass** — every `QTabWidget` keeps its pane
+> border (S10), the WorkflowPhase `QStackedWidget` frame dropped (S11); plus Processing raster vertical-centre
+> (S12), the checkbox touch-target made real-Android-only so desktop `--phone` shows the desktop icon (S13), and
+> a global native combo-box **▼** (S14). **New best practice:** GUI-layout changes are now **mocked in
+> [Wireloom](../spectracsPy/docs/DEV_WORKFLOW.md)** (markup → SVG, toolkit-neutral) and agreed *before* coding —
+> the reference mock lives beside the spec (`docs/mock_bench_acquisition.wireloom`).
 
 ## 1. Extract the spectrum → colour logic  *(**IMPLEMENTED 2026-06-29** — spec `spectracsPy/docs/SPEC_spectrum_processing.md`; 11 unit tests pass. Remaining: wire into `PumpkinPlugin.evaluation`, #6)*
 Lift the proven `spectrasTest.py` hue pipeline into a reusable logic module / utility
