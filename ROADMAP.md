@@ -66,16 +66,20 @@
 > [Wireloom](../spectracsPy/docs/DEV_WORKFLOW.md)** (markup → SVG, toolkit-neutral) and agreed *before* coding —
 > the reference mock lives beside the spec (`docs/mock_bench_acquisition.wireloom`).
 >
-> **Plugin platform — M1 IMPLEMENTED 2026-07-10; M2 + M3 DESIGN:** the big theme — *the plugin drives the GUI of both
-> the dev bench and the end-user view.* **M1 convergence** (`spectracsPy/docs/SPEC_plugin_driven_convergence.md`) is
+> **Plugin platform — M1 + M2 IMPLEMENTED (2026-07-10/11); M3 DESIGN:** the big theme — *the plugin drives the GUI of
+> both the dev bench and the end-user view.* **M1 convergence** (`spectracsPy/docs/SPEC_plugin_driven_convergence.md`) is
 > **built**: a shared render **visitor** seam (`QtWorkflowRenderer`) + generic `WorkflowPhaseRenderer` (steps→tabs), the
 > view-model vocabulary extended (`SpectrumPlotView` traces/bands/markers, new `SpectrumCaptureView`/`CaptureView`,
 > re-homed to `model.spectral.plugin.view`), EVALUATION/PROCESSING now plugin-declared, a **bench plugin selector**
 > (Dev/Pumpkin), and the wizard routed through the same renderer. Two pre-existing camera bugs fixed en route (V4L2
-> mid-stream exposure; tall-frame raster display). **M2 = plugin-driven PDF report**
-> (`SPEC_bench_pdf_export.md` — matplotlib preview=PDF, `shownInReport`, whole-Workflow embedded JSON via pypdf; LIS →
-> **SENAITE** deferred). **M3 = plugin distribution** (`SPEC_plugin_distribution.md` — separate repo + DB-stored
-> **signed** source, client-side load; `plugin_sdk` becomes a versioned API). M2/M3 depend on M1; sequence M1→M2→M3.
+> mid-stream exposure; tall-frame raster display). **M2 = plugin-driven PDF report — DONE**
+> (`SPEC_bench_pdf_export.md`): a Qt-free `MatplotlibWorkflowRenderer` (second target of the M1 visitor) renders an
+> A4 preview that **is** the PDF; a per-view-model **`isShownInReport`** flag curates the body cross-phase; the whole
+> `SpectralWorkflow` is embedded as `workflow.json` + each capture as a named PNG attachment via **pypdf**; generic
+> per-view-model `toJson`/`fromJson` (fixes the lossy serializer + persisted-run reload); fit-to-width `PdfPreviewWidget`
+> + "Open bigger" full-window view; plugin-declared `CaptureView` chrome flags (frames/exposure hidden by default). LIS
+> → **SENAITE** stays deferred. **M3 = plugin distribution** (`SPEC_plugin_distribution.md` — separate repo + DB-stored
+> **signed** source, client-side load; `plugin_sdk` becomes a versioned API). M3 depends on M1; sequence M1→M2→M3.
 
 ## 1. Extract the spectrum → colour logic  *(**IMPLEMENTED 2026-06-29** — spec `spectracsPy/docs/SPEC_spectrum_processing.md`; 11 unit tests pass. Remaining: wire into `PumpkinPlugin.evaluation`, #6)*
 Lift the proven `spectrasTest.py` hue pipeline into a reusable logic module / utility
@@ -230,6 +234,17 @@ explicit request only.**
 
 `CX` (the `SPEC_connection_and_calibration_ux` design) is the **natural next step** (Edwin). Note it
 **reverses Roadmap #3's** user-selection direction → key on **serial**, not username (see #3's ⚠ note).
+
+## Test-suite hygiene debt  *(NEW 2026-07-10 — backlog, non-blocking)*
+Three pre-existing `tests/` failures catalogued in
+[`spectracsPy/docs/SPEC_test_hygiene_debt.md`](../spectracsPy/docs/SPEC_test_hygiene_debt.md) (surfaced during the
+M2 verification sweep; **none caused by M2** — all in code M2 does not touch). All three are **test-side** (no
+product change): **T1** `test_plugin_binding_and_seed` — stale test-DB schema (missing
+`spectrometer_calibration_profile.calibrationSpectrumJson` column) → rebuild the fixture from mapped metadata;
+**T2** `test_workflow_wizard_persistence_offscreen` — the delete path opens a **modal `InWindowDialog.confirm`**
+that blocks the headless event loop → **this hangs the whole `pytest tests/` run**; patch the confirm (auto-accept)
+and add a global pytest timeout; **T3** `test_pumpkin_wizard_offscreen` — stale nav-glyph assertion (`Next →` vs
+`Next ▶`). Until T2 is fixed, run the suite **per-file with a timeout** (see the spec). Effort: small/trivial each.
 
 ## Still-deferred design threads (pick up when their build item needs them)
 - **Persistable-workflow schema** in [`DB_ENTITIES.md`](DB_ENTITIES.md): map `model/spectral/` classes to

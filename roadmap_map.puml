@@ -5,7 +5,7 @@
 ' runtime_models / workflow_object_model) intentionally do not.
 ' Regenerate:  java -jar plantuml.jar -tsvg roadmap_map.puml
 
-title Spectracs — Roadmap map\nstatus + dependencies (as of 2026-07-10, incl. plugin platform M1–M3)
+title Spectracs — Roadmap map\nstatus + dependencies (as of 2026-07-11, incl. plugin platform M1+M2 done, M3 design)
 
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
@@ -75,11 +75,12 @@ rectangle "CROSS-CUTTING  (deferred design threads)" as CC #FFFFFF {
   rectangle "EvaluationResult -> GUI integration\n✅ done — EvaluationResultRenderer in the wizard\n(swatches + verdict)" as CCb #C8E6C9
   rectangle "PDF report + email\n(PDF prototype: Playground eval test)" as CCc #E1BEE7
   rectangle "LED-combination optimisation\n(future: search a flatter reference)" as CCd #E1BEE7
+  rectangle "**test-suite hygiene debt**\nbacklog (non-blocking) — 3 pre-existing test\nfailures: stale calib-DB fixture (T1),\nmodal-dialog hang blocks the suite (T2),\nstale nav-glyph assertion (T3)\nSPEC_test_hygiene_debt.md" as CCe #E1BEE7
 }
 
 rectangle "PLUGIN PLATFORM  (the convergence theme)" as PP #FFFFFF {
   rectangle "**M1 — plugin-driven convergence**\n✅ done 2026-07-10\nshared render visitor + WorkflowPhaseRenderer (steps->tabs);\nview-model vocab extended (plot traces/bands/markers,\nSpectrumCaptureView/CaptureView); EVAL+PROC plugin-declared;\nbench plugin selector (Dev/Pumpkin); wizard converged" as M1 #C8E6C9
-  rectangle "**M2 — plugin-driven PDF report**\n> design (SPEC_bench_pdf_export.md)\nReport step-tab; matplotlib preview = PDF;\nshownInReport; whole-Workflow embedded JSON (pypdf);\nLIS -> SENAITE deferred" as M2 #FFE0B2
+  rectangle "**M2 — plugin-driven PDF report**\n✅ done 2026-07-11 (SPEC_bench_pdf_export.md)\nQt-free MatplotlibWorkflowRenderer (2nd visitor target);\nReport step-tab, preview = PDF; isShownInReport curates;\nwhole-Workflow workflow.json + capture PNGs via pypdf;\ngeneric per-view-model toJson/fromJson; fit-to-width\npreview + 'Open bigger'; CaptureView chrome flags;\nLIS -> SENAITE deferred" as M2 #C8E6C9
   rectangle "**M3 — plugin distribution**\nlater/design (SPEC_plugin_distribution.md)\nseparate repo + DB-stored SIGNED source, client load;\nplugin_sdk = versioned API; PluginRegistry" as M3 #ECEFF1
 }
 
@@ -89,6 +90,7 @@ R6 ..> M1 : both hosts converge
 M1 --> M2 : render seam -> matplotlib target
 M1 --> M3 : plugin becomes a droppable unit
 PR ..> M2 : evaluation content -> report
+M2 ..> CCe : surfaced during verification
 
 ' ---- dependency / unblocks edges ----
 R1 --> R6  : evaluation body
