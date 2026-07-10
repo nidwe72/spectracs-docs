@@ -65,6 +65,17 @@
 > a global native combo-box **▼** (S14). **New best practice:** GUI-layout changes are now **mocked in
 > [Wireloom](../spectracsPy/docs/DEV_WORKFLOW.md)** (markup → SVG, toolkit-neutral) and agreed *before* coding —
 > the reference mock lives beside the spec (`docs/mock_bench_acquisition.wireloom`).
+>
+> **Plugin platform — M1 IMPLEMENTED 2026-07-10; M2 + M3 DESIGN:** the big theme — *the plugin drives the GUI of both
+> the dev bench and the end-user view.* **M1 convergence** (`spectracsPy/docs/SPEC_plugin_driven_convergence.md`) is
+> **built**: a shared render **visitor** seam (`QtWorkflowRenderer`) + generic `WorkflowPhaseRenderer` (steps→tabs), the
+> view-model vocabulary extended (`SpectrumPlotView` traces/bands/markers, new `SpectrumCaptureView`/`CaptureView`,
+> re-homed to `model.spectral.plugin.view`), EVALUATION/PROCESSING now plugin-declared, a **bench plugin selector**
+> (Dev/Pumpkin), and the wizard routed through the same renderer. Two pre-existing camera bugs fixed en route (V4L2
+> mid-stream exposure; tall-frame raster display). **M2 = plugin-driven PDF report**
+> (`SPEC_bench_pdf_export.md` — matplotlib preview=PDF, `shownInReport`, whole-Workflow embedded JSON via pypdf; LIS →
+> **SENAITE** deferred). **M3 = plugin distribution** (`SPEC_plugin_distribution.md` — separate repo + DB-stored
+> **signed** source, client-side load; `plugin_sdk` becomes a versioned API). M2/M3 depend on M1; sequence M1→M2→M3.
 
 ## 1. Extract the spectrum → colour logic  *(**IMPLEMENTED 2026-06-29** — spec `spectracsPy/docs/SPEC_spectrum_processing.md`; 11 unit tests pass. Remaining: wire into `PumpkinPlugin.evaluation`, #6)*
 Lift the proven `spectrasTest.py` hue pipeline into a reusable logic module / utility

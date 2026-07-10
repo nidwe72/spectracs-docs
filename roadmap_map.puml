@@ -5,7 +5,7 @@
 ' runtime_models / workflow_object_model) intentionally do not.
 ' Regenerate:  java -jar plantuml.jar -tsvg roadmap_map.puml
 
-title Spectracs — Roadmap map\nstatus + dependencies (as of 2026-07-10)
+title Spectracs — Roadmap map\nstatus + dependencies (as of 2026-07-10, incl. plugin platform M1–M3)
 
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
@@ -76,6 +76,19 @@ rectangle "CROSS-CUTTING  (deferred design threads)" as CC #FFFFFF {
   rectangle "PDF report + email\n(PDF prototype: Playground eval test)" as CCc #E1BEE7
   rectangle "LED-combination optimisation\n(future: search a flatter reference)" as CCd #E1BEE7
 }
+
+rectangle "PLUGIN PLATFORM  (the convergence theme)" as PP #FFFFFF {
+  rectangle "**M1 — plugin-driven convergence**\n✅ done 2026-07-10\nshared render visitor + WorkflowPhaseRenderer (steps->tabs);\nview-model vocab extended (plot traces/bands/markers,\nSpectrumCaptureView/CaptureView); EVAL+PROC plugin-declared;\nbench plugin selector (Dev/Pumpkin); wizard converged" as M1 #C8E6C9
+  rectangle "**M2 — plugin-driven PDF report**\n> design (SPEC_bench_pdf_export.md)\nReport step-tab; matplotlib preview = PDF;\nshownInReport; whole-Workflow embedded JSON (pypdf);\nLIS -> SENAITE deferred" as M2 #FFE0B2
+  rectangle "**M3 — plugin distribution**\nlater/design (SPEC_plugin_distribution.md)\nseparate repo + DB-stored SIGNED source, client load;\nplugin_sdk = versioned API; PluginRegistry" as M3 #ECEFF1
+}
+
+' ---- plugin platform ----
+BENCH --> M1 : generic host over the plugin
+R6 ..> M1 : both hosts converge
+M1 --> M2 : render seam -> matplotlib target
+M1 --> M3 : plugin becomes a droppable unit
+PR ..> M2 : evaluation content -> report
 
 ' ---- dependency / unblocks edges ----
 R1 --> R6  : evaluation body
