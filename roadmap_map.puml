@@ -5,7 +5,7 @@
 ' runtime_models / workflow_object_model) intentionally do not.
 ' Regenerate:  java -jar plantuml.jar -tsvg roadmap_map.puml
 
-title Spectracs — Roadmap map\nstatus + dependencies (as of 2026-07-11, incl. plugin platform M1+M2 done, M3 design)
+title Spectracs — Roadmap map\nstatus + dependencies (as of 2026-07-11, incl. plugin platform M1+M2 done, M3 design; LIMS M1 design)
 
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
@@ -84,6 +84,12 @@ rectangle "PLUGIN PLATFORM  (the convergence theme)" as PP #FFFFFF {
   rectangle "**M3 — plugin distribution**\nlater/design (SPEC_plugin_distribution.md)\nseparate repo + DB-stored SIGNED source, client load;\nplugin_sdk = versioned API; PluginRegistry" as M3 #ECEFF1
 }
 
+rectangle "LIMS  (field-to-lab)" as LIMS #FFFFFF {
+  rectangle "**LIMS M1 — create a Sample (SENAITE first)**\n✅ done + click-through verified 2026-07-11\n(created OIL-0006 with the PDF attached) — L0–L7\nplugin PUBLISHING phase + 'Send to LIMS' step (Publish btn);\nALL over the spectracsPy-server API (creds server-only):\nclient builds PDF -> Pyro publishSampleToLims(info, pdf);\nserver assembles LIMS-neutral submission from AppUser +\nreal spectrometer graph; LimsGateway seam + adapter registry\n(plugin selects LIMS via LimsTarget; SenaiteLimsGateway + Mock);\nadapter: idempotent bottom-up ensure-or-create -> AnalysisRequest\n+ attach M2 PDF. spectracs_app_service set up manually (Lab Manager)" as LIMS1 #C8E6C9
+  rectangle "**LIMS-side Plone add-on**\ndeferred (separate repo, Plone/Py2.7)\nparse embedded workflow.json + render absorption\non demand inside SENAITE (PDF viewer + buttons)" as LIMS2 #E1BEE7
+  rectangle "**results push + state machine**\nlater: numeric metrics -> Analysis Services;\nReceive/Submit/Verify/Publish (CoA); offline queue" as LIMS3 #ECEFF1
+}
+
 ' ---- plugin platform ----
 BENCH --> M1 : generic host over the plugin
 R6 ..> M1 : both hosts converge
@@ -91,6 +97,11 @@ M1 --> M2 : render seam -> matplotlib target
 M1 --> M3 : plugin becomes a droppable unit
 PR ..> M2 : evaluation content -> report
 M2 ..> CCe : surfaced during verification
+M2 --> LIMS1 : PDF payload (workflow.json + captures)
+M1 --> LIMS1 : plugin-declared PUBLISHING step
+LIMS1 --> LIMS2 : same embedded PDF, LIMS-side viewer
+LIMS1 --> LIMS3 : sample exists -> push results + advance state
+PAY ..> LIMS1 : both imply online-required client
 
 ' ---- dependency / unblocks edges ----
 R1 --> R6  : evaluation body

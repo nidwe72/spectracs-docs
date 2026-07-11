@@ -274,8 +274,23 @@ and add a global pytest timeout; **T3** `test_pumpkin_wizard_offscreen` — stal
 - **Pumpkin-oil authenticity / genuineness check** *(later task, 2026-07-05)* — a mechanism that verifies the
   measured oil is **really genuine pumpkin oil** (authenticity / adulteration detection), not just a colour/
   verdict. Plugin-side evaluation feature, postponed; relates to the peak-ratio algorithm switch above.
-- **LIMS integration** *(future, product)* — integrate with a **lab information management system** (push
-  measurement results / pull sample context). Implies the client is **online-required** in normal operation.
+- **LIMS integration** *(**IMPLEMENTED + click-through verified 2026-07-11** — spec
+  [`spectracsPy/docs/SPEC_lims_integration.md`](../spectracsPy/docs/SPEC_lims_integration.md); driving the bench to
+  Publishing + Publish created `OIL-0006` in SENAITE with the PDF attached)* — the **field-to-lab**
+  handoff: a plugin-declared **PUBLISHING** phase + "Send to LIMS" step (Publish button) creates a **Sample**
+  (`AnalysisRequest`) in **SENAITE LIMS** (local Docker, `6090:8080`) and **attaches the M2 PDF** (whose embedded
+  `workflow.json` + `capture_*.png` are the payload). **Everything runs over the spectracsPy-server API** — the client
+  builds the PDF and calls **one Pyro `@expose`** (`publishSampleToLims(pluginLimsInfo, pdfBytes)`); the **server** holds
+  the LIMS creds (never leaves the server) and assembles a **LIMS-neutral submission** from the authenticated AppUser +
+  the **real spectrometer graph** (instrument = the registered spectrometer's vendor/model/style, analyses = the
+  plugin's real metrics). A thin **`LimsGateway` seam** with an adapter registry keeps it **LIMS-agnostic** (no
+  cross-LIMS library exists) — the **plugin selects the LIMS** via a `LimsTarget`; `SenaiteLimsGateway` (+ a
+  `MockLimsGateway` for tests) is the first adapter and runs an **idempotent bottom-up ensure-or-create** of the whole
+  `senaite.jsonapi` graph (Department→Category→Service, SampleType, InstrumentType/Manufacturer/Supplier→**Instrument**
+  by serial, Client→Contact) then the Sample + PDF attach. The **`spectracs_app_service` is set up manually** (Lab Manager, so
+  the bootstrap can create setup objects). Creds via `ServerConfig` `.env` (`LIMS_SENAITE_*`). **Deferred:** LIMS-side
+  Plone add-on, numeric results push + analysis-level Instrument link, sample state machine, offline queue, second
+  adapter (OpenELIS/FHIR). Implies the client is **online-required**. Implement on explicit request only.
 - **Rental-fee / licensing gate** *(product — payment MILESTONE 1 IMPLEMENTED 2026-07-06)* — a **monthly
   rental-fee / license check** gates use; another reason operation is online-required. Ties to the
   connection/registration flow (`SPEC_real_camera_capture.md` §9.4-a2) — the serial-bundle resolve is a
