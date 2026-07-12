@@ -17,6 +17,10 @@ for optical spectroscopy with a DIY spectroscope).
 - **[`ROADMAP.md`](ROADMAP.md)** — the working backlog / agreed next steps to build (resume point).
   Diagram: [`roadmap_map.svg`](roadmap_map.svg) — status + dependency graph (what is done, what is
   next/unblocked, what blocks what).
+- **Doc-automation harness** — the "Director" screencast tooling
+  ([`spectracsPy/docs/SPEC_doc_automation.md`](../spectracsPy/docs/SPEC_doc_automation.md), IMPLEMENTED).
+  Diagram: [`doc_automation_architecture.svg`](doc_automation_architecture.svg) — the two-process
+  (Director ↔ app `--doc-mode`) UDP + visible-mouse architecture.
 - `*.puml` — PlantUML sources for the diagrams.
 - `spectracs.gaphor` — an older (2023) Gaphor UML model, kept for reference.
 

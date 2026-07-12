@@ -1,0 +1,66 @@
+@startuml doc_automation_architecture
+' Spectracs — Documentation/screencast automation ("Director") architecture.
+' Companion to spectracsPy/docs/SPEC_doc_automation.md (IMPLEMENTED M1, 2026-07-12).
+' Regenerate:  java -jar plantuml.jar -tsvg doc_automation_architecture.puml
+
+title Spectracs — Doc-automation ("Director") harness\ntwo processes, one local-UDP seam + a visible mouse (as-built 2026-07-12)
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName Sans
+skinparam ArrowColor #5A7D8C
+skinparam ArrowFontColor #5A7D8C
+skinparam rectangle {
+  FontColor #222222
+  BorderColor #5A5A5A
+  roundCorner 10
+}
+skinparam package {
+  BorderColor #5A5A5A
+  FontColor #222222
+}
+
+legend right
+  |= colour |= part |
+  | <#E3F2FD>    | Director (external tooling, automation/) |
+  | <#E8F5E9>    | Spectracs app, --doc-mode (gated) |
+  | <#FFF3E0>    | OS / output artifacts |
+endlegend
+
+package "Director process  (automation/, dev-only)" #E3F2FD {
+  rectangle "Prompter (QDialog)\nleft screen · CONTINUE gate" as PR #E3F2FD
+  rectangle "Scenario (QThread)\nthe per-scenario run()" as SC #E3F2FD
+  rectangle "Director API\nnav / click / wait_ready /\nset_hint / wait_for_human /\nscreenshot / launch_app / finish" as DIR #E3F2FD
+  rectangle "PyAutoGUI\nreal cursor glide" as PAG #E3F2FD
+  rectangle "ffmpeg (x11grab)\nrecord app window" as FF #E3F2FD
+}
+
+package "Spectracs  --doc-mode  (app tree, gated)" #E8F5E9 {
+  rectangle "DocModeUdpService  :5555\nset_hint · locate(+tab) · nav ·\nwait · activate · dismiss · ping" as UDP #E8F5E9
+  rectangle "DocHintPanelViewModule\nright-side narration" as HINT #E8F5E9
+  rectangle "App views\nWizard / Measurement bench\n(objectName'd widgets)" as VIEWS #E8F5E9
+  rectangle "NavigationHandler" as NAV #E8F5E9
+}
+
+rectangle "Screen / X11 :0\n(app window on its monitor)" as SCREEN #FFF3E0
+rectangle "automation/recordings/*.mp4\n(gitignored — not versioned)\n+ screenshots/*.png" as OUT #FFF3E0
+
+SC --> DIR : calls
+DIR --> PR : prompt / gate
+DIR --> UDP : UDP JSON commands
+UDP --> HINT : set_hint
+UDP --> NAV : nav (NavigationSignal)
+UDP --> VIEWS : locate (mapToGlobal) /\nactivate (findChild→click) / wait
+DIR --> PAG : glide to (cx,cy)
+PAG --> SCREEN : visible cursor motion
+DIR --> FF : start / stop
+FF --> SCREEN : grab app-window rect
+FF --> OUT : encode mp4
+VIEWS --> SCREEN : app renders here
+
+note bottom of DIR
+  Robust click = glide the VISIBLE cursor (PyAutoGUI),
+  then trigger the widget PROGRAMMATICALLY over UDP
+  (activate) — never a missed pixel-click.
+end note
+@enduml

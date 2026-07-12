@@ -80,6 +80,22 @@
 > + "Open bigger" full-window view; plugin-declared `CaptureView` chrome flags (frames/exposure hidden by default). LIS
 > → **SENAITE** stays deferred. **M3 = plugin distribution** (`SPEC_plugin_distribution.md` — separate repo + DB-stored
 > **signed** source, client-side load; `plugin_sdk` becomes a versioned API). M3 depends on M1; sequence M1→M2→M3.
+>
+> **Documentation / screencast automation — IMPLEMENTED (M1, 2026-07-12):**
+> [`spectracsPy/docs/SPEC_doc_automation.md`](../spectracsPy/docs/SPEC_doc_automation.md) +
+> [`doc_automation_architecture.svg`](doc_automation_architecture.svg). A **"Director"** harness so the AI
+> can generate per-scenario scripts that drive Spectracs for tutorial **videos + screenshots** with a
+> **visible cursor** and human-in-the-loop pauses. App side (`--doc-mode`, all gated): a right-side hint
+> panel + a local **UDP** service (`DocModeUdpService` :5555 — set_hint/locate/nav/wait/**activate**/dismiss/
+> ping). Director side (external `automation/`): non-modal Prompter + `QThread` scenario runner + a real
+> mouse (PyAutoGUI). Robust clicks = **glide the visible cursor, then trigger the widget programmatically**
+> over UDP (never a missed pixel-click); nav via `NavigationSignal` (menu entries are `QAction`s, not
+> widgets). **Driven live end-to-end:** smoke gate, the **virtual pumpkin wizard** (real computed absorption
+> curve, no hardware), and the **dev measurement bench on the real device** (all 8 beats, live reference
+> spectrum off the real camera). One-command launchers (`wizard.sh`, `bench.sh`) with **auto screen
+> recording** (ffmpeg x11grab → `automation/recordings/*.mp4`, app-window-only; **videos gitignored, not
+> versioned**). **Open issues → to specify later** (spec §15): login automation, bench calibration/serial
+> prerequisite, record-after-prep trimming, Tier A feature-tour chapters, unattended/CI for no-hardware runs.
 
 ## 1. Extract the spectrum → colour logic  *(**IMPLEMENTED 2026-06-29** — spec `spectracsPy/docs/SPEC_spectrum_processing.md`; 11 unit tests pass. Remaining: wire into `PumpkinPlugin.evaluation`, #6)*
 Lift the proven `spectrasTest.py` hue pipeline into a reusable logic module / utility
