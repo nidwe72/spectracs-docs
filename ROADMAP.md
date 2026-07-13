@@ -81,6 +81,24 @@
 > → **SENAITE** stays deferred. **M3 = plugin distribution** (`SPEC_plugin_distribution.md` — separate repo + DB-stored
 > **signed** source, client-side load; `plugin_sdk` becomes a versioned API). M3 depends on M1; sequence M1→M2→M3.
 >
+> **Acquisition guidance — IMPLEMENTED (both hosts) 2026-07-13:**
+> [`spectracsPy/docs/SPEC_acquisition_guidance.md`](../spectracsPy/docs/SPEC_acquisition_guidance.md) — first-time users
+> are walked through the ACQUISITION phase: a **coach line** in the top status bar states the single next action (from the
+> plugin's per-step `CaptureView.prompt`), and a **muted-amber cue** marks exactly one control at a time (2px border on
+> the Measure/capture/Next button, an amber ● on the tab to switch to, ✓ on done tabs). Reuses the previously-orphaned
+> `CaptureView.prompt` — **no new SDK**. Built + offscreen-verified in **both** the end-user wizard (`WizardViewModule`,
+> 17/17) **and** the dev measurement bench (`DevMeasurementBenchViewModule`, 19/19 — **Decision B**, superseding the
+> initial bench-content-only Decision A); both plugins (`PumpkinOilPlugin`, `DevSpectralPlugin`) carry role-specific
+> prompts. **Cost of Decision B:** the guidance logic is **mirrored** (~90 lines) across the two still-separate
+> acquisition panels — to be deduped by the convergence below.
+>
+> **▶ NEXT (plugin platform) — capture-panel convergence (the deferred M1 "P6"):** route ACQUISITION itself through the
+> shared `WorkflowPhaseRenderer` capture path so **both** hosts share ONE acquisition/capture panel instead of two
+> hand-built ones (`WizardViewModule.__acquisitionPanel` + `DevMeasurementBenchViewModule.__buildAcquisitionPanel`). The
+> shared seam today stops at the *computed* phases; the capture panel is the last un-converged piece. When it lands, the
+> **now-duplicated acquisition-guidance logic collapses into that one shared path.** Edwin flagged a "tight discussion"
+> to precede this. **This is the next plugin-platform item to handle.**
+>
 > **Documentation / screencast automation — IMPLEMENTED (M1, 2026-07-12):**
 > [`spectracsPy/docs/SPEC_doc_automation.md`](../spectracsPy/docs/SPEC_doc_automation.md) +
 > [`doc_automation_architecture.svg`](doc_automation_architecture.svg). A **"Director"** harness so the AI
