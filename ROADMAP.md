@@ -3,8 +3,8 @@
 > **Big-picture view:** [`roadmap_map.svg`](roadmap_map.svg) — the **product value-chain** the items below
 > serve: the path one measurement travels (Setup → Capture → Process → Evaluate → Report → Publish → Bill)
 > over the platform/foundation layer, each stage **shaded by how complete the real end-user path is**
-> (status verified against the code 2026-07-13). It surfaces the one real gap — CAPTURE in the end-user
-> wizard (still virtual; the bench does real capture), gated by the capture-panel convergence. Generated
+> (status verified against the code 2026-07-13). The former real gap — CAPTURE in the end-user wizard — is now
+> **CLOSED**: the wizard does real capture via the shared `CapturePanel` (M3, 2026-07-13, rig-verified). Generated
 > from [`roadmap_map.puml`](roadmap_map.puml); regenerate with `java -jar plantuml.jar -tsvg roadmap_map.puml`.
 >
 > Captured **2026-06-28** to resume next session. The **workflow object model is settled** — see
@@ -105,9 +105,11 @@
 > (`SPEC_plugin_driven_convergence.md` §3 ¶, `SPEC_bench_pdf_export.md` §3/§5, `SPEC_pumpkin_peak_ratio_eval.md` §6);
 > offscreen-verified 12/12, no regressions.
 >
-> **▶ NEXT (plugin platform) — capture-panel convergence (the deferred M1 "P6"):** route ACQUISITION itself through the
-> shared `WorkflowPhaseRenderer` capture path so **both** hosts share ONE acquisition/capture panel instead of two
-> hand-built ones (`WizardViewModule.__acquisitionPanel` + `DevMeasurementBenchViewModule.__buildAcquisitionPanel`). The
+> **✅ DONE (M3, 2026-07-13, rig-verified) — capture-panel convergence (was the deferred M1 "P6"):** ACQUISITION now runs
+> through a shared **`CapturePanel`** (host-owned reparented singleton, Option A) so **both** hosts share ONE
+> acquisition/capture panel instead of two hand-built ones. The engine gained a headless frame-provider seam (so the
+> wizard does real capture = SM3), the mirrored guidance collapsed into `AcquisitionGuidance`, and the bench shed ~460
+> net lines. Commits `05bb3c6`…`e71bd80`; `SPEC_plugin_driven_convergence.md` §9. (Original plan follows.) The
 > shared seam today stops at the *computed* phases; the capture panel is the last un-converged piece. When it lands, the
 > **now-duplicated acquisition-guidance logic collapses into that one shared path.** Edwin flagged a "tight discussion"
 > to precede this. **This is the next plugin-platform item to handle.**
@@ -260,8 +262,8 @@ explicit request only.**
  RC-R1   CaptureBackend owns cv2; VideoThread routes through it  one capture path; drop MJPG-force RC-R0         DONE ✓
  RC-R2   Real device selection: ROI/Hough + detect-peaks (=SM2)  complete calib off the real cam  RC-R1          DONE ✓
          (+ calibration auto-exposure, green doublet, blue ROI)  (via dev measurement bench)
- RC-R3   Real capture in workflow "Measure" + live-burst→graph   real measurement UX (=SM3)       RC-R2          ▶ NEXT
-         (bench proves the real capture+extraction path)
+ RC-R3   Real capture in workflow "Measure" + live-burst→graph   real measurement UX (=SM3)       RC-R2          DONE ✓
+         (shipped M3: shared CapturePanel in the wizard; rig-verified)
  ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
  CX      SPEC_connection_and_calibration_ux (serial-as-key)      the object model + UX design     RC (context)   DESIGN ✔ + BUILT
  CX-M    Master setup UI: serial → {device, calibration(CFL),    master authors a unit            CX, #4         DONE ✓

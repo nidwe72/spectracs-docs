@@ -3,8 +3,8 @@
 ' (Setup -> Capture -> Process -> Evaluate -> Report -> Publish -> Bill) — over a platform/foundation
 ' layer, each stage shaded by how complete the REAL end-user path is. Companion to ROADMAP.md (the prose
 ' backlog). The point it surfaces: the pipeline is green end-to-end on the virtual device (and on the
-' bench for real hardware); the single gap in the real END-USER path is CAPTURE (the wizard is still
-' virtual), gated by the capture-panel convergence. Status verified against code 2026-07-13.
+' bench for real hardware). The real END-USER CAPTURE gap is now CLOSED — the wizard does real capture via the
+' shared CapturePanel (M3, 2026-07-13, rig-verified). Remaining frontier: P5 real-oil verdict calibration.
 ' Regenerate:  java -jar plantuml.jar -tsvg roadmap_map.puml
 
 title Spectracs — Roadmap map\nthe measurement value-chain over the platform, shaded by real-path completeness — 2026-07-13
@@ -30,15 +30,15 @@ endlegend
 
 ' =================== the active frontier (what to actually do next) ===================
 rectangle "★ FRONTIER — the real next moves (unblocked)" as FR #FFF3E0 {
-  rectangle "**1. Capture-panel convergence** (deferred M1 'P6')\nroute ACQUISITION through the shared capture path ->\nUNBLOCKS real wizard capture (SM3) + DEDUPES the\nmirrored acquisition-guidance logic" as FR1 #FFE0B2
-  rectangle "**2. SM3 — real measurement in the WIZARD** (RC-R3)\nlive-burst -> graph on the ELP; auto-expose ref,\nreuse on sample. (Bench already does this; the\nwizard does not — engine.__capture is virtual-only)" as FR2 #FFE0B2
+  rectangle "**1. Capture-panel convergence** ✅ DONE (M3, 2026-07-13)\nACQUISITION runs through the shared CapturePanel in\nBOTH hosts; guidance deduped; bench -~460 net lines" as FR1 #C8E6C9
+  rectangle "**2. SM3 — real measurement in the WIZARD** ✅ DONE (M3, rig-verified)\nlive-burst -> graph on a real device via the shared\nCapturePanel + the engine frame-provider seam" as FR2 #C8E6C9
   rectangle "**3. P5 — calibrate the verdict on real oils**\nsave metrics + known good/bad oils -> quant->qual\nbounds -> real peak-ratio edges (no thresholds ship first)" as FR3 #FFE0B2
 }
 
 ' =================== the product value chain (a measurement's journey) ===================
 rectangle "THE MEASUREMENT VALUE CHAIN  (a single measurement, left -> right)" as VC #FFFFFF {
   rectangle "**1 · SETUP & CONNECT**\n✅ serial-keyed: master SpectrometerSetup\n(serial -> device + calibration + plugin),\nend-user register-by-serial -> auto-login.\nVirtual + real calibration (ELP) done.\n(real USB connect '5b' = design)" as S1 #C8E6C9
-  rectangle "**2 · CAPTURE**  ← the one real-path gap\n✅ virtual device (engine)  ✅ bench real capture\n(live burst, auto-expose ref/sample)\n▶ WIZARD real capture = SM3 (still virtual;\nblocked on the convergence above)" as S2 #FFE0B2
+  rectangle "**2 · CAPTURE** ✅\n✅ virtual device (engine)  ✅ bench real capture\n✅ WIZARD real capture (M3 — shared CapturePanel +\nengine frame-provider seam; rig-verified)" as S2 #C8E6C9
   rectangle "**3 · PROCESS**\n✅ Mean -> Transmission (T=S/R) -> Absorption\n(A = -log10 S/R); plugin-declared plots\n(ref/sample overlay, T, A)" as S3 #C8E6C9
   rectangle "**4 · EVALUATE**\n✅ peak-ratio render (greenness/pigment/browning/\nclarity, provisional) ✅ perceived-colour swatch\n▶ P5 calibrate -> real edges   (later: P6 pumpkin\nplugin adopts peak-ratio)" as S4 #C8E6C9
   rectangle "**5 · REPORT**\n✅ plugin-driven PDF (M2): matplotlib visitor,\npreview = PDF, isShownInReport curates,\nwhole-Workflow JSON + capture PNGs embedded" as S5 #C8E6C9
@@ -57,7 +57,7 @@ rectangle "END-USER WORKFLOW & CAPTURE  (the host the chain runs through)" as EW
 rectangle "PLUGIN PLATFORM  (one declaration, many hosts/targets)" as PP #FFFFFF {
   rectangle "**M1 convergence** ✅\nrender visitor + WorkflowPhaseRenderer\n(steps->tabs); view-model vocab; two hosts" as PM1 #C8E6C9
   rectangle "**M2 PDF target** ✅\nMatplotlibWorkflowRenderer = 2nd visitor;\ngeneric per-view-model toJson/fromJson" as PM2 #C8E6C9
-  rectangle "**Capture-panel convergence** ▶\nthe LAST un-converged host panel\n(= Frontier #1)" as PM6 #FFE0B2
+  rectangle "**Capture-panel convergence** ✅ (M3)\nACQUISITION routes through the shared CapturePanel\n(both hosts); guidance collapsed" as PM6 #C8E6C9
   rectangle "**M3 distribution** (later/design)\nDB-stored SIGNED plugin source, client load;\nplugin_sdk = versioned API; PluginRegistry" as PM3 #ECEFF1
 }
 
@@ -83,7 +83,7 @@ rectangle "CROSS-CUTTING  (deferred design threads)" as CC #FFFFFF {
 }
 
 ' =================== the goal ===================
-rectangle "★ MILESTONE — real end-to-end after user setup\nmaster sets up a serial unit -> end user registers by serial ->\nREAL measurement + evaluation (no virtual device).\nGated only by Frontier #1 -> SM3." as GOAL #ECEFF1
+rectangle "★ MILESTONE — real end-to-end after user setup\nmaster sets up a serial unit -> end user registers by serial ->\nREAL measurement + evaluation (no virtual device).\n**Frontier #1 + SM3 shipped (M3) — reachable now;**\nremaining: P5 real-oil verdict calibration + full-chain run." as GOAL #FFE0B2
 
 ' ---- value chain flow ----
 S1 -right-> S2
