@@ -92,6 +92,16 @@
 > prompts. **Cost of Decision B:** the guidance logic is **mirrored** (~90 lines) across the two still-separate
 > acquisition panels — to be deduped by the convergence below.
 >
+> **Bench evaluation colour swatch — IMPLEMENTED 2026-07-13:** the dev measurement bench's EVALUATION now shows the
+> sample's perceived **colour** as a metric-grid row — same shape as the numeric metric fields (gray label chip +
+> aligned value cell), but the value cell renders a **swatch** instead of a read-only field, labelled "color", **no
+> target** swatch. Done by **extending `MetricFieldView` with an optional `color`** (not a new view-model), so it shares
+> the metric grid's aligned label column for free; both render targets branch inside `visitMetricField` (Qt swatch /
+> matplotlib patch → also on the PDF). The plugin computes RGB from the transmission via `EvaluationColorUtil`.
+> **Bench-only** — `PumpkinOilPlugin` keeps its `ColorSwatchView` measured/target comparison blocks. Specs amended
+> (`SPEC_plugin_driven_convergence.md` §3 ¶, `SPEC_bench_pdf_export.md` §3/§5, `SPEC_pumpkin_peak_ratio_eval.md` §6);
+> offscreen-verified 12/12, no regressions.
+>
 > **▶ NEXT (plugin platform) — capture-panel convergence (the deferred M1 "P6"):** route ACQUISITION itself through the
 > shared `WorkflowPhaseRenderer` capture path so **both** hosts share ONE acquisition/capture panel instead of two
 > hand-built ones (`WizardViewModule.__acquisitionPanel` + `DevMeasurementBenchViewModule.__buildAcquisitionPanel`). The

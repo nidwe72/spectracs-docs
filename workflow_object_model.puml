@@ -135,12 +135,19 @@ class SpectrumPlotView <<view>> {
   + spectrum
   + title
 }
+class MetricFieldView <<view>> {
+  + label
+  + value      (unused when color set)
+  + tooltip / style
+  + color?     (r,g,b) -> value cell renders a swatch, not a field
+}
 SpectralWorkflowStep --> EvaluationResult : evaluationResult
 EvaluationResult "1" o-- "0..*" ResultView : items
 ResultView <|-- ColorSwatchView
 ResultView <|-- LabelView
 ResultView <|-- VerdictView
 ResultView <|-- SpectrumPlotView
+ResultView <|-- MetricFieldView
 
 ' ===================== publishing artifacts (deferred) =====================
 class Pdf <<postponed>> {
