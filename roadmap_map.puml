@@ -1,11 +1,13 @@
 @startuml roadmap_map
-' Spectracs — Roadmap big-picture map: build items, status, and dependencies.
-' Companion to ROADMAP.md (the prose backlog). This view answers "what is next and
-' what blocks what", which the structural diagrams (db_entities / plugin_model /
-' runtime_models / workflow_object_model) intentionally do not.
+' Spectracs — Roadmap big-picture map: the PRODUCT VALUE CHAIN — the path one measurement travels
+' (Setup -> Capture -> Process -> Evaluate -> Report -> Publish -> Bill) — over a platform/foundation
+' layer, each stage shaded by how complete the REAL end-user path is. Companion to ROADMAP.md (the prose
+' backlog). The point it surfaces: the pipeline is green end-to-end on the virtual device (and on the
+' bench for real hardware); the single gap in the real END-USER path is CAPTURE (the wizard is still
+' virtual), gated by the capture-panel convergence. Status verified against code 2026-07-13.
 ' Regenerate:  java -jar plantuml.jar -tsvg roadmap_map.puml
 
-title Spectracs — Roadmap map\nstatus + dependencies (as of 2026-07-11, incl. plugin platform M1+M2 done, M3 design; LIMS M1 design)
+title Spectracs — Roadmap map\nthe measurement value-chain over the platform, shaded by real-path completeness — 2026-07-13
 
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
@@ -20,126 +22,106 @@ skinparam rectangle {
 
 legend right
   |= colour |= meaning |
-  | <#C8E6C9>    | done |
-  | <#FFE0B2>    | next / unblocked |
-  | <#ECEFF1>    | later (blocked by a dependency) |
+  | <#C8E6C9>    | shipped (real path) |
+  | <#FFE0B2>    | next / the active frontier |
+  | <#ECEFF1>    | later (blocked / not yet) |
   | <#E1BEE7>    | deferred design thread |
 endlegend
 
-rectangle "FOUNDATIONS" as F #FFFFFF {
-  rectangle "**#1  spectrum -> colour**\n✅ done\nSpectrumUtil + SpectralColorUtil.spectrumToColor" as R1 #C8E6C9
-  rectangle "**#2  login in header**\n✅ done\naccount control + full-width status bar" as R2 #C8E6C9
-  rectangle "**Measurement & evaluation concept**\n✅ done\nSOUND pipeline: T=S/R (LED-independent),\ncolour(T) under D65, hue -> roast verdict\n(concept + physics KB)" as CONCEPT #C8E6C9
+' =================== the active frontier (what to actually do next) ===================
+rectangle "★ FRONTIER — the real next moves (unblocked)" as FR #FFF3E0 {
+  rectangle "**1. Capture-panel convergence** (deferred M1 'P6')\nroute ACQUISITION through the shared capture path ->\nUNBLOCKS real wizard capture (SM3) + DEDUPES the\nmirrored acquisition-guidance logic" as FR1 #FFE0B2
+  rectangle "**2. SM3 — real measurement in the WIZARD** (RC-R3)\nlive-burst -> graph on the ELP; auto-expose ref,\nreuse on sample. (Bench already does this; the\nwizard does not — engine.__capture is virtual-only)" as FR2 #FFE0B2
+  rectangle "**3. P5 — calibrate the verdict on real oils**\nsave metrics + known good/bad oils -> quant->qual\nbounds -> real peak-ratio edges (no thresholds ship first)" as FR3 #FFE0B2
 }
 
-rectangle "PIPELINE PLAYGROUND  (proof-of-concept)" as PG #FFFFFF {
-  rectangle "**Pipeline Playground (PoC)**\n✅ done — master-only dev bench\nLED-synth REFERENCE + oil SAMPLE +\nabsorption + colour + verdict; CFL calibration;\n7-tab bench; regression test + documentation PDF" as PLAY #C8E6C9
+' =================== the product value chain (a measurement's journey) ===================
+rectangle "THE MEASUREMENT VALUE CHAIN  (a single measurement, left -> right)" as VC #FFFFFF {
+  rectangle "**1 · SETUP & CONNECT**\n✅ serial-keyed: master SpectrometerSetup\n(serial -> device + calibration + plugin),\nend-user register-by-serial -> auto-login.\nVirtual + real calibration (ELP) done.\n(real USB connect '5b' = design)" as S1 #C8E6C9
+  rectangle "**2 · CAPTURE**  ← the one real-path gap\n✅ virtual device (engine)  ✅ bench real capture\n(live burst, auto-expose ref/sample)\n▶ WIZARD real capture = SM3 (still virtual;\nblocked on the convergence above)" as S2 #FFE0B2
+  rectangle "**3 · PROCESS**\n✅ Mean -> Transmission (T=S/R) -> Absorption\n(A = -log10 S/R); plugin-declared plots\n(ref/sample overlay, T, A)" as S3 #C8E6C9
+  rectangle "**4 · EVALUATE**\n✅ peak-ratio render (greenness/pigment/browning/\nclarity, provisional) ✅ perceived-colour swatch\n▶ P5 calibrate -> real edges   (later: P6 pumpkin\nplugin adopts peak-ratio)" as S4 #C8E6C9
+  rectangle "**5 · REPORT**\n✅ plugin-driven PDF (M2): matplotlib visitor,\npreview = PDF, isShownInReport curates,\nwhole-Workflow JSON + capture PNGs embedded" as S5 #C8E6C9
+  rectangle "**6 · PUBLISH (LIMS)**\n✅ M1: PUBLISHING phase + 'Send to LIMS' ->\nSENAITE Sample + PDF attach, all via server API\n(later: numeric results push + state machine)" as S6 #C8E6C9
+  rectangle "**7 · BILL**\n✅ PayPal M1: one-off €1 sandbox end-to-end\n(Transaction + Orders v2 + Account settings)\n(later: €200/mo recurring; licence gate)" as S7 #C8E6C9
 }
 
-rectangle "USER & AUTH  (master user)" as UA #FFFFFF {
-  rectangle "**#4  User CRUD**\n✅ done\nadd / edit / delete AppUser (master-only)" as R4 #C8E6C9
-  rectangle "**#3  Profile <-> User binding + deletion**\n▶ next — BINDING HALF DONE (integration Track B)\nAppUser -> {Plugin, device} seeded ✅;\nmaster UI (serial->AppUser, delete profile) remains" as R3 #FFE0B2
+' =================== the end-user host the chain runs through ===================
+rectangle "END-USER WORKFLOW & CAPTURE  (the host the chain runs through)" as EW #FFFFFF {
+  rectangle "**#6 pumpkin-oil workflow + plugin** ✅\nplugin_sdk + PumpkinOilPlugin + engine +\ninteractive nested wizard (Measure, plots, verdict);\nincl. **#6a** absorption display (PROCESSING)" as R6 #C8E6C9
+  rectangle "**Acquisition guidance (both hosts)** ✅ NEW 2026-07-13\ncoach line (plugin CaptureView.prompt) + amber\nnext-action cue; wizard + bench (logic mirrored ->\ndeduped by the capture-panel convergence)" as GUIDE #C8E6C9
+  rectangle "**SM1 — Capture-images dev view** ✅ (RC-R0/R1)\nVID:PID->cv2 resolver + CaptureBackend (no MJPG) +\nsave-PNG + per-camera exposure + OUR auto-exposure" as SM1 #C8E6C9
 }
 
-rectangle "VIRTUAL DEVICE" as VD #FFFFFF {
-  rectangle "**#5  three picture sets**\n✅ done — integration Track A\n3 role image slots + folder picker;\nSPD->ROI encoder (shared vmax) + round-trip test" as R5 #C8E6C9
+' =================== platform + foundations that carry the chain ===================
+rectangle "PLUGIN PLATFORM  (one declaration, many hosts/targets)" as PP #FFFFFF {
+  rectangle "**M1 convergence** ✅\nrender visitor + WorkflowPhaseRenderer\n(steps->tabs); view-model vocab; two hosts" as PM1 #C8E6C9
+  rectangle "**M2 PDF target** ✅\nMatplotlibWorkflowRenderer = 2nd visitor;\ngeneric per-view-model toJson/fromJson" as PM2 #C8E6C9
+  rectangle "**Capture-panel convergence** ▶\nthe LAST un-converged host panel\n(= Frontier #1)" as PM6 #FFE0B2
+  rectangle "**M3 distribution** (later/design)\nDB-stored SIGNED plugin source, client load;\nplugin_sdk = versioned API; PluginRegistry" as PM3 #ECEFF1
 }
 
-rectangle "WORKFLOW & PLUGIN   (the goal)" as G #FFFFFF {
-  rectangle "**#6a  ABSORPTION display**\n✅ done — real absorption plot in the wizard\n(PROCESSING phase, via SpectralWorkflow spine)" as R6a #C8E6C9
-  rectangle "**#6  pumpkin-oil workflow + plugin**\n✅ done — integration Tracks B+C\nplugin_sdk + PumpkinOilPlugin + engine +\ninteractive nested-wizard (Measure, plots, verdict)" as R6 #C8E6C9
+rectangle "FOUNDATIONS  (proven earlier)" as FO #FFFFFF {
+  rectangle "#1 spectrum->colour ✅ · #2 login header ✅\nmeasurement & evaluation CONCEPT ✅\n(T=S/R, colour under D65, hue verdict)" as FO1 #C8E6C9
+  rectangle "Pipeline Playground PoC ✅\n(LED-synth ref + oil + absorption + colour +\nverdict; CFL calibration; regression test)" as FO2 #C8E6C9
+  rectangle "#4 User CRUD ✅ · #5 three picture sets ✅\n(virtual device: 3 role slots + SPD->ROI\nencoder + round-trip)" as FO3 #C8E6C9
 }
 
-rectangle "CONNECTION & CAPTURE" as CX #FFFFFF {
-  rectangle "**CX — connection & calibration UX (milestone 5a)**\n✅ done (on the VIRTUAL device) 2026-07-05\nserial-keyed setup (server-DB migration); master\nauthoring GUIs (Plugin / Profile+auto-calibrate / Setup);\nend-user self-register by serial; header connection indicator" as CXA #C8E6C9
-  rectangle "**SM1 — Capture-images dev view**\n✅ done 2026-07-07  (RC-R0 + RC-R1)\nVID:PID->cv2 resolver + CaptureBackend (no MJPG-force);\nSettings>Development live view + save PNG;\nper-camera exposure (ELP CFL=78) + OUR auto-exposure\n(bisection, slider, status-bar progress)" as SM1 #C8E6C9
-  rectangle "**SM2 — real calibration off the ELP**\n✅ done 2026-07-08  (RC-R2)\nROI/Hough + detect-peaks on the real cam;\ncalibration auto-exposure + green doublet (542.4)\n+ blue-line ROI (max-channel)" as SM2 #C8E6C9
-  rectangle "**Dev measurement bench**\n✅ done + verified 2026-07-08\nmaster Swiss-knife: REF+SAMPLE -> T -> A (no verdict);\nDevSpectralPlugin (transient); seeded masterUserExakta;\nproves the real capture+extraction path\n+ 2026-07-09 build-out: EVALUATION phase, acquisition\ntabs (Captured-image/Spectrum), per-frame progress +\nlive spectra, metric fields, phone-width responsiveness\n+ 2026-07-10 cosmetic/UX polish (S1–S14): frame\nhierarchy, checkbox touch-target, native combo arrow\n(mocked in Wireloom first — see DEV_WORKFLOW.md)" as BENCH #C8E6C9
-  rectangle "**SM3 — real measurement**\n▶ next  (RC-R3)\nreal capture in workflow Measure (live-burst->graph);\nmeasurement auto-exposure: expose REF, reuse on SAMPLE" as SM3 #FFE0B2
-  rectangle "**★ real measurement after user setup**\ngoal: master sets up a serial unit -> end user\nregisters by serial -> real measurement + evaluation" as MS #ECEFF1
-}
-
-rectangle "EVALUATION  (peak-ratio — the verdict)" as EV #FFFFFF {
-  rectangle "**Peak-ratio evaluation (P0–P4)**\n✅ done 2026-07-09 — render-only in the bench\ngeneric SpectrumFeatureUtil ops + DevSpectralPlugin\ncomposition (hard-coded pumpkin bands);\ngreenness / pigment / browning / clarity;\nprovisional verdict (no thresholds yet)" as PR #C8E6C9
-  rectangle "**P5 — calibrate on real oils**\n▶ next: save metrics + known good/bad oils ->\nquant->qual bounds -> real verdict edges\n(no thresholds ship before this)" as PR5 #FFE0B2
-  rectangle "**P6 — pumpkin plugin uses peak-ratio**\nlater: PumpkinOilPlugin composes the SAME ops\n(A/B vs hue); promote consts to shared feature-config" as PR6 #ECEFF1
-}
-
-rectangle "SAAS / BILLING  (product)" as SAAS #FFFFFF {
-  rectangle "**PayPal payment — milestone 1**\n✅ done + click-through verified 2026-07-06\nsingle 1,00 € SANDBOX payment end-to-end:\nTransaction (server DB) + Orders v2 (stdlib) +\nAccount settings screen (Profile / Payment tabs)" as PAY #C8E6C9
-  rectangle "**recurring rental fee — M2**\nlater: €200/month PayPal Subscriptions\n(pay even without use); then M3 live, M4 Android" as PAY2 #ECEFF1
+rectangle "ENABLEMENT" as EN #FFFFFF {
+  rectangle "**Doc Director harness — M1** ✅\n--doc-mode hint panel + UDP protocol +\nPyAutoGUI Director + scenarios (pumpkin\nwizard = M1). Bench video pending a rig" as EN1 #C8E6C9
+  rectangle "**Doc M2** (later)\nvirtual feature tour + real USB connect\nscreencast; scenario picker; fallbacks" as EN2 #ECEFF1
 }
 
 rectangle "CROSS-CUTTING  (deferred design threads)" as CC #FFFFFF {
-  rectangle "persistable-workflow DB schema\nprereq for persistence in #3 / #6" as CCa #E1BEE7
-  rectangle "EvaluationResult -> GUI integration\n✅ done — EvaluationResultRenderer in the wizard\n(swatches + verdict)" as CCb #C8E6C9
-  rectangle "PDF report + email\n(PDF prototype: Playground eval test)" as CCc #E1BEE7
+  rectangle "**workflow-record persistence**\ndesign only (SPEC_workflow_persistence.md):\nDbMeasurement JSON-blob record + saved-runs list/detail;\nprereq for Save in #3 / #6" as CCa #E1BEE7
+  rectangle "**Android port**\ndesign only (SPEC_android_port.md):\nreal-scipy-in-app, two APKs, buildozer+p4a, spike gate" as CCand #E1BEE7
+  rectangle "PDF report + email\n(PDF done via M2; email transport deferred)" as CCc #E1BEE7
   rectangle "LED-combination optimisation\n(future: search a flatter reference)" as CCd #E1BEE7
-  rectangle "**test-suite hygiene debt**\nbacklog (non-blocking) — 3 pre-existing test\nfailures: stale calib-DB fixture (T1),\nmodal-dialog hang blocks the suite (T2),\nstale nav-glyph assertion (T3)\nSPEC_test_hygiene_debt.md" as CCe #E1BEE7
+  rectangle "pumpkin authenticity / adulteration check\n(later plugin-side evaluation feature)" as CCauth #E1BEE7
+  rectangle "**test-suite hygiene debt**\nbacklog (non-blocking) — 3 pre-existing test\nfailures (T1 stale calib-DB fixture, T2 modal-dialog\nhang blocks the suite, T3 stale nav-glyph)\nSPEC_test_hygiene_debt.md" as CCe #E1BEE7
+  rectangle "**LIMS-side Plone add-on**\ndeferred (separate repo, Plone/Py2.7):\nparse embedded workflow.json + render absorption\non demand inside SENAITE" as LIMS2 #E1BEE7
 }
 
-rectangle "PLUGIN PLATFORM  (the convergence theme)" as PP #FFFFFF {
-  rectangle "**M1 — plugin-driven convergence**\n✅ done 2026-07-10\nshared render visitor + WorkflowPhaseRenderer (steps->tabs);\nview-model vocab extended (plot traces/bands/markers,\nSpectrumCaptureView/CaptureView); EVAL+PROC plugin-declared;\nbench plugin selector (Dev/Pumpkin); wizard converged" as M1 #C8E6C9
-  rectangle "**M2 — plugin-driven PDF report**\n✅ done 2026-07-11 (SPEC_bench_pdf_export.md)\nQt-free MatplotlibWorkflowRenderer (2nd visitor target);\nReport step-tab, preview = PDF; isShownInReport curates;\nwhole-Workflow workflow.json + capture PNGs via pypdf;\ngeneric per-view-model toJson/fromJson; fit-to-width\npreview + 'Open bigger'; CaptureView chrome flags;\nLIS -> SENAITE deferred" as M2 #C8E6C9
-  rectangle "**M3 — plugin distribution**\nlater/design (SPEC_plugin_distribution.md)\nseparate repo + DB-stored SIGNED source, client load;\nplugin_sdk = versioned API; PluginRegistry" as M3 #ECEFF1
-}
+' =================== the goal ===================
+rectangle "★ MILESTONE — real end-to-end after user setup\nmaster sets up a serial unit -> end user registers by serial ->\nREAL measurement + evaluation (no virtual device).\nGated only by Frontier #1 -> SM3." as GOAL #ECEFF1
 
-rectangle "LIMS  (field-to-lab)" as LIMS #FFFFFF {
-  rectangle "**LIMS M1 — create a Sample (SENAITE first)**\n✅ done + click-through verified 2026-07-11\n(created OIL-0006 with the PDF attached) — L0–L7\nplugin PUBLISHING phase + 'Send to LIMS' step (Publish btn);\nALL over the spectracsPy-server API (creds server-only):\nclient builds PDF -> Pyro publishSampleToLims(info, pdf);\nserver assembles LIMS-neutral submission from AppUser +\nreal spectrometer graph; LimsGateway seam + adapter registry\n(plugin selects LIMS via LimsTarget; SenaiteLimsGateway + Mock);\nadapter: idempotent bottom-up ensure-or-create -> AnalysisRequest\n+ attach M2 PDF. spectracs_app_service set up manually (Lab Manager)" as LIMS1 #C8E6C9
-  rectangle "**LIMS-side Plone add-on**\ndeferred (separate repo, Plone/Py2.7)\nparse embedded workflow.json + render absorption\non demand inside SENAITE (PDF viewer + buttons)" as LIMS2 #E1BEE7
-  rectangle "**results push + state machine**\nlater: numeric metrics -> Analysis Services;\nReceive/Submit/Verify/Publish (CoA); offline queue" as LIMS3 #ECEFF1
-}
+' ---- value chain flow ----
+S1 -right-> S2
+S2 -right-> S3
+S3 -right-> S4
+S4 -right-> S5
+S5 -right-> S6
+S6 -right-> S7
 
-' ---- plugin platform ----
-BENCH --> M1 : generic host over the plugin
-R6 ..> M1 : both hosts converge
-M1 --> M2 : render seam -> matplotlib target
-M1 --> M3 : plugin becomes a droppable unit
-PR ..> M2 : evaluation content -> report
-M2 ..> CCe : surfaced during verification
-M2 --> LIMS1 : PDF payload (workflow.json + captures)
-M1 --> LIMS1 : plugin-declared PUBLISHING step
-LIMS1 --> LIMS2 : same embedded PDF, LIMS-side viewer
-LIMS1 --> LIMS3 : sample exists -> push results + advance state
-PAY ..> LIMS1 : both imply online-required client
+' ---- platform carries the chain ----
+PM1 --> S3 : declares process/eval views
+PM1 --> S4
+PM2 --> S5 : PDF is a 2nd render target
+PM1 --> S6 : plugin PUBLISHING step
+PM6 --> S2 : shared capture seam UNBLOCKS wizard
+PM1 --> PM6
+PM1 --> PM2
+PM1 --> PM3
 
-' ---- dependency / unblocks edges ----
-R1 --> R6  : evaluation body
-CONCEPT --> PLAY : implemented by
-PLAY --> R5 : synthesis recipe
-PLAY ..> R6a : pipeline proven
-PLAY ..> CCd : the tool to explore
-R4 --> R3  : users must exist first
-R3 --> R6  : AppUser -> {Profile, Plugin}
-R5 --> R6  : realistic end-to-end
-R6a ..> R6 : milestone feeds full build
-CCa ..> R3
-CCa ..> R6
-R6 ..> CCb
-R6 ..> CCc
+' ---- the end-user host runs the chain ----
+R6 --> S2 : the wizard runs the chain
+GUIDE ..> S2 : guides ACQUISITION
+SM1 --> S2 : real-capture foundation
+S6 ..> LIMS2 : same embedded PDF, LIMS-side viewer
 
-' ---- connection & capture ----
-R3 ..> CXA : re-keyed on SERIAL (not username)
-R6 --> CXA : plugin+device bound per serial
-SM1 --> SM2 : resolver + backend + exposure
-CXA --> SM2 : serial unit to calibrate
-SM1 --> BENCH : capture + auto-exposure
-SM2 --> BENCH : real calibration
-CXA --> BENCH : calibrated serial unit
-BENCH ..> SM3 : proves capture+extraction
-SM2 --> SM3 : calibrated real device
-SM3 --> MS : real measurement
-CXA --> MS : user setup
+' ---- foundations support ----
+FO1 --> S3
+FO2 --> S4 : pipeline proven
+FO3 --> S1 : users + virtual device
+FO3 --> S7 : AppUser -> Transaction
 
-' ---- evaluation (peak-ratio) ----
-BENCH --> PR : EVALUATION phase added
-CONCEPT ..> PR : physically-specific successor to hue
-PR --> PR5 : render -> calibrate
-PR5 --> PR6 : real edges -> plugin verdict
-R6 ..> PR6 : the pumpkin plugin wires it in
+' ---- frontier -> goal ----
+FR1 --> FR2
+FR2 --> GOAL
+S1 --> GOAL : setup half (done)
 
-' ---- saas / billing ----
-R4 --> PAY : needs AppUser (Transaction FK)
-PAY --> PAY2 : proves the pipe
+' ---- enablement demonstrates the chain ----
+S2 ..> EN1 : the wizard run is the M1 scenario
+EN1 --> EN2
 
 @enduml

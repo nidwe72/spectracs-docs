@@ -1,8 +1,11 @@
 # Spectracs — Roadmap (working backlog)
 
-> **Big-picture view:** [`roadmap_map.svg`](roadmap_map.svg) — a status + dependency graph of the
-> items below (what is done, what is next/unblocked, what blocks what). Generated from
-> [`roadmap_map.puml`](roadmap_map.puml); regenerate with `java -jar plantuml.jar -tsvg roadmap_map.puml`.
+> **Big-picture view:** [`roadmap_map.svg`](roadmap_map.svg) — the **product value-chain** the items below
+> serve: the path one measurement travels (Setup → Capture → Process → Evaluate → Report → Publish → Bill)
+> over the platform/foundation layer, each stage **shaded by how complete the real end-user path is**
+> (status verified against the code 2026-07-13). It surfaces the one real gap — CAPTURE in the end-user
+> wizard (still virtual; the bench does real capture), gated by the capture-panel convergence. Generated
+> from [`roadmap_map.puml`](roadmap_map.puml); regenerate with `java -jar plantuml.jar -tsvg roadmap_map.puml`.
 >
 > Captured **2026-06-28** to resume next session. The **workflow object model is settled** — see
 > [`SPECTRAL_WORKFLOW_CONCEPT.md`](SPECTRAL_WORKFLOW_CONCEPT.md) §8–§9 +
