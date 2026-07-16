@@ -1,0 +1,85 @@
+@startuml project_structure
+title Spectracs — project structure & tiering (**spectracsPy-core**) · DESIGN 2026-07-16\nspectracsPy/docs/SPEC_project_structure.md
+
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam defaultTextAlignment center
+skinparam nodeFontSize 12
+skinparam noteFontSize 11
+skinparam ArrowColor #37474F
+skinparam NoteBackgroundColor #FFFDE7
+skinparam NoteBorderColor #BDBDBD
+
+legend top left
+  |= colour |= meaning |
+  | <#C8E6C9> | exists today |
+  | <#FFE0B2> | NEW — this spec |
+  | <#E1E1E1> | FUTURE |
+  solid arrow = depends on  ·  note = external dependencies
+  (!) = Qt leak to fix — see spec §4  ·  #n = decision n, spec §5
+endlegend
+
+' ===================== CONSUMERS (top) =====================
+rectangle "**spectracs-plugins**   ·  NEW\n----\nPumpkinOilPlugin · DevSpectralPlugin\n\nimports **plugin_sdk ONLY**\n(lint gate at publish time)" as PLUGINS #FFE0B2
+rectangle "**spectracsPy**  (the app)\n----\nview · controller · QtWorkflowRenderer\nsession · server client · SpectralWorkflowEngine\n+ S0: the Qt app-plumbing from -model/-base\n  (Navigation/AppStatus/DbEntityChanged/Video\n   signals · SpectralJob · SingletonQObject)\nPluginRegistry (M3-A1)\ncapture: video · acquisition · device/calibration (#1)\nimportSpectrum (#7) · persistence · playground\nlogic/**application**/ (renamed from 'appliction' — #8)\n\n>> **Qt lives HERE** <<" as APP #C8E6C9
+rectangle "**senaite-spectracs**  ·  FUTURE\n----\nLIMS addon — shows spectra\nreuses the M1 render seam\nno Qt · no app · no camera" as SENAITE #E1E1E1
+rectangle "**spectracsPy-server**\n----\nPyro5 endpoints\n**DUMB STORE** — never signs,\nnever holds the private key" as SERVER #C8E6C9
+
+' ===================== THE NEW TIER =====================
+rectangle "**spectracsPy-core**   ·  NEW   —   **Qt-free, for real**\n----\n**spectral science**  absorption · transmission · meanSpectrum\n                              spectrumToColor · verdict · feature\n                              RobustReduction · ExtendedRoi (misfiled under acquisition/)\n                              spectralLine (peak selection) · synthesis (LED/oil)\n**conditioning chain**  SpectrumUtil facade -> smooth (scipy savgol)\n                              removeBaseline (scipy) · rebin · normalize\n                              (code in core; NOT exported by plugin_sdk — #2)\n**plugin_sdk** (the facade)  ops · util · SpectralPlugin · SDK_VERSION\n**render seam (M1)**  WorkflowItemVisitor · dispatchItem\n                              MatplotlibWorkflowRenderer\n                              WorkflowReportBuilder  (de-Qt'd — S2)" as CORE #FFE0B2
+
+' ===================== FOUNDATION =====================
+rectangle "**spectracsPy-model**\n----\nspectral data classes  Spectrum · SpectraContainer · SpectralWorkflow\nplugin view-models  ColorSwatchView · MetricFieldView …  (already Qt-free)\nDB entities  DbPlugin · AppUser · SpectrometerSetup/Profile\n**SpectralColor**  (NEW — S1, replaces QColor in SpectralLine)\nL3 Qt residue: 9 app-plumbing classes → app in S0\n(misfiled, NOT over-engineered — they keep their Qt)" as MODEL #C8E6C9
+rectangle "**spectracsPy-base**\n----\nsciens.base · Singleton\n(SingletonQObject → app in S0)" as BASE #C8E6C9
+
+' ===================== EDGES =====================
+PLUGINS  --> CORE
+APP      --> CORE
+SENAITE  --> CORE
+CORE     --> MODEL
+APP      --> MODEL
+SENAITE  --> MODEL
+SERVER   --> MODEL
+MODEL    --> BASE
+
+' ===================== EXTERNAL DEPENDENCIES =====================
+note right of CORE #E3F2FD
+  **external deps — spectracsPy-core**
+  numpy · **scipy** · colour-science · rgbxy · spectres
+  matplotlib · Pillow · pypdf   (render seam / M2)
+  ----
+  **no PySide6 · no pyqtgraph · no opencv · no Pyro5**
+  scipy rides in with the conditioning chain
+  (Edwin: explicitly fine — wheels everywhere,
+  Android P0 proved real scipy on-device)
+end note
+
+note right of APP #E3F2FD
+  **external deps — spectracsPy (app)**
+  PySide6 · pyqtgraph        (Qt — app only, after S0/S1/S2)
+  scipy · opencv-headless    (capture / calibration)
+  pyusb · psutil · appdata
+  colormath · luxpy · pyspectra
+end note
+
+note right of SERVER #E3F2FD
+  **external deps — server**
+  Pyro5 · bcrypt
+  **PyNaCl** (NEW — M3 signature verify)
+end note
+
+note left of MODEL #E3F2FD
+  **external deps — spectracsPy-model**
+  SQLAlchemy (+ -serializer)
+  marshmallow (+ -sqlalchemy)
+  (!) PySide6 — gone after S0 + S1 (§4b)
+end note
+
+note bottom of PLUGINS
+  Open the project in PyCharm:
+  SDK resolvable, **app code absent**.
+  CI proves each plugin headlessly
+  (engine.runAll) before it ships.
+end note
+
+@enduml

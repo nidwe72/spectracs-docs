@@ -48,8 +48,14 @@
 > bands (Soret-flank blue + ~575 nm Q-band + green anchor → a *greenness* ratio) so it separates *why* an oil
 > is off (browned vs faded vs turbid). **P0–P4 done, render-only first sweep** in the dev measurement bench:
 > generic `SpectrumFeatureUtil` ops + `DevSpectralPlugin.evaluation` composing them with hard-coded pumpkin
-> constants → a real EVALUATION phase showing greenness / pigment / browning / clarity. **Next: P5** (save +
-> calibrate on real known-good/bad oils → verdict edges — *no thresholds ship before this*), then **P6** (wire
+> constants → a real EVALUATION phase showing greenness / pigment / browning / clarity.
+> **⏭ NEXT PROMINENT TASK (Edwin, 2026-07-16) — phase `PB`, §1b: the literature-anchored bands.**
+> **Blue = 440–460 nm** (the right-hand **slope** of the 430 nm Soret — the peak itself saturates at the working
+> dilution, so it is not capturable) · **green Q-band = 560–580 nm** (literature peak ~570). A `DevSpectralPlugin`
+> constants change; deltas + traps in §1b.1/§1b.2. **Scheduled AFTER the plugin story**
+> (`SPEC_project_structure.md` → `SPEC_plugin_distribution.md`), and **before P5** — calibrating windows that are
+> about to move would waste the real-oil runs. Then **P5** (save + calibrate on real known-good/bad oils → verdict
+> edges — *no thresholds ship before this*), then **P6** (wire
 > the independent `PumpkinOilPlugin`). Same session (`SPEC_dev_measure_bench.md` §12–18,
 > `SPEC_dev_capture_view.md` §11): extended 400–700 nm analysis window + shared ROI overlay; bench acquisition
 > as Reference/Sample steps with Captured-image/Spectrum tabs + per-frame progress bar + live spectra;
