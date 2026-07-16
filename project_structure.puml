@@ -30,7 +30,7 @@ rectangle "**spectracsPy-core**   ·  NEW   —   **Qt-free, for real**\n----\n*
 
 ' ===================== FOUNDATION =====================
 rectangle "**spectracsPy-model**\n----\nspectral data classes  Spectrum · SpectraContainer · SpectralWorkflow\nplugin view-models  ColorSwatchView · MetricFieldView …  (already Qt-free)\nDB entities  DbPlugin · AppUser · SpectrometerSetup/Profile\n**SpectralColor**  (NEW — S1, replaces QColor in SpectralLine)\nL3 Qt residue: 9 app-plumbing classes → app in S0\n(misfiled, NOT over-engineered — they keep their Qt)" as MODEL #C8E6C9
-rectangle "**spectracsPy-base**\n----\nsciens.base · Singleton\n(SingletonQObject → app in S0)" as BASE #C8E6C9
+rectangle "**spectracsPy-base**\n----\nsciens.base · Singleton\n(SingletonQObject moved to app in S0 ✅)" as BASE #C8E6C9
 
 ' ===================== EDGES =====================
 PLUGINS  --> CORE
@@ -72,7 +72,7 @@ note left of MODEL #E3F2FD
   **external deps — spectracsPy-model**
   SQLAlchemy (+ -serializer)
   marshmallow (+ -sqlalchemy)
-  (!) PySide6 — gone after S0 + S1 (§4b)
+  PySide6 — GONE ✅ (S0 + S1b)
 end note
 
 note bottom of PLUGINS
