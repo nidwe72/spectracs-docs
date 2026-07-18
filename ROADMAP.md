@@ -356,6 +356,16 @@ and add a global pytest timeout; **T3** `test_pumpkin_wizard_offscreen` — stal
   (Profile + Payment tabs) off the header account menu (desktop), server-side secret in an un-versioned
   `.env`. Product model = monthly rental fee (pay even without use). **Next milestones:** M2 recurring
   €200/month (Subscriptions API), M3 live go-live, M4 Android. Implement on explicit request only.
+- **Per-camera exposure range** *(capture fidelity — **POSTPONED** 2026-07-19)* — the auto-exposure search range is a
+  **hardcoded `[1, 500]`** in `CapturePanel`, not per-camera. V4L2 `exposure_time_absolute` units differ wildly between
+  cameras (and the driver clamps to its own min/max/step), so a fixed cap can top out **dark** on a different camera — a
+  real gap now that **multiple cameras are in use**. Fix: read the camera's actual exposure range at open, else **seed
+  per-sensor in `SpectrometerSensorUtil`** (the home for per-camera capture constants — WB-Kelvin, exposure default,
+  range). Cheap diagnostic first: log the exposure AE lands on (near 500 ⇒ cap-limited; well below ⇒ the deliberate
+  no-clip AE metric, leave it). Not urgent — the ELP works and the ~110–120 spectrum peak is mostly the no-clip metric,
+  not the cap. Spec: [`spectracsPy/docs/SPEC_capture_quality.md`](../spectracsPy/docs/SPEC_capture_quality.md) §14.9.
+  Emerged from the capture-fidelity arc (C1–C3 + WB split + full-frame settle, all done 2026-07-19). Implement on
+  explicit request only.
 
 ## Dependencies / suggested order
 - **#1, #2, #4 — done.** The measurement/evaluation concept + Pipeline Playground PoC — done.
