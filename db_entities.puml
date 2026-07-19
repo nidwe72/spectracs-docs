@@ -119,6 +119,7 @@ class SpectralWorkflow <<planned>> {
   + username : String        ' soft ref -> AppUser (stamped at Save)
   + userId : String          ' soft ref (the Home list FILTER key)
   + pluginCodeRef : String   ' soft ref -> DbPlugin.codeRef
+  + pluginVersion : String   ' A3 provenance: exact resolved version; NULL = shipped built-in
   + timestampIso : String    ' sort key
 }
 

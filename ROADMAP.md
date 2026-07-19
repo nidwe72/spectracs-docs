@@ -13,6 +13,22 @@
 > to build**. **Implement on explicit request only** (spec-first workflow). Roughly ordered;
 > dependencies noted at the bottom.
 >
+> **✅ M3 PLUGIN DISTRIBUTION + A3 PROVENANCE — IMPLEMENTED 2026-07-18/19:**
+> [`spectracsPy/docs/SPEC_plugin_distribution.md`](../spectracsPy/docs/SPEC_plugin_distribution.md). Ships plugin
+> updates without an APK rebuild: `DbPlugin` identity is now **`(codeRef, version)`** (insert-never-update),
+> **Ed25519**-signed source stored in the server DB and **verified + exec'd client-side** (`PluginRegistry`
+> sealedness dispatch), plus the publish/assign UI (A1·A2 + B0–B6; **B6 bench listing rig-verified**). **A3 run
+> provenance (this session):** every saved `SpectralWorkflow` now stamps the resolved **`pluginVersion`** beside
+> `pluginCodeRef` (new nullable column + app migration `f0ac79b33dde`; NULL = shipped built-in), so a run/PDF traces
+> to the exact plugin version. *Remaining: B7 Android, B8 batch-assign.*
+>
+> **✅ SCHEMA-MIGRATIONS HARDENING (AllEntities completeness guard) — IMPLEMENTED 2026-07-19:**
+> [`spectracsPy/docs/SPEC_schema_migrations.md`](../spectracsPy/docs/SPEC_schema_migrations.md) §8. A3 surfaced that
+> `AllEntities` (Alembic's `target_metadata` source) omitted the 7-table `model.spectral` workflow graph, so
+> autogenerate proposed **dropping** those tables. Fixed (metadata 2→9 app tables) and made **self-enforcing** with a
+> guard test (`tests/test_all_entities_complete.py`, curated-import-then-walk in a subprocess) that fails naming any
+> entity missing from `AllEntities` — the invariant is now checked by CI, not by a comment.
+>
 > **✅ INTEGRATION MILESTONE — IMPLEMENTED 2026-07-02 (delivers #5 + #6; 37 tests green):**
 > [`spectracsPy/docs/SPEC_pumpkin_integration.md`](../spectracsPy/docs/SPEC_pumpkin_integration.md).
 > Three tracks, all built — **A** virtual-device 3-image folder + shared-vmax/linear encoder + round-trip

@@ -7,7 +7,7 @@
 ' shared CapturePanel (M3, 2026-07-13, rig-verified). Remaining frontier: P5 real-oil verdict calibration.
 ' Regenerate:  java -jar plantuml.jar -tsvg roadmap_map.puml
 
-title Spectracs — Roadmap map\nthe measurement value-chain over the platform, shaded by real-path completeness — 2026-07-13
+title Spectracs — Roadmap map\nthe measurement value-chain over the platform, shaded by real-path completeness — 2026-07-19
 
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
@@ -58,13 +58,14 @@ rectangle "PLUGIN PLATFORM  (one declaration, many hosts/targets)" as PP #FFFFFF
   rectangle "**M1 convergence** ✅\nrender visitor + WorkflowPhaseRenderer\n(steps->tabs); view-model vocab; two hosts" as PM1 #C8E6C9
   rectangle "**M2 PDF target** ✅\nMatplotlibWorkflowRenderer = 2nd visitor;\ngeneric per-view-model toJson/fromJson" as PM2 #C8E6C9
   rectangle "**Capture-panel convergence** ✅ (M3)\nACQUISITION routes through the shared CapturePanel\n(both hosts); guidance collapsed" as PM6 #C8E6C9
-  rectangle "**M3 distribution** (later/design)\nDB-stored SIGNED plugin source, client load;\nplugin_sdk = versioned API; PluginRegistry" as PM3 #ECEFF1
+  rectangle "**M3 distribution** ✅ (A1·A2 + B0–B6 + A3, 2026-07-18/19)\nDB-stored SIGNED plugin source, client-side load;\n(codeRef,version) identity; Ed25519 sign/verify;\nPluginRegistry sealedness dispatch; publish/assign UI;\nA3 run provenance stamp. Later: B7 android · B8 batch" as PM3 #C8E6C9
 }
 
 rectangle "FOUNDATIONS  (proven earlier)" as FO #FFFFFF {
   rectangle "#1 spectrum->colour ✅ · #2 login header ✅\nmeasurement & evaluation CONCEPT ✅\n(T=S/R, colour under D65, hue verdict)" as FO1 #C8E6C9
   rectangle "Pipeline Playground PoC ✅\n(LED-synth ref + oil + absorption + colour +\nverdict; CFL calibration; regression test)" as FO2 #C8E6C9
   rectangle "#4 User CRUD ✅ · #5 three picture sets ✅\n(virtual device: 3 role slots + SPD->ROI\nencoder + round-trip)" as FO3 #C8E6C9
+  rectangle "**Schema migrations (Alembic)** ✅\nboth DB trees, guarded init, boot auto-apply;\nAllEntities completeness GUARD test (§8)\nso a new entity can't silently break autogen" as FO4 #C8E6C9
 }
 
 rectangle "ENABLEMENT" as EN #FFFFFF {
@@ -114,6 +115,7 @@ FO1 --> S3
 FO2 --> S4 : pipeline proven
 FO3 --> S1 : users + virtual device
 FO3 --> S7 : AppUser -> Transaction
+FO4 --> PM3 : (codeRef,version) + provenance migrations
 
 ' ---- frontier -> goal ----
 FR1 --> FR2
