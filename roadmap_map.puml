@@ -79,7 +79,7 @@ rectangle "CROSS-CUTTING  (deferred design threads)" as CC #FFFFFF {
   rectangle "PDF report + email\n(PDF done via M2; email transport deferred)" as CCc #E1BEE7
   rectangle "LED-combination optimisation\n(future: search a flatter reference)" as CCd #E1BEE7
   rectangle "pumpkin authenticity / adulteration check\n(later plugin-side evaluation feature)" as CCauth #E1BEE7
-  rectangle "**test-suite hygiene debt**\nbacklog (non-blocking) — 3 pre-existing test\nfailures (T1 stale calib-DB fixture, T2 modal-dialog\nhang blocks the suite, T3 stale nav-glyph)\nSPEC_test_hygiene_debt.md" as CCe #E1BEE7
+  rectangle "**test-suite hygiene debt**\nALL test items T1–T4 RESOLVED (2026-07-19):\n`pytest tests/` runs whole = 192 passed, no hang\n(T2 modal fixed + conftest hang-watchdog).\nRemaining: runtime/doc only (R1 LAN-IP, R2 path, D1 luxpy)\nSPEC_test_hygiene_debt.md" as CCe #E1BEE7
   rectangle "**LIMS-side Plone add-on**\ndeferred (separate repo, Plone/Py2.7):\nparse embedded workflow.json + render absorption\non demand inside SENAITE" as LIMS2 #E1BEE7
 }
 

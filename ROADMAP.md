@@ -306,16 +306,17 @@ explicit request only.**
 `CX` (the `SPEC_connection_and_calibration_ux` design) is the **natural next step** (Edwin). Note it
 **reverses Roadmap #3's** user-selection direction → key on **serial**, not username (see #3's ⚠ note).
 
-## Test-suite hygiene debt  *(NEW 2026-07-10 — backlog, non-blocking)*
-Three pre-existing `tests/` failures catalogued in
-[`spectracsPy/docs/SPEC_test_hygiene_debt.md`](../spectracsPy/docs/SPEC_test_hygiene_debt.md) (surfaced during the
-M2 verification sweep; **none caused by M2** — all in code M2 does not touch). All three are **test-side** (no
-product change): **T1** `test_plugin_binding_and_seed` — stale test-DB schema (missing
-`spectrometer_calibration_profile.calibrationSpectrumJson` column) → rebuild the fixture from mapped metadata;
-**T2** `test_workflow_wizard_persistence_offscreen` — the delete path opens a **modal `InWindowDialog.confirm`**
-that blocks the headless event loop → **this hangs the whole `pytest tests/` run**; patch the confirm (auto-accept)
-and add a global pytest timeout; **T3** `test_pumpkin_wizard_offscreen` — stale nav-glyph assertion (`Next →` vs
-`Next ▶`). Until T2 is fixed, run the suite **per-file with a timeout** (see the spec). Effort: small/trivial each.
+## Test-suite hygiene debt  *(✅ test items CLEARED 2026-07-19 — was NEW 2026-07-10)*
+Catalogued in [`spectracsPy/docs/SPEC_test_hygiene_debt.md`](../spectracsPy/docs/SPEC_test_hygiene_debt.md).
+**All test items T1–T4 are now resolved** and `pytest tests/` runs as one invocation for the first time
+(**192 passed in ~25s, no hang**). T1 (stale calib-DB fixture) & T3 (stale nav-glyph) cleared incidentally;
+**T2** (the suite-staller — the delete test patched the *wrong* dialog, `QMessageBox.question`, while the delete
+path opens `InWindowDialog.confirm`) fixed by patching the right target **plus** a dependency-free per-test
+faulthandler **hang-watchdog** (`tests/conftest.py`) so a future modal-in-test fails fast instead of hanging;
+**T4** (`test_lims_submission_assembly` — LIMS manufacturer default: born inconsistent in the M1 LIMS work) fixed
+test-side to expect the `"Spectracs"` house label (vendor is a hard invariant; a blank Manufacturer is the
+corrupt-data exposure to avoid). **Remaining debt is runtime/doc only** (R1 LAN-IP interface names, R2 missing
+`-core` on `runServer.sh` PYTHONPATH, D1 `luxpy` doc drift) — no open test items.
 
 ## Still-deferred design threads (pick up when their build item needs them)
 - **Persistable-workflow schema** in [`DB_ENTITIES.md`](DB_ENTITIES.md): map `model/spectral/` classes to
