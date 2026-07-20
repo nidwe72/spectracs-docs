@@ -32,6 +32,7 @@ endlegend
 rectangle "★ FRONTIER — the real next moves (unblocked)" as FR #FFF3E0 {
   rectangle "**1. Capture-panel convergence** ✅ DONE (M3, 2026-07-13)\nACQUISITION runs through the shared CapturePanel in\nBOTH hosts; guidance deduped; bench -~460 net lines" as FR1 #C8E6C9
   rectangle "**2. SM3 — real measurement in the WIZARD** ✅ DONE (M3, rig-verified)\nlive-burst -> graph on a real device via the shared\nCapturePanel + the engine frame-provider seam" as FR2 #C8E6C9
+  rectangle "**V — CAPABILITY PROOF** (the go/no-go 'hyper milestone')\nprove the cheap VIS rig is DILUTION-INVARIANT and SEPARATES the 3\noils (too-green / typical / brown) on the DEV bench. Metrics: peak\nratio (old + new PB 440-460/560-580 bands) + intrinsic absorption\ncolour + OPTIONAL PCA 'is-pumpkin' bonus. SNV/baseline/smooth\n'eureka' comparison bench; one-oil x dilutions run, then 3-oil run;\nhuman-judged first. Gates P5.\n**Prereq DONE:** radiometric max-channel gray reduction (capture §15,\nrig-verified 2026-07-20 — blue recovered ~3x). SPEC_capability_proof.md" as FRV #FFE0B2
   rectangle "**3. P5 — calibrate the verdict on real oils**\nsave metrics + known good/bad oils -> quant->qual\nbounds -> real peak-ratio edges (no thresholds ship first)" as FR3 #FFE0B2
 }
 
@@ -120,6 +121,8 @@ FO4 --> PM3 : (codeRef,version) + provenance migrations
 ' ---- frontier -> goal ----
 FR1 --> FR2
 FR2 --> GOAL
+FRV --> FR3 : prove capability, THEN calibrate edges
+FRV --> GOAL : the go/no-go gate
 S1 --> GOAL : setup half (done)
 
 ' ---- enablement demonstrates the chain ----
