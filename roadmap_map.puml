@@ -7,7 +7,7 @@
 ' shared CapturePanel (M3, 2026-07-13, rig-verified). Remaining frontier: P5 real-oil verdict calibration.
 ' Regenerate:  java -jar plantuml.jar -tsvg roadmap_map.puml
 
-title Spectracs — Roadmap map\nthe measurement value-chain over the platform, shaded by real-path completeness — 2026-07-19
+title Spectracs — Roadmap map\nthe measurement value-chain over the platform, shaded by real-path completeness — 2026-07-24
 
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
@@ -32,8 +32,8 @@ endlegend
 rectangle "★ FRONTIER — the real next moves (unblocked)" as FR #FFF3E0 {
   rectangle "**1. Capture-panel convergence** ✅ DONE (M3, 2026-07-13)\nACQUISITION runs through the shared CapturePanel in\nBOTH hosts; guidance deduped; bench -~460 net lines" as FR1 #C8E6C9
   rectangle "**2. SM3 — real measurement in the WIZARD** ✅ DONE (M3, rig-verified)\nlive-burst -> graph on a real device via the shared\nCapturePanel + the engine frame-provider seam" as FR2 #C8E6C9
-  rectangle "**V — CAPABILITY PROOF** (the go/no-go 'hyper milestone')\nprove the cheap VIS rig is DILUTION-INVARIANT and SEPARATES the 3\noils (too-green / typical / brown) on the DEV bench. Metrics: peak\nratio (old + new PB 440-460/560-580 bands) + intrinsic absorption\ncolour + OPTIONAL PCA 'is-pumpkin' bonus. SNV/baseline/smooth\n'eureka' comparison bench; one-oil x dilutions run, then 3-oil run;\nhuman-judged first. Gates P5.\n**Prereq DONE:** radiometric max-channel gray reduction (capture §15,\nrig-verified 2026-07-20 — blue recovered ~3x). SPEC_capability_proof.md" as FRV #FFE0B2
-  rectangle "**3. P5 — calibrate the verdict on real oils**\nsave metrics + known good/bad oils -> quant->qual\nbounds -> real peak-ratio edges (no thresholds ship first)" as FR3 #FFE0B2
+  rectangle "**V — CAPABILITY PROOF** (the go/no-go 'hyper milestone') — EFFECTIVELY MET\n**Scope NARROWED to a BINARY good-green vs over-roasted-brown call**\n(2026-07-24, §1a — too-green class + green-ranking dropped: oils are\ngreen- or brown-type, ranking greens is taste, brown is objectively worse).\nPigment ratio (Soret/Q 440-460 / 560-580) separates the 2 clusters ~10-13x\nthe noise, NON-OVERLAPPING + DILUTION-INVARIANT (<=5%), 4 oils / 32 runs;\ncolour corroborates via chroma. **Roast Ampel verdict gauge BUILT (G0-G8).**\n▶ **CLOSING = broaden the panel: measure +1 brown, +4 green (fresh, §11.4a).**\nSPEC_capability_proof.md" as FRV #FFE0B2
+  rectangle "**3. P5 — calibrate the verdict on real oils**\nsave metrics + known good/bad oils -> quant->qual\nbounds (binary 2.8 Ampel edge already set; finer\ngradations out of scope, §1a)" as FR3 #FFE0B2
 }
 
 ' =================== the product value chain (a measurement's journey) ===================
@@ -41,7 +41,7 @@ rectangle "THE MEASUREMENT VALUE CHAIN  (a single measurement, left -> right)" a
   rectangle "**1 · SETUP & CONNECT**\n✅ serial-keyed: master SpectrometerSetup\n(serial -> device + calibration + plugin),\nend-user register-by-serial -> auto-login.\nVirtual + real calibration (ELP) done.\n(real USB connect '5b' = design)" as S1 #C8E6C9
   rectangle "**2 · CAPTURE** ✅\n✅ virtual device (engine)  ✅ bench real capture\n✅ WIZARD real capture (M3 — shared CapturePanel +\nengine frame-provider seam; rig-verified)" as S2 #C8E6C9
   rectangle "**3 · PROCESS**\n✅ Mean -> Transmission (T=S/R) -> Absorption\n(A = -log10 S/R); plugin-declared plots\n(ref/sample overlay, T, A)" as S3 #C8E6C9
-  rectangle "**4 · EVALUATE**\n✅ peak-ratio render (greenness/pigment/browning/\nclarity, provisional) ✅ perceived-colour swatch\n▶ P5 calibrate -> real edges   (later: P6 pumpkin\nplugin adopts peak-ratio)" as S4 #C8E6C9
+  rectangle "**4 · EVALUATE**\n✅ peak-ratio render (greenness/pigment/browning/clarity)\n✅ perceived-colour swatch\n✅ **Roast Ampel verdict gauge** (plugin-driven green/brown:\nanalytical band in EVALUATION + verdict badge in Send-to-LIMS)\n▶ P5 calibrate -> real edges (later: P6 pumpkin adopts)" as S4 #C8E6C9
   rectangle "**5 · REPORT**\n✅ plugin-driven PDF (M2): matplotlib visitor,\npreview = PDF, isShownInReport curates,\nwhole-Workflow JSON + capture PNGs embedded" as S5 #C8E6C9
   rectangle "**6 · PUBLISH (LIMS)**\n✅ M1: PUBLISHING phase + 'Send to LIMS' ->\nSENAITE Sample + PDF attach, all via server API\n(later: numeric results push + state machine)" as S6 #C8E6C9
   rectangle "**7 · BILL**\n✅ PayPal M1: one-off €1 sandbox end-to-end\n(Transaction + Orders v2 + Account settings)\n(later: €200/mo recurring; licence gate)" as S7 #C8E6C9
@@ -71,6 +71,7 @@ rectangle "FOUNDATIONS  (proven earlier)" as FO #FFFFFF {
 
 rectangle "ENABLEMENT" as EN #FFFFFF {
   rectangle "**Doc Director harness — M1** ✅\n--doc-mode hint panel + UDP protocol +\nPyAutoGUI Director + scenarios (pumpkin\nwizard = M1). Bench video pending a rig" as EN1 #C8E6C9
+  rectangle "**Record the AS-IS app video** ▶ NEXT (2026-07-24)\na current-state screencast of the real end-to-end\n(measure -> process -> evaluate w/ Roast Ampel -> report\n-> LIMS) via the Director harness; extends SPEC_doc_automation.md" as EN3 #FFE0B2
   rectangle "**Doc M2** (later)\nvirtual feature tour + real USB connect\nscreencast; scenario picker; fallbacks" as EN2 #ECEFF1
 }
 
@@ -127,6 +128,8 @@ S1 --> GOAL : setup half (done)
 
 ' ---- enablement demonstrates the chain ----
 S2 ..> EN1 : the wizard run is the M1 scenario
-EN1 --> EN2
+EN1 --> EN3 : next = record the app AS-IS
+S4 ..> EN3 : the Roast Ampel is in the as-is video
+EN3 --> EN2
 
 @enduml

@@ -13,6 +13,26 @@
 > to build**. **Implement on explicit request only** (spec-first workflow). Roughly ordered;
 > dependencies noted at the bottom.
 >
+> **✅ CAPABILITY PROOF (milestone V) EFFECTIVELY MET + ROAST AMPEL GAUGE IMPLEMENTED — 2026-07-23/24:**
+> [`spectracsPy/docs/SPEC_capability_proof.md`](../spectracsPy/docs/SPEC_capability_proof.md) +
+> [`SPEC_roast_ampel.md`](../spectracsPy/docs/SPEC_roast_ampel.md). **Scope narrowed to a binary good-green vs
+> over-roasted-brown call** (§1a — the too-green class and green-ranking are dropped: in practice oils are green-
+> or brown-type, ranking greens is a matter of taste, brown is objectively worse — tastes worse, sells cheaper).
+> On that claim the gate is **effectively met**: the **Pigment ratio** (Soret/Q, 440–460 / 560–580) separates the
+> two clusters by **~10–13× the measurement noise, non-overlapping**, and is **dilution-invariant** (≤5% at 2 vs 3
+> drops), across **4 oils / 32 runs**; colour corroborates via chroma. The **Roast Ampel verdict gauge is BUILT**
+> (G0–G8, `SPEC_roast_ampel.md` §8): a plugin-driven green/brown gauge — an analytical band in EVALUATION and a
+> plain verdict badge in Send-to-LIMS. Sample-clearing physics + a mandatory fresh-sample protocol are documented
+> (§11.4a–d), and a colleague-facing **status-report PDF** + generator shipped (§11.8,
+> `spectracsPy/docs/tools/build_capability_status_pdf.py`).
+> **▶ NEXT (Edwin 2026-07-24) — two tasks:**
+> 1. **Close the Capability Proof by measurement** — measure the broadened oil panel (**+1 brown, +4 green**, each
+>    fresh per the §11.4a protocol; brown ×5) to lift the good/brown call from n=4 to a wider, settled panel.
+>    *Confirmatory* — the core claim is already met (§11.6).
+> 2. **Update the "Director" for a nice AS-IS app video** — a current-state screencast of the real end-to-end
+>    (measure → process → evaluate with the Roast Ampel → report → Send-to-LIMS), extending the Doc Director
+>    harness ([`SPEC_doc_automation.md`](../spectracsPy/docs/SPEC_doc_automation.md)).
+>
 > **✅ M3 PLUGIN DISTRIBUTION + A3 PROVENANCE — IMPLEMENTED 2026-07-18/19:**
 > [`spectracsPy/docs/SPEC_plugin_distribution.md`](../spectracsPy/docs/SPEC_plugin_distribution.md). Ships plugin
 > updates without an APK rebuild: `DbPlugin` identity is now **`(codeRef, version)`** (insert-never-update),
