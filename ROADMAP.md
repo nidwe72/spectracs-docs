@@ -172,6 +172,31 @@
 > versioned**). **Open issues → to specify later** (spec §15): login automation, bench calibration/serial
 > prerequisite, record-after-prep trimming, Tier A feature-tour chapters, unattended/CI for no-hardware runs.
 
+## ▶ Plugin hardening — production-readiness gate  *(HYPER-MILESTONE / real blocker — Edwin 2026-07-24; design-first)*
+
+**A stable plugin system is a primary concern and a real blocker: we go productive only once the plugin _code_ and
+its _integration_ are stable.** This is a go/no-go gate in the class of the Capability Proof — not a feature. To be
+specced; captured here so it is not lost. Scope of what "stable" must cover:
+- **SDK contract stability** — settle/freeze the `plugin_sdk` surface a plugin builds against (the five phase hooks,
+  the view-model vocabulary, and the new `policy()` / `WorkflowPolicy` from
+  [`SPEC_simplified_plugin_navigation.md`](../spectracsPy/docs/SPEC_simplified_plugin_navigation.md)). Versioned
+  already (`targetSdkVersion`); hardening = a settled, documented, back-compatible contract.
+- **Execution robustness / error isolation** — a misbehaving plugin (a hook that throws, returns malformed data, or
+  targets a mismatched SDK) must **degrade gracefully and never crash the host**. One uniform, defensively-wrapped
+  execution surface = the `PluginExecutionView` base (that spec, §10).
+- **Validation & conformance** — a plugin **conformance test-suite** + load/publish-time validation (extends the
+  existing `PluginPublishUtil.inspectPluginSource` + `codeRefMatchesClass` + self-contained lint).
+- **Security / trust of exec'd code** — a distributed plugin runs arbitrary Python client-side; review the trust
+  model (Ed25519 sign + verify + sealedness dispatch, `SPEC_plugin_distribution.md`) as the _complete_ guard,
+  including what an unsigned/dev plugin may do.
+- **Diagnostics** — clear operator-facing errors + logs when a plugin fails.
+
+**Relationship to current work:** the nav/convergence work
+([`SPEC_simplified_plugin_navigation.md`](../spectracsPy/docs/SPEC_simplified_plugin_navigation.md) — `NavigationModel`
++ one `PluginExecutionView` base + two thin subclasses) is a **down-payment** on this milestone: it makes plugin
+_integration_ generic, uniform, and testable, which is a precondition for hardening it. Sequence: settle that
+convergence, then spec + build this hardening gate **before any productive/commercial rollout**.
+
 ## 1. Extract the spectrum → colour logic  *(**IMPLEMENTED 2026-06-29** — spec `spectracsPy/docs/SPEC_spectrum_processing.md`; 11 unit tests pass. Remaining: wire into `PumpkinPlugin.evaluation`, #6)*
 Lift the proven `spectrasTest.py` hue pipeline into a reusable logic module / utility
 (`ColorUtil.spectrumToHue(...)`; eventual home `spectracs.plugin_sdk.util.ColorUtil`). Stands alone (no
