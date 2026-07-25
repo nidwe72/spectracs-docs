@@ -1,5 +1,5 @@
 @startuml workflow_object_model
-title Spectracs — SpectralWorkflow object model\nas-built + persistence Option A (concept §9 / §9.5), rev 2026-07-02
+title Spectracs — SpectralWorkflow object model\nas-built + persistence Option A (concept §9 / §9.5), rev 2026-07-25
 
 hide circle
 hide empty methods
@@ -141,6 +141,22 @@ class MetricFieldView <<view>> {
   + tooltip / style
   + color?     (r,g,b) -> value cell renders a swatch, not a field
 }
+class SpectrumCaptureView <<view>> {
+  + caption
+  + cropped / roiOverlay   (host fills .image after capture:
+     crop-to-ROI / full-frame ROI-border / full-frame mask)
+}
+class VerdictGaugeView <<view>> {
+  + value / thresholds / classes
+  + render  (BAND|SWATCH|LABEL|ZONES|VALUE)   -- Roast Ampel gauge
+}
+class TabGroupView <<view>> {
+  + tabs : [(label, ResultView)]
+  --
+  explicit SUB-TAB container (§7b): Qt -> QTabWidget,
+  matplotlib -> children stacked; children recurse
+  through ViewModelFactory (nested, host-fill descends)
+}
 SpectralWorkflowStep --> EvaluationResult : evaluationResult
 EvaluationResult "1" o-- "0..*" ResultView : items
 ResultView <|-- ColorSwatchView
@@ -148,6 +164,10 @@ ResultView <|-- LabelView
 ResultView <|-- VerdictView
 ResultView <|-- SpectrumPlotView
 ResultView <|-- MetricFieldView
+ResultView <|-- SpectrumCaptureView
+ResultView <|-- VerdictGaugeView
+ResultView <|-- TabGroupView
+TabGroupView "1" o-- "0..*" ResultView : tabs (children)
 
 ' ===================== publishing artifacts (deferred) =====================
 class Pdf <<postponed>> {

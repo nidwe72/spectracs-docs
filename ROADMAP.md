@@ -197,6 +197,15 @@ specced; captured here so it is not lost. Scope of what "stable" must cover:
 _integration_ generic, uniform, and testable, which is a precondition for hardening it. Sequence: settle that
 convergence, then spec + build this hardening gate **before any productive/commercial rollout**.
 
+> **✅ DOWN-PAYMENT SETTLED — 2026-07-25:** the simplified-plugin-navigation bundle is **IMPLEMENTED + rig-verified**
+> (M1 nav-model SDK · M2 `AbstractPluginExecutionView` base + two thin subclasses · M3 DEV should-be · the §7b/§7c
+> content bundle J·T1·T2·T3·C1·C2·SW). Highlights: plugin-driven `WorkflowPolicy`/`NavigationPolicy`; AUTO_ADVANCE
+> with a fresh-capture-only re-jump (Option C); explicit `TabGroupView` sub-tab container across both render targets;
+> DEV renames/reorder + full-frame(ROI-border)+cropped report captures; phase-chevron renames (Metadata→"Details",
+> Publishing→"Verdict/Publish"); the temporary `SIMPLIFIED_NAVIGATION` toggle removed (DEV is permanently should-be).
+> The `plugin_sdk` surface this settles (`policy()`/`WorkflowPolicy`, the view-model vocabulary incl. `TabGroupView`)
+> is exactly the contract the SDK-stability bullet above must freeze. Suite 260 spectracsPy + 23 plugins green.
+
 ## 1. Extract the spectrum → colour logic  *(**IMPLEMENTED 2026-06-29** — spec `spectracsPy/docs/SPEC_spectrum_processing.md`; 11 unit tests pass. Remaining: wire into `PumpkinPlugin.evaluation`, #6)*
 Lift the proven `spectrasTest.py` hue pipeline into a reusable logic module / utility
 (`ColorUtil.spectrumToHue(...)`; eventual home `spectracs.plugin_sdk.util.ColorUtil`). Stands alone (no
