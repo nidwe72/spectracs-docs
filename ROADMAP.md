@@ -388,11 +388,21 @@ corrupt-data exposure to avoid). **Remaining debt is runtime/doc only** (R1 LAN-
 - **Exposure / capture follow-ups (from SM1, 2026-07-07)** — auto-exposure is proven in the dev view;
   **✅ now also wired into real calibration (SM2, 2026-07-08)** via `AutoExposureCaptureHelper`; still
   open: **wire it into the measurement (SM3) flow**; the **LED-array measurement
-  exposure** value (dial it live in the dev view once the LED source is on hand); camera **response linearity
-  / gamma** check for quantitative T (same-exposure ref/sample keeps the ratio robust regardless); **gain**
+  exposure** value (dial it live in the dev view once the LED source is on hand); ~~camera **response linearity
+  / gamma** check~~ **✅ DONE 2026-07-26 — measured, see the gamma item below**; **gain**
   as a v2 lever when exposure alone can't reach target; a **focus-assist dev tool** (sharpness algorithm to
   beat the eye — the instrument is already focused, this is a quality aid, matters for calibration). Detail:
   `spectracsPy/docs/SPEC_real_camera_capture.md` §9.3, `SPEC_dev_capture_view.md` §6.
+- **Gamma linearization of the capture path** *(DE-RISKED DESIGN, ready to build — 2026-07-26)* — undo the
+  camera's brightness curve before the spectrum is formed. **Verdict-neutral by construction**, so it moves no
+  threshold and blocks nothing: measured off-line from the spectra embedded in the report PDFs, the pigment ratio
+  is *bit-identical* under a pure-power decode at any exponent. Settled: decode with the **pure `x^2.2`** law
+  (the official piecewise sRGB curve measured **24 % worse** on class separation and was declined), applied per
+  channel as the **first** operation in `ImageSpectrumAcquisitionLogicModule.__reducedColumnValues`; raise the
+  colour ceiling 3.0 → 6.6 in the same commit. Gains: **+33–40 % perceived colour chroma**, physically real
+  absorbance, cross-camera comparability of absolute values — and **closure**, retiring "maybe it's the gamma"
+  as a suspect for every future anomaly. Spec: `spectracsPy/docs/SPEC_capture_quality.md` §17 + §17.5;
+  documentation: `spectracsPy/docs/DOC_capture_fidelity.md` → `internal/Spectracs_CaptureFidelity.pdf`.
 - **Pumpkin-oil evaluation → peak-ratio algorithm** *(later task, 2026-07-05)* — switch the
   `PumpkinOilPlugin` evaluation (currently spectrum→hue/colour) to a **peak-ratio** method. Design discussion
   (in German) captured externally: `https://share.google/x0Ij7iuZQR8Q` (Gemini thread). To be specced in

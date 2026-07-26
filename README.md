@@ -21,6 +21,16 @@ for optical spectroscopy with a DIY spectroscope).
   ([`spectracsPy/docs/SPEC_doc_automation.md`](../spectracsPy/docs/SPEC_doc_automation.md), IMPLEMENTED).
   Diagram: [`doc_automation_architecture.svg`](doc_automation_architecture.svg) — the two-process
   (Director ↔ app `--doc-mode`) UDP + visible-mouse architecture.
+- **[`internal/`](internal/)** — generated, internal-use documentation PDFs. Not hand-written and not
+  hand-edited: each is produced from a markdown master in `spectracsPy/docs/` by a generator in
+  `spectracsPy/docs/tools/`. Currently:
+  **`Spectracs_CaptureFidelity.pdf`** — textbook-style documentation of the capture chain (how the
+  camera is made to measure a spectrum, and why each step is as it is: `max(R,G,B)` grey values, the
+  brightness/gamma law, auto-exposure, settling, sensor warm-up, spatial + temporal outlier
+  rejection, white balance, dark frames, the wavelength window, sample dilution — plus what was
+  deliberately *not* done). Source: `spectracsPy/docs/DOC_capture_fidelity.md`; regenerate with
+  `python3 docs/tools/build_capture_fidelity_pdf.py`. Written for developer, chemist and lab reader
+  alike; self-contained (figures embedded), so it can be sent alongside a report.
 - `*.puml` — PlantUML sources for the diagrams.
 - `spectracs.gaphor` — an older (2023) Gaphor UML model, kept for reference.
 
