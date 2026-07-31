@@ -37,8 +37,9 @@
 > [`SPEC_capture_quality.md`](../spectracsPy/docs/SPEC_capture_quality.md) **§16.13**. Six re-seats of one brown
 > fill, post-rebuild: **brown σ = 0.131** (raw CV 1.41 %) against a pre-registered pass criterion of ≤ 3.5 % —
 > **PASS**, and below the optimistic branch of §16.11.12's two-outcome prediction. Green 12.251 ± 0.354 vs brown
-> 9.303 ± 0.131, **no overlap on any run**; at the shipped T = 10.6 green sits **+4.83 σ** above and brown
-> **+9.88 σ** below. The ~10 % false-GREEN that was "all the remaining risk" is retired. The brown mean also
+> 9.303 ± 0.131, **no overlap on any run**; at the shipped T = 10.6 green sits **+4.66 σ** above and brown
+> **+9.88 σ** below *(those σ-margins use set C alone, matching the means quoted; against the wider B+C green
+> the figure is +4.83 σ — `SPEC_capture_quality.md` §16.13.5)*. The ~10 % false-GREEN that was "all the remaining risk" is retired. The brown mean also
 > survived a rig rebuild *and* a different oil (9.303 vs the archived 9.361, −0.62 %).
 > **▶ What is left is σ_fill, and only σ_fill:** series D is re-seats of ONE fill and excludes sample preparation
 > entirely, so **series E** (6 separate fills, time-ordered, raw + baselined side by side —
@@ -54,6 +55,30 @@
 > metric's physics, algebra and dilution-invariance proof; the two existing internal PDFs were corrected to match.
 > Near-term plugin task marked: **surface the 600–630 band as a measurement and rename the metric family**
 > (`SPEC_pumpkin_peak_ratio_eval.md` §15, HIGH PRIORITY, short).
+>
+> **⏸ 2026-08-01 — DECISIONS: the solvent programme is PAUSED, and "one measurement decides" is now bounded.**
+> 1. **Keep isopropanol** (`SPEC_capture_quality.md` §16.12.7b). The solvent work existed to buy **precision**;
+>    series D showed precision is no longer the binding constraint (*d* ≈ 11) — **the unvalidated threshold
+>    is**. A solvent swap would buy what we do not need and cost a threshold re-derivation. **1-butanol is
+>    rejected outright on hazard** (H318, irreversible eye damage); **2-butanol** is recorded as the surviving
+>    candidate, not scheduled. ⚠ **A safety constraint nobody had written down:** the 220 V lamp sits in the
+>    lower cone under a top-down beam, so **any leak runs into mains electrics** — vessel integrity is a safety
+>    property, which rejects the acetone-plus-glass-hack route and constrains all future vessel work. The
+>    decision is **conditional on series E**; a large σ_fill reopens it.
+> 2. **The one-measurement question is bounded, and it is close to binary.** Brown is the binding class:
+>    **σ_fill ≤ 3.3 % CV ⇒ one measurement decides ≥95 %**; at 5.4 % it decides 39 %. §11.4f B's pre-registered
+>    3–6 % straddles that boundary exactly. **There is no failure mode, only a cost** — the fallback is the
+>    three-fill protocol shipped today. Sensitivity table: §16.11.13.
+> 3. **✅ Dilution invariance is RESOLVED for practical purposes** (`SPEC_capture_quality.md` §16.10.8) — the
+>    other half of the gate's own pass criterion. Pooling the **three** within-oil dilution pairs already on
+>    disk gives a log–log slope of **+0.033 ± 0.029**, consistent with zero: a realistic ±17 % preparation
+>    error moves the metric **~0.6 %**, a *fourfold* error under 5 %, against a **33 %** class gap. Edwin's
+>    point that the imprecision *is* the experiment — drops are not drops, by intent — turns out to be
+>    measurable. The dedicated ≥4× sweep is **demoted**, not a gate item.
+> 4. **Position adopted:** >95 % is practicable, and "measure again" is a **feature**, not a defect — provided
+>    the ÜBERGANG verdict withholds its *direction* (§16.10.17c) **and** the protocol is enforced: new
+>    **§16.10.17e** — an incomplete run yields **no verdict**, and the protocol, threshold and completeness are
+>    **persisted with the record** (same argument as A3's `pluginVersion`). DESIGN; implement later.
 >
 > **✅ M3 PLUGIN DISTRIBUTION + A3 PROVENANCE — IMPLEMENTED 2026-07-18/19:**
 > [`spectracsPy/docs/SPEC_plugin_distribution.md`](../spectracsPy/docs/SPEC_plugin_distribution.md). Ships plugin
