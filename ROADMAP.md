@@ -33,6 +33,28 @@
 >    (measure → process → evaluate with the Roast Ampel → report → Send-to-LIMS), extending the Doc Director
 >    harness ([`SPEC_doc_automation.md`](../spectracsPy/docs/SPEC_doc_automation.md)).
 >
+> **⭐ UPDATE 2026-07-31 — SERIES D RAN; the discrimination criterion is now MET ON MEASUREMENT, not projection.**
+> [`SPEC_capture_quality.md`](../spectracsPy/docs/SPEC_capture_quality.md) **§16.13**. Six re-seats of one brown
+> fill, post-rebuild: **brown σ = 0.131** (raw CV 1.41 %) against a pre-registered pass criterion of ≤ 3.5 % —
+> **PASS**, and below the optimistic branch of §16.11.12's two-outcome prediction. Green 12.251 ± 0.354 vs brown
+> 9.303 ± 0.131, **no overlap on any run**; at the shipped T = 10.6 green sits **+4.83 σ** above and brown
+> **+9.88 σ** below. The ~10 % false-GREEN that was "all the remaining risk" is retired. The brown mean also
+> survived a rig rebuild *and* a different oil (9.303 vs the archived 9.361, −0.62 %).
+> **▶ What is left is σ_fill, and only σ_fill:** series D is re-seats of ONE fill and excludes sample preparation
+> entirely, so **series E** (6 separate fills, time-ordered, raw + baselined side by side —
+> `SPEC_capability_proof.md` §11.4f B) is the single outstanding measurement. §16.11.13's protocol inversion and
+> §16.11.11's projected decision table both stay gated on it. ⚠ **T = 10.6 itself remains UNVALIDATED** — series D
+> bought precision, not correctness (item 1 above is still the answer to that).
+>
+> **Also 2026-07-31 — the science behind the metric was corrected and written up.** The oil's pigment is
+> **protochlorophyll / protopheophytin**, not chlorophyll, and its red band is at **~623–626 nm**, not ~665
+> (`KB_spectroscopy_physics.md` §4.1 — sourced; the wrong molecule had propagated through seven documents). The
+> green→brown difference is **speciation, not concentration** (§16.13.9, *d* = 10.26 on a scale-invariant ratio).
+> A new internal document, **[*From Spectrum to Verdict*](internal/Spectracs_MetricAlgebra.pdf)**, gives the
+> metric's physics, algebra and dilution-invariance proof; the two existing internal PDFs were corrected to match.
+> Near-term plugin task marked: **surface the 600–630 band as a measurement and rename the metric family**
+> (`SPEC_pumpkin_peak_ratio_eval.md` §15, HIGH PRIORITY, short).
+>
 > **✅ M3 PLUGIN DISTRIBUTION + A3 PROVENANCE — IMPLEMENTED 2026-07-18/19:**
 > [`spectracsPy/docs/SPEC_plugin_distribution.md`](../spectracsPy/docs/SPEC_plugin_distribution.md). Ships plugin
 > updates without an APK rebuild: `DbPlugin` identity is now **`(codeRef, version)`** (insert-never-update),
