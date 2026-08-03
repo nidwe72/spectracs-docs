@@ -54,7 +54,10 @@
 > A new internal document, **[*From Spectrum to Verdict*](internal/Spectracs_MetricAlgebra.pdf)**, gives the
 > metric's physics, algebra and dilution-invariance proof; the two existing internal PDFs were corrected to match.
 > Near-term plugin task marked: **surface the 600–630 band as a measurement and rename the metric family**
-> (`SPEC_pumpkin_peak_ratio_eval.md` §15, HIGH PRIORITY, short).
+> (`SPEC_pumpkin_peak_ratio_eval.md` §15, HIGH PRIORITY, short). ⭐ **DONE 2026-08-03, differently than
+> planned** — instead of surfacing 600–630, the far anchor was **moved to 620–630 nm** onto the Qy band and
+> declared in `declaredEvalBands()`, which surfaces it by construction (`SPEC_capture_quality.md` §16.20;
+> §15.1 marked RESOLVED).
 >
 > **⏸ 2026-08-01 — DECISIONS: the solvent programme is PAUSED, and "one measurement decides" is now bounded.**
 > 1. **Keep isopropanol** (`SPEC_capture_quality.md` §16.12.7b). The solvent work existed to buy **precision**;
@@ -494,6 +497,56 @@ corrupt-data exposure to avoid). **Remaining debt is runtime/doc only** (R1 LAN-
   not the cap. Spec: [`spectracsPy/docs/SPEC_capture_quality.md`](../spectracsPy/docs/SPEC_capture_quality.md) §14.9.
   Emerged from the capture-fidelity arc (C1–C3 + WB split + full-frame settle, all done 2026-07-19). Implement on
   explicit request only.
+
+## ▶ RESUME POINT — 2026-08-03  *(the metric changed; the rig work is what is outstanding)*
+
+**Shipped and green (329 tests), NOT COMMITTED.** The DEV plugin now shows **three verdicts** on a
+**620–630 nm** far baseline anchor — `baseline + pedestal` (T = 10.6), `baseline` (T = 12.5), and the raw
+Soret/Q as a **value with no verdict**. All 122 archived reports were regenerated on it (verified backup at
+`spectracs-references/tmp_backup_pre620_20260803/`). Spec: `SPEC_capture_quality.md` §16.20/§16.20.7.
+
+**⚠ A live defect was fixed on the way:** the PUBLISHING verdict badge — the one screen an end user sees —
+ran on the raw Soret/Q at `T` = 4.4, a threshold **below the entire brown class**, so it reported brown oil
+as "good — green" on every run (`SPEC_roast_ampel.md` §2b).
+
+**▶ Next, in order:**
+
+1. **M3 publish + assign** the changed plugin. ⚠ **Do a no-op version bump through the flow FIRST** — the
+   live publish→assign→load path has never been rig-verified, so combining it with a metric change makes any
+   failure ambiguous.
+2. **Rig click-through** — capture → three verdicts → PDF, on the bench.
+3. **⭐ `T` re-derivation.** The scale moved (`M∞` 9.998 → 12.450). 10.6 was *retained*, not derived, and it
+   is the project's binding unvalidated constant either way.
+4. **⭐⭐ The DECAY-RATE run — §16.11.17.** *(new 2026-08-03; jumped ahead of the filter and acetone arms
+   deliberately.)* One fill, five reads over 24 h, one evening, no consumables. Edwin's question *"why does
+   29th A differ from B and C?"* turned out to have a bigger answer than expected: **the 24 h-aged fill is a
+   browner OIL, not a noisier one** — 27 % below fresh on a concentration-free shape ratio, with the Qy
+   flank down 17 % while the 572 nm degradation feature is up 14 %, and **3 of 3 runs misclassify**
+   (§16.11.16). The pigment demetallates in the solvent. **"Measure within the hour" is therefore a VERDICT
+   rule, not a precision rule — and the hour has never been tested from either side.** It runs first because
+   both arms below hold a fill for an unrecorded time and inherit the confound.
+   *(The archive folder was renamed `20270729A` → `20270729A_aged24h` so this cannot be read past again.)*
+   ⭐ **Amended after Edwin measured the running rig 2026-08-03: nothing exceeds 40 °C after 1½ h** — so the
+   fill must be stored **on the bench**, not in the instrument, and the sample temperature logged at every
+   read. A conventional Q₁₀ puts 40 °C at 3–5× the 25 °C degradation rate, which raises a live hypothesis:
+   part of §16.12.11 A's 30-minute "settling" drift may be **thermal degradation** — same sign, same
+   timescale, and nothing in that analysis could have told them apart (§16.11.17 P5).
+5. **The filter arm — `SPEC_capture_quality.md` §16.21, F1 first.** PTFE 0.22 µm filters ordered. ⚠ It is
+   **not** a pedestal fix (§16.21.0a: filtration cannot make the correction less important). Its target is
+   **σ_fill via the aliquot step**, which gates the one-measurement protocol — three fills (~1 h) versus one
+   (~20 min) per sample. ⚠ Interleave the arms and timestamp every fill (§16.21.3).
+6. **The acetone arm — §16.22**, a bench probe under mitigation. ⚠⚠ **§16.12.7b's safety rejection is NOT
+   withdrawn**: acetone's vapour is heavier than air and the 220 V lamp sits in the lower cone beneath it.
+   ⚠ Same interleaving requirement (§16.22.4). **Narrowed 2026-08-03 (§16.22.1a):** the 40 °C measurement
+   closes the *thermal* half — acetone's autoignition is 465 °C, derated ~370 °C, so hot-surface ignition is
+   10× away and the LED lamp is why. What remains is **electrical**: switch contacts, socket and LED driver
+   inside the cone the vapour sinks into. ⭐ **Highest-value change before any acetone reaches the bench —
+   switch the lamp from a socket OUTSIDE the cone**, which removes the only spark source from the vapour
+   path. Also: at 40 °C acetone's vapour pressure is ~56 kPa against ~31 kPa at 25 °C, so open-cup
+   evaporation runs ~1.8× faster (§16.22.4 A5).
+
+**Still open and unchanged:** `r_Q`'s mechanism (§16.19 ruled out both scattering and the far anchor, leaving
+≥80 % unexplained); §16.10.8 dilution invariance; brown σ_fill post-rebuild, never measured.
 
 ## Dependencies / suggested order
 - **#1, #2, #4 — done.** The measurement/evaluation concept + Pipeline Playground PoC — done.
