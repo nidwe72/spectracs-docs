@@ -531,11 +531,20 @@ as "good — green" on every run (`SPEC_roast_ampel.md` §2b).
    read. A conventional Q₁₀ puts 40 °C at 3–5× the 25 °C degradation rate, which raises a live hypothesis:
    part of §16.12.11 A's 30-minute "settling" drift may be **thermal degradation** — same sign, same
    timescale, and nothing in that analysis could have told them apart (§16.11.17 P5).
-5. **The filter arm — `SPEC_capture_quality.md` §16.21, F1 first.** PTFE 0.22 µm filters ordered. ⚠ It is
+5. **⭐ The PREPARATION PROTOCOL — §16.23**, using hardware already owned: a **60 µL haematocrit capillary**
+   (Hirschmann 9100160, €0.04) dropped into **15 mL of IPA** in a **capped graduated centrifuge tube**. That is
+   1:250 against today's ~1:243 — `A_Q` 0.224, inside the window, **so no threshold is re-derived**. It removes
+   drop counting, the unknown drop volume, pipette transfer loss, evaporation, batch ageing and
+   cross-contamination in one move, and makes a **σ_fill triplet cost ~€0.10**. ⭐ The cuvette is unchanged, so
+   §16.12.7b's leak-into-mains constraint does not apply. ⛔ **Two gates first:** G1 the additive blank (are the
+   capillaries heparinised? heparin is insoluble in IPA and would add scatter to the one system whose open
+   problem is a scattering pedestal), G2 weigh ten filled capillaries (the 0.9–1.0 mm ID band is a ±10 % volume
+   band and "nominal 60 µL" sits at its top). Both cost one capture and one weighing.
+6. **The filter arm — `SPEC_capture_quality.md` §16.21, F1 first.** PTFE 0.22 µm filters ordered. ⚠ It is
    **not** a pedestal fix (§16.21.0a: filtration cannot make the correction less important). Its target is
    **σ_fill via the aliquot step**, which gates the one-measurement protocol — three fills (~1 h) versus one
    (~20 min) per sample. ⚠ Interleave the arms and timestamp every fill (§16.21.3).
-6. **The acetone arm — §16.22**, a bench probe under mitigation. ⚠⚠ **§16.12.7b's safety rejection is NOT
+7. **The acetone arm — §16.22**, a bench probe under mitigation. ⚠⚠ **§16.12.7b's safety rejection is NOT
    withdrawn**: acetone's vapour is heavier than air and the 220 V lamp sits in the lower cone beneath it.
    ⚠ Same interleaving requirement (§16.22.4). **Narrowed 2026-08-03 (§16.22.1a):** the 40 °C measurement
    closes the *thermal* half — acetone's autoignition is 465 °C, derated ~370 °C, so hot-surface ignition is
