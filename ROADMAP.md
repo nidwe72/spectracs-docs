@@ -422,6 +422,24 @@ test-side to expect the `"Spectracs"` house label (vendor is a hard invariant; a
 corrupt-data exposure to avoid). **Remaining debt is runtime/doc only** (R1 LAN-IP interface names, R2 missing
 `-core` on `runServer.sh` PYTHONPATH, D1 `luxpy` doc drift) — no open test items.
 
+## Known defects (open)
+
+- **`CameraWarmupVideoThread` reaches `CapturePanel.handleVideoThreadSignal`** *(intermittent; long-standing,
+  logged 2026-08-04)* — `CapturePanel.py:413` does `if not videoSignal.isPreview:` and occasionally receives a
+  **`CameraWarmupVideoThread` instance** where a `VideoSignal` is expected →
+  `AttributeError: 'CameraWarmupVideoThread' object has no attribute 'isPreview'`. Seen twice in one bench
+  session (`20260804A`), each time **after** the sample's `CAPTURE-SETTINGS`/`CAPTURE-LOWDN` lines, so the
+  captured data itself was complete — but it kills the stream handler mid-session and is a plausible reason the
+  panel does not carry a locked exposure forward between runs (see the AE-control item below).
+  ⚠ **How the warm-keeper's payload reaches that slot is NOT yet explained**: `CameraWarmupService` never
+  connects it to the panel, and `CameraWarmupVideoThread` does not even declare `videoThreadSignal` (only
+  `DevCaptureVideoThread` and the three calibration threads do). Needs a runtime check on the rig, not a static
+  read. ⛔ **Do not "fix" it with `getattr(videoSignal, "isPreview", False)`** — that silences the traceback and
+  *masks* the real hazard the comment above the line warns about (§14.6: a non-capture frame becoming
+  `__latestImage`, so the burst starts on a mid-ramp outlier). Root-cause it. Suspects to check first: a leaked
+  worker delivering a queued signal into a discarded panel (the `__stopStream` failure mode already documented
+  there), and the `CameraLease` pause/resume handover.
+
 ## Still-deferred design threads (pick up when their build item needs them)
 - **Persistable-workflow schema** in [`DB_ENTITIES.md`](DB_ENTITIES.md): map `model/spectral/` classes to
   SQLAlchemy, add the `Plugin` entity + `AppUser` bindings, record the `DbSpectrum` + `MeasurementProfile`
@@ -497,6 +515,171 @@ corrupt-data exposure to avoid). **Remaining debt is runtime/doc only** (R1 LAN-
   not the cap. Spec: [`spectracsPy/docs/SPEC_capture_quality.md`](../spectracsPy/docs/SPEC_capture_quality.md) §14.9.
   Emerged from the capture-fidelity arc (C1–C3 + WB split + full-frame settle, all done 2026-07-19). Implement on
   explicit request only.
+- **⭐ No way to PIN the exposure from the DEV plugin — TO DISCUSS** *(NEW 2026-08-04; sibling of the item above)*
+  — the AE controls exist in `CapturePanel` (auto-expose checkbox + manual slider + `__lockedExposure`) and the
+  plugin-declared `CaptureView` already carries chrome flags for exactly this kind of thing (frames/exposure
+  hidden by default, `SPEC_bench_pdf_export.md`), **but the DEV plugin does not surface them**, so on the bench
+  there is no way to hold one exposure across a run series. **Why it now matters (measured, not theoretical):**
+  in `20260804A` the AE landed **104 / 90 / 104** across three consecutive runs of one fill, and the odd run
+  carried a **flat +0.024 A** artifact against the two that matched (+0.003 A between the matched pair) — enough
+  to move `Verdict · baseline` from 17.5 to 15.1. `findExposure` picks the brightest exposure still **≤ 245
+  channelPeak**: a hard ceiling honed by bisection, so near the boundary the control is **bistable**, not
+  drifting — a hair more brightness in the blank drops it a whole bisection step. **Discussion points:** (a) do
+  we expose AE via a `CaptureView` flag, or a bench-level "lock exposure for this series" control that outlives
+  a single run? (b) should the AE ceiling get hysteresis so it stops flipping rungs? (c) should the applied
+  exposure be **persisted into `workflow.json`** — today it exists only as a stdout `CAPTURE-SETTINGS` line, and
+  reconstructing which run used which exposure needed the `CAPTURE-LOWDN` value matched back against the
+  embedded spectra. **(c) is the cheapest and probably should not wait for the rest.** See the exposure-invariance
+  item below — that is the *reason* this is not merely a convenience.
+- **⭐⭐ Exposure-invariance of `A = −log10(S/R)` is NOT established** *(NEW 2026-08-04 — Edwin's question;
+  needs one rig run to settle)* — the pipeline assumes a changed exposure cancels in `T = S/R` because both legs
+  share it. `20260804A` (4 runs of one filtered fill) says it does not. **The case, 3 controls vs 1:** three runs
+  at AE-landed exposure **104** give `Verdict · baseline` **17.537 / 17.596 / 17.343** (sd 0.132, **0.8 % CV**);
+  the one run at exposure **90** gives **15.114** — **−13.6 %, i.e. 18 sd** off the controls. Leg-scale mismatch
+  tracks it exactly: **2.5 %** (DN) on the exposure-90 run against **≤0.5 %** on all three exposure-104 runs,
+  worth a **flat +0.024 A** offset versus ±0.004.
+  **⛔ SETTLING IS EXCLUDED** (Edwin, from the log): in the exposure-90 block the reference reads `minDn=96.2`
+  and the *next* capture at the same exposure reads `minDn=96.2` — identical to 0.1 DN, so the sensor was fully
+  arrived; and the first block's three consecutive references drift only 111.1→111.7→111.8 (**+0.6 %**) against
+  the 2.5 % to be explained. **Mechanism still unidentified.** The sensor transfer is *not* the pure `pow2.2` the
+  decode assumes (the reference's own drop is DN-dependent, ×0.886 dimmest fifth → ×0.920 brightest), but a toe
+  cannot yet be confirmed as the cause: ⚠ **`corr(excess A, sample DN)` is CONFOUNDED and must not be used** —
+  dark sample bins *are* the high-absorbance bins, so the concentration drift below fakes the toe signature
+  exactly (control run 004 shows a *larger* such correlation, +0.58, than the suspect run, −0.28).
+  **▶ Decisive experiment (one evening, no consumables):** one fill, one seating, no reseats — capture
+  reference+sample at a ladder of **pinned** exposures and plot `A` and the metric against exposure. ⭐ **The
+  ladder MUST be INTERLEAVED (104, 90, 104, 90, …), not swept monotonically** — see the drift below; a monotone
+  sweep aliases it straight onto the exposure axis. Flat ⇒ invariance holds; sloped ⇒ that slope *is* the
+  correction and exposure-pinning becomes mandatory. ⚠ Until settled, **runs at different exposures are not
+  comparable**; archived sets should be checked for exposure homogeneity before pooling. **Written up in full
+  as [`SPEC_capture_quality.md`](../spectracsPy/docs/SPEC_capture_quality.md) §16.24** (§16.24.1). Diagnostic:
+  `spectracsPy/diagnostics/probe_20260804A.py`.
+- **⭐⭐ THE ERROR BUDGET IS 17× ASYMMETRIC — `SPEC_capture_quality.md` §16.24.2/.3/.4** *(NEW 2026-08-05 —
+  Edwin's question "there is the slope of the baseline that would change between the runs; how much?")* — the
+  structural finding behind the item above, and it would have bitten without any exposure problem. The
+  subtracted baseline is **62 % of the raw Q band and −1.0 % of the raw Soret**, so `QB` (0.036) is a small
+  difference of comparable numbers while `SoretB` ≈ raw: **a 0.001 A baseline error is worth 2.78 % on the
+  metric at Q against 0.16 % at the Soret — 17×.** ⇒ the metric's precision is set almost entirely by where
+  the baseline lands at 570 nm. ⛔ The *extrapolated* Soret is NOT the fragile end (the baseline is ~0 there);
+  the *interpolated* Q is — reason about **baseline-as-a-fraction-of-band**, not anchor geometry. The baseline
+  slope varies **39 %** run-to-run, only **23 %** of it concentration: the slope is a *difference* of two
+  anchors that individually track concentration well (r² 0.87 / 0.78) but whose difference does not (r² 0.23),
+  so it sheds signal and keeps noise. ⭐ **And that is why the Qy-flank anchor works:** `corr(far anchor, Q
+  band)` = **0.84–0.99**, so far-anchor scatter is common-mode with the Q band and cancels — 4–18× better than
+  independent noise. ⚠ **QUALIFIED 2026-08-05 (§16.24.4a):** concentration drifts within a set and both bands
+  follow it, so part of that correlation is trivial. Partial correlation with `A450` removed: **Steirerkraft B
+  0.996 with concentration explaining only 3 % of the far anchor** (decisive FOR genuine common-mode), but
+  **Kiendler A collapses 0.843 → 0.341** (there it is mostly just the fill). ⇒ **both mechanisms, mix varies by
+  set**; the 4–18 % measured benefit holds either way, but where concentration dominates it says nothing about
+  rejecting instrument noise. **The precision floor is the 1–16 % that is NOT common-mode**, and the failure signature
+  is *an error that moves the far anchor without moving Q* (= run 002). Also gives §16.20.9 §2 the quantitative
+  argument it lacked: the pedestal metric's denominator is 50 % bigger, and measures **half the sensitivity to
+  the artifact (−6.1 % vs −13.6 %) at 3× the noise on clean runs (CV 2.4 % vs 0.8 %)** — a real trade, n=3.
+- **⭐⭐ SPIKE LEAKAGE — a per-run instrument-health check, ready to build** *(Edwin's idea 2026-08-05;
+  `SPEC_capture_quality.md` §16.24.8, DESIGN)* — the lamp's **473 nm pump edge** and **580 nm phosphor valley**
+  are sharp; the oil absorbs smoothly; so any sharp structure surviving into `A(λ)` there is pure instrument
+  artifact and its size measures the failure of `S/R` to cancel **in that run, from that run's own data** — no
+  second run, no ladder, no calibration constant. Statistic `k = d(hp A)/d(hp log₁₀R)` on a 14.7 nm high-pass.
+  On `20260804A` it reads **0.445 for the exposure-90 run against 0.014–0.097** for the controls — and ⭐ it
+  correctly **CLEARS run 006**, whose metric is badly wrong but whose fault was the *sample*. ⇒ paired with
+  §16.15's `near/A450` turbidity covariate, **two numbers separate instrument faults from sample events**
+  (002 fails leakage / passes turbidity; 006 the reverse). **Build:** compute both at capture, **persist into
+  `workflow.json`** (a stdout-only diagnostic cannot be used on an archived run), warn above a threshold.
+  ⛔ **Do not invent the threshold from one session — compute `k` across the 122-run archive first.**
+  ⛔⛔ **Detector, NOT corrector — and the shift interpretation is REFUTED (§16.24.8a-bis).** Aligning the legs
+  was tried on BOTH fiducials and both are worse (473: CV 0.7 %→5.0 %; 607: CV 0.7 %→**23.8 %**). **There is
+  nothing to align:** `ImageSpectrumAcquisitionLogicModule` takes the ROI *and* the pixel→nm polynomial from the
+  stored calibration for both legs, so they are co-registered by construction. The fitted lags (−0.9…−1.4 nm)
+  are orders too large to be physical, and they reproduce the **opposite-sign estimator artifact that
+  `SPEC_metric_research.md` §3.6a had already diagnosed and fixed** in `diagnostics/lamp_line_calibration.py`.
+  §16.13.9's registration question stays open; nothing here advances it. ⭐ **The idea is standard practice**
+  (lock mass / D₂-lamp 486·656 nm / Raman Si 520.7 / `icoshift`) — its correct level is **BETWEEN SESSIONS**,
+  which is exactly where §3.6a/§3.8 already puts it, gating C14.
+- **⛔⛔ THE `r_Q` DILUTION SERIES IS STILL NOT RUN — and the archive shortcut is a TRAP (`SPEC_capture_quality.md`
+  §16.16.12)** *(Edwin 2026-08-05: "I think we have done the dilution test for the Steirerkraft oil now")*.
+  Pooling `20260804A` with `20270729B/C` gives the 2.4× `B_Q` span §16.16.2 asks for and a tight CI excluding
+  zero — **and it is void.** Collinearity check: the new cluster sits **2.0 σ off** the B+C line, and `M∞` is
+  **18.544 vs 11.181 for the same oil** ⇒ two clusters, not one line; the "fit" is the chord between them.
+  ⚠⚠ **The tight CI is the trap** — it is narrow *because* the clusters are far apart (max lever arm), and a
+  bootstrap resamples points, not the one-line assumption. Three further disqualifications, any one sufficient:
+  not serial-from-one-stock (§16.16.4), `20260804A` is **filtered** so its pedestal composition differs by
+  construction (§16.21.0a), and between-session `r_Q` stability is untested (§16.16.11 2′).
+  ✅ **What IS confirmed: the shipped constant reproduces exactly on the shipped anchor — Kiendler A+B+C give
+  `r_Q` = −0.0184, `M∞` = 12.450, CI [−0.0292, −0.0085] excluding zero.** ▶ §16.16.5 stands unchanged (serial
+  dilution, 12 runs, span ≈4×, se ≈0.002) **plus two additions**: all rungs either filtered or unfiltered,
+  never mixed; and keep `A_Q` ≥ 0.19 at the most dilute rung — §16.16.3's "go DOWN" is now amended to "down,
+  but not past the floor".
+- **⭐⭐ TWO STANDING BENCH RULES added to the preparation recipe — `SPEC_capture_quality.md` §16.23.9**
+  *(Edwin 2026-08-05)*. **RULE 1 — filter for σ_fill ONLY, expect nothing for the metric:** §16.21.0a
+  *predicted* it (the filter takes the flat coarse population, not the curving nanodroplets; `B_Q` is unchanged
+  by construction) and `20260804A` *measured* it — `near/A450` −31 % ✅ but metric CV **4.0 %**, inside the
+  archive's unfiltered 3.6–5.0 %, and the clearing drift unchanged. ⚠ σ_fill itself is still **untested** (one
+  fill) so the filter arm still needs its own experiment. **RULE 2 — measure at the specified `A_Q`, never
+  thin:** ⛔ `20260804A` ran at **`A_Q` = 0.093 against the 0.19 floor — 49 % of it**, and Kiendler A at 58 %,
+  so this is a recurring drift, not one slip. Thin fills **double the leverage of every Q-band error**
+  (`QB` 0.036 vs 0.068–0.073 ⇒ a 0.009 A shape error costs 25 % vs 12 %) and push `r_Q` to **54 % of its own
+  denominator**, outside the 23–43 % on record — which is why the pedestal gauge lost dilution invariance
+  (slope +0.334 vs +0.049). ⛔ **The linked risk: a visibly cleaner filtered sample invites a thinner fill —
+  the one way filtration can actively hurt.** ⚠ §16.23.6a's blue constraint pulls the other way and is
+  unresolved; **Rule 2 governs until §16.23.6f decides**, since the Q-band lever is measured and the blue-end
+  cost is still a hypothesis.
+- **✅ DECISION 2026-08-05 (Edwin) — KEEP THE BASELINE CONSTRUCTION AS-IS** (`SPEC_capture_quality.md`
+  §16.10.2a). *(a)* it discriminates — Cohen's *d* = 6.60, no overlap on the post-rebuild archive; *(b)* it is
+  arguable on two independent grounds — the Morton–Stubbs construction, and §16.24.4b's two-axis physics (the
+  anchor shares the *amount* axis so noise cancels, differs on the *speciation* axis so signal survives; a
+  pigment-free anchor would do neither); *(c)* nothing better exists — **five** routes closed in
+  `SPEC_metric_research.md` §7.8 plus §7.14's audit of the orthodox alternatives, all blocked on the same
+  missing 30 nm. ⚠ **Does NOT settle:** `T` = 10.6 (still unvalidated — this is about the construction, not
+  the boundary), A1/`r_Q` transfer (§16.16.5 unrun), and it is **not** an argument against the red-end
+  extension. Expected to be revisited only if the capture window changes.
+- **⛔⭐ EXTERNAL-LITERATURE AUDIT of the orthodox scatter corrections — `SPEC_metric_research.md` §7.14**
+  *(Edwin 2026-08-05; tool `diagnostics/scatter_correction_audit.py`)*. The shipped two-window linear baseline
+  uses the **Morton–Stubbs / Allen construction** — but ⛔⛔ **CORRECTED same day (§16.10.2a): we satisfy NEITHER
+  of its two conditions.** (1) it requires the irrelevant absorption to be **linear** — ours is convex, which is
+  `r_Q` (25 % of `B_Q` at working strength, 54 % when thin); (2) it requires anchors **free of the analyte** —
+  **51–79 % of our 620–630 anchor IS pigment**, measured against the scattering law. Violation 2 is
+  **deliberate and load-bearing** (§16.12.12: remove the Qy flank and the classes overlap) and does **not**
+  break dilution invariance (§16.14, anchor pigment scales with `c`), but it costs comparability: **`M∞` is not
+  the pigment's true Soret/Q ratio**, which is the deeper reason `T` is tied to this rig and recipe. ⛔ *"We use
+  the pharmacopoeial method"* is **NOT** an available defence — the honest one is *"we use its construction
+  knowingly outside its conditions; here is what each deviation costs."* Two testable alternatives were priced and **both are worse**:
+  **λ⁻ⁿ turbidity baseline** (Cohen *d* 6.60 → 5.88) and **2nd derivative** (*d* = **0.38, classes overlap**).
+  ⭐⭐ Route E's failure is the sharpest disproof of assumption A6 in the research: scattering must FALL toward
+  the red, but our far anchor **RISES on all five sets** (far/near 1.47–2.50, brown included), so no physical
+  exponent exists and the fit rails at its bound — **the far window is the Qy flank, not a turbidity window,
+  and one window cannot be both.** ⇒ every orthodox method needs either an absorption-free region or a
+  resolved peak, and 440–629.8 nm has **neither** — i.e. **§7.8's "30 nm of missing spectrum" reached
+  independently from outside.** Raises the value of the red-end capture extension; does **not** lower its price
+  (S-mount roll-off + lamp collapse past ~630 nm remain).
+- **⛔ `M` IS EXACTLY INVARIANT TO ANY CONSTANT SUBTRACTION — "normalise the spectra first" is always a no-op**
+  *(`SPEC_capture_quality.md` §16.24.9; Edwin's proposal 2026-08-05, a real technique — dual-wavelength
+  spectrophotometry — but already subsumed here)*. Normalising `R` and `S` at a chosen feature is algebraically
+  `A' = A − A(λ₀)`, a single-point baseline. **Proof:** subtracting a constant `c` shifts the fitted anchor line
+  by exactly `c`, so `(A−c)−(line−c) = A−line` and every band mean is unchanged. Measured at four anchor
+  wavelengths: the shipped metric is **bit-identical on every row**. ⇒ the two-window linear baseline already
+  removes a constant **and a slope**; the proposal removes only the constant. Colour already does it separately
+  (`BaselineOffsetOp`, which colour genuinely needs). ⛔ **Retires the whole class of "rescale/anchor before the
+  metric" proposals — do not re-derive.** ⚠ `r_Q` is NOT in this class (it subtracts from ONE band, after
+  baselining). ⛔ And 473 nm would be the worst anchor: a point anchor on the steepest feature turns wavelength
+  jitter into value error (raw ratio degrades 7.95 % → −252 %) — a fiducial wants maximum gradient, a
+  normalisation point wants minimum.
+- **⛔ Three sensor models RULED OUT for the exposure effect** *(`SPEC_capture_quality.md` §16.24.1a)* — wrong
+  gamma (**exactly zero effect — an algebraic result: a wrong exponent scales `A` by a constant, the baseline is
+  linear in `A`, so the ratio is invariant** ⇒ `M` is already immune to every pure-power transfer error, and
+  under any pure-power sensor exposure cancels exactly ⇒ **there is no metric-side change left to make**),
+  black level (−13.5 % → −12.6 % at 20 DN), stray light (**worse**, −14.5 %). Remaining suspects are not static
+  per-pixel transfers.
+- **Two by-products of `20260804A` worth keeping** *(2026-08-04; full write-up `SPEC_capture_quality.md`
+  §16.24.5, incl. a ⛔ correction — the filter's scatter reduction is ~31 %, not 37 %, once concentration is
+  controlled)*: **(1) a live dilution-invariance confirmation
+  on ONE fill** — across the three exposure-104 runs `A450` fell **12.3 %** (0.6214 → 0.5446 over 87 min) while
+  `Verdict · baseline` moved **0.8 %**. That is the §16.10.8 claim demonstrated with everything but concentration
+  held fixed — arguably cleaner than the dilution pairs, which vary the preparation too. **(2) a concentration
+  drift of −0.00085 A450/min in a FILTERED fill**, shape-preserving (the metric held), so it is *not* the
+  §16.11.16 demetallation signature — pigment speciation is unchanged. Candidates: continued settling despite the
+  0.22 µm filter, or adsorption onto the cuvette. ⚠ Relevant to **§16.11.17 (decay-rate)** and to **§16.23
+  (preparation protocol)**: it puts a clock on a fill even after filtration, and it is the reason the ladder above
+  must interleave.
 
 ## ▶ RESUME POINT — 2026-08-03  *(the metric changed; the rig work is what is outstanding)*
 
