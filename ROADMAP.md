@@ -750,6 +750,46 @@ dosing: green-green signal **0.98 units against 1.665 units of fill spread, SNR 
 confirm the class call survives the new recipe, green-vs-green because that is the one the capillary is *for*
 and the one the capability gate needs (*d* ≈ 1.3–2.0 today against ≳ 3 required).
 
+### ⭐⭐ PRIO 3 — THE VALIDATION STUDY *(added 2026-08-06; `SPEC_metric_research.md` §9.1 item 6)*
+
+**Never done, and until now not on any milestone.** Everything measured so far shows the numbers *separate*.
+Nothing shows they **mean what we say they mean**.
+
+⇒ Run it **after** PRIO 1 + PRIO 2 and the Soret trim — otherwise it validates a configuration that is about
+to change, and has to be repeated.
+
+**Panel:** ⭐ **12+ greens, 2–3 browns.** ⚠ Today the class claim rests on **ONE brown oil** (§2.2) — a single
+bottle cannot support a class. The brown arm is the weaker half of the panel and the more important one.
+
+**Ground truth — two independent kinds, recorded separately:**
+
+| | what | why separate |
+|---|---|---|
+| **objective** | **roast level** (mill/process record) | the physical variable the metric claims to track |
+| **subjective** | a **jury visual sub-score** | what a buyer actually judges — and it may *disagree* with roast level, which is itself a finding |
+
+⚠ **Record them apart and never let one inform the other.** If the jury sees the instrument's verdict, or the
+scores are merged before analysis, the study measures agreement with itself.
+
+**Design conditions, all of which decide whether it is a validation or a demonstration:**
+
+- ⛔ **Freeze the thresholds BEFORE the first sample** — pre-registered, from the re-derivation the Soret trim
+  and the 1/3 band force anyway. A threshold fitted after seeing the panel proves nothing.
+- ⚠ **Spread the panel across sessions and interleave the classes.** §3.4's **session confound** is still open
+  and is the one thing that could invalidate `M` itself; a study run class-by-class in one sitting inherits it
+  whole.
+- ⚠ **Honour the ageing rule** (§16.11.16: a 24 h-aged fill reads as a *browner oil* and misclassified 3 of 3).
+  Fresh per §11.4a, timestamp every fill, log sample temperature. ▶ §16.11.17's decay-rate run should ideally
+  precede this, so "within the hour" is a measured window rather than a guess.
+- **Report per-oil, not pooled** — a class-level *d* hides which individual oils sit near the boundary, and
+  those are the ones a customer will bring.
+
+⇒ **What it converts.** After the Soret trim + aperture + capillary the projected run-to-run CV is **~1.4 %**
+(from 3–5 %), which should lift within-green separation from *d* ≈ 1.34 to **~3.5–5** — i.e. the capability
+gate's failing half becomes met. ⭐ **At that point the bottleneck stops being precision and becomes
+evidence**, and this study is the only item that addresses it. Until it runs, the instrument is good and the
+*claim* is untested.
+
 ### ⭐ The 660–680 nm QUIET-WINDOW test *(added to the backlog 2026-08-06)*
 
 `SPEC_metric_research.md` **§7.14.4** + `SPEC_capture_quality.md` §16.26. **One number decides whether the whole
