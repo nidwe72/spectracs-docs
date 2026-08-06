@@ -39,14 +39,18 @@ ganttDiagram {
 </style>
 
 ' ── PARALLEL: the only item that depends on anyone but Edwin ──────────────────────
-[Oil shopping: 8 oils for P3a] as [SHOP] lasts 8 days
+[Oil shopping: 9 oils for P3a] as [SHOP] lasts 8 days
 [SHOP] is colored in #7EC4C4
 note bottom
   ⚠ LEAD TIME, not effort — a few hours of actual
   shopping spread over the window. It is on the chart
   because it is the ONLY item that depends on shops
   being open and stocked rather than on Edwin.
-  2 brown / 2 non-premium green / 4 premium green.
+  2 brown / 3 non-premium green / 4 premium green.
+  ⚠ THREE non-premium, not two: a rank test on 2 vs 4
+  has a p-value FLOOR of 0.067 — it cannot reach
+  significance however well the instrument performs.
+  3 vs 4 reaches 0.029. One bottle buys the claim.
   ⛔ MUST be in hand before P3a starts (Wed 19 Aug).
   ⚠ Keep receipts/labels: the premium/non-premium
   label is a SECOND variable in the study, recorded
@@ -142,12 +146,12 @@ end note
 
 [THRESHOLDS FROZEN] as [FROZEN] happens at [FREEZE]'s end
 
-[P3a: 8 oils, 24 fills] as [P3AMEAS] lasts 2 days
+[P3a: 9 oils, 27 fills] as [P3AMEAS] lasts 2 days
 [P3AMEAS] starts at [FREEZE]'s end
 [P3AMEAS] is colored in #6BA3D6
 note bottom
-  2 brown / 2 non-premium green / 4 premium green.
-  ⭐ OUT-OF-SAMPLE: eight oils the thresholds
+  2 brown / 3 non-premium green / 4 premium green.
+  ⭐ OUT-OF-SAMPLE: nine oils the thresholds
   have never seen. Fresh per fill (the ageing
   rule) — ~3-4 fills per evening.
 end note

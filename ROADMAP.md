@@ -761,16 +761,58 @@ and the one the capability gate needs (*d* ≈ 1.3–2.0 today against ≳ 3 req
 **A scaled-down validation that removes the part of PRIO 3 that was months.** Eight shop-available oils is a
 weekend's shopping, not a mill relationship; two judges is a diary entry, not a panel.
 
-**Panel — 8 oils, three tiers:**
+**Panel — 9 oils, three tiers:**
 
 | tier | n |
 |---|---|
 | brown (over-roasted) | 2 |
-| green, **non-premium** | 2 |
+| green, **non-premium** | ⭐ **3** |
 | green, **premium** | 4 |
 
 ⭐ **The three tiers make this a WITHIN-GREEN test in the field**, which is exactly the half of the capability
 claim PRIO 2 measures in the lab. ⇒ P3a is the field confirmation of P2's number, not a separate exercise.
+
+#### ⛔ WHY 3 AND NOT 2 — the panel was originally 2, and 2 cannot reach significance
+
+A rank test on n non-premium against m premium has a **floor on its p-value** set by the number of possible
+orderings — reached only when the separation is *perfect*:
+
+| design | best possible p | |
+|---|---|---|
+| **2 vs 4** *(the original panel)* | **0.067** | ⛔ **cannot reach p < 0.05, however well the instrument performs** |
+| 3 vs 3 | 0.050 | ⛔ exactly on the boundary |
+| 2 vs 5 | 0.048 | reachable |
+| ⭐ **3 vs 4** *(adopted)* | ⭐ **0.029** | reachable |
+| 4 vs 4 | 0.014 | reachable |
+
+⇒ **One extra bottle takes the best case from 0.067 to 0.029.** With 2 vs 4 there are only 15 orderings, so
+even both non-premium greens landing cleanly below all four premium ones leaves `p = 1/15`. ⚠ The result Edwin
+most wants from P3a — *a non-premium green showing up as non-premium* — would have been **suggestive but not
+defensible**, and a chemist colleague is exactly the person who would say so.
+
+⚠ **The asymmetry is in your favour and worth knowing before the run:** a **positive** result is clean, a
+**null** result is uninformative — if the tiers do not separate you cannot tell whether the metric failed or
+whether "premium" simply does not track roast. That is a further reason to spend the bottle that makes the
+positive case reachable.
+
+#### ⚠ Green-vs-green is a PROBABILISTIC call, and must be presented as one
+
+Cohen's *d* translated into what it means for judging a **single** sample (error per side, optimal cut):
+
+| case | *d* | error |
+|---|---|---|
+| **green vs brown**, measured | 7.50 | **0.01 %** — effectively deterministic |
+| green vs green, projected best | 5.00 | 0.62 % |
+| green vs green, projected low | 3.50 | 4.01 % |
+| green vs green, at the ≳ 3 bar | 3.00 | 6.68 % |
+| green vs green, **today** | 1.34 | 25.14 % |
+
+⇒ ⭐ **The brown verdict can stay a BADGE; a within-green result must be a RANKING WITH A CONFIDENCE.**
+Presenting them identically would overclaim the weaker one by three orders of magnitude.
+
+⇒ And what makes the hoped-for observation *evidence* rather than a coincidence: the judges said so too,
+blind, before seeing any output — and the gap exceeds the within-oil scatter. ▶ **Report it as "gap of X
+against a within-oil σ of Y", never as a bare ordering.**
 
 **Judges:** two — Edwin (developer) and the colleague (chemist).
 
@@ -779,7 +821,7 @@ claim PRIO 2 measures in the lab. ⇒ P3a is the field confirmation of P2's numb
 ⚠ **The only item on the whole path that depends on anyone but Edwin.** Everything else is bench or desk work
 under his control; this one needs shops to be open and stocked.
 
-- **8 oils: 2 brown · 2 non-premium green · 4 premium green.**
+- **9 oils: 2 brown · ⭐ 3 non-premium green · 4 premium green.** ⚠ The third non-premium is not padding — see the p-value floor above; at 2 the study cannot reach significance.
 - ⛔ **In hand before P3a starts** — on the current schedule that is **Wed 19 August**, i.e. **8 working days
   of lead time** from day 1. It is *lead time, not effort*: a few hours of actual shopping spread over the
   window.
