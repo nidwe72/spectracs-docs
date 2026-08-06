@@ -69,9 +69,28 @@ note bottom
   the jar's INNER diameter.
 end note
 
+[DN guard: record min(S), warn out of window] as [DNGUARD] lasts 1 day
+[DNGUARD] starts at [FTEST]'s end
+[DNGUARD] is colored in #7FB069
+note bottom
+  §16.23.8 (design, not implemented). Two-sided:
+  record min(S) per capture, warn when it leaves
+  the 16 DN floor / 20-40 DN target band, propose
+  the correction. Warns, never blocks.
+  ⭐ Runs in PARALLEL with the aperture print (which
+  has dead time) so it costs no schedule day — but it
+  must land BEFORE the measurement steps, because it
+  is what tells you a fill was out of range AT CAPTURE
+  rather than in analysis three days later.
+  ⚠ It also reads G2's finding: the capillary's +-10 %
+  volume band is exactly what pushes a fill out of the
+  DN window.
+end note
+
 ' ── 2 · the preparation path ──────────────────────────────────────────────────────
 [Gates G1 + G2, settle the capillary recipe] as [GATES] lasts 2 days
 [GATES] starts at [APERTURE]'s end
+[GATES] starts at [DNGUARD]'s end
 [GATES] is colored in #6BA3D6
 note bottom
   ⛔ G1 FIRST: are the capillaries heparinised?
