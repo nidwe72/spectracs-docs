@@ -1,0 +1,149 @@
+@startgantt first_presentable_state
+' Spectracs — the FIRST PRESENTABLE STATE milestone, as a schedule.
+' Companion to spectracsPy/docs/SPEC_first_presentable_state.md (the prose spec) and ROADMAP.md
+' (the working backlog, where these appear as NEXT TASK / PRIO 1 / PRIO 2 / PRIO 3a).
+'
+' The point this surfaces: the path from "the metric still moves" to "the metric and its thresholds are
+' FROZEN, validated out-of-sample, and presentable to a lab owner" is ~10-12 working days, and only two
+' items on it carry a real tail. Everything is sequential because each step's output is the next step's
+' input: the aperture changes the optical path, so the capillary runs must come after it; the thresholds
+' are derived from the capillary corpus, so they must be frozen before the validation sees any oil.
+'
+' Durations are EDWIN's estimates (2026-08-06), from his own bench pace, and sum to 12 working days
+' - the upper end of his 10-12 range, because a plan should not be built on the optimistic end.
+' ⚠ Two items carry a tail (marked red/orange): the never-rig-verified publish path and the print fit.
+' Budget 13-15 days if either fights back. Effort-days, not calendar.
+' Regenerate: java -jar plantuml.jar -tsvg first_presentable_state.puml
+
+printscale daily
+saturday are closed
+sunday are closed
+
+Project starts the 11th of August 2026
+
+' ── colours ───────────────────────────────────────────────────────────────────────
+' green  = software / desk       blue = bench measurement
+' orange = build / fabrication   red  = carries a tail risk
+<style>
+ganttDiagram {
+  task {
+    FontName Verdana
+    FontSize 11
+  }
+  milestone {
+    FontSize 11
+    FontStyle bold
+  }
+}
+</style>
+
+' ── 0 · unblock the plugin path ───────────────────────────────────────────────────
+[No-op bump, then Soret trim 440-460 -> 448-460 + re-sign] as [TRIM] lasts 1 day
+[TRIM] is colored in #E8756B
+note bottom
+  ⚠ TAIL RISK, and the only one on the critical
+  path that could cost days rather than hours:
+  publish->assign->load has NEVER been run end
+  to end. Do the NO-OP BUMP FIRST, inside this
+  day, so a failure there is not tangled with
+  the metric change that follows.
+end note
+
+' ── 1 · the sample path ───────────────────────────────────────────────────────────
+[Opaque-oil test: measure f] as [FTEST] lasts 1 day
+[FTEST] starts at [TRIM]'s end
+[FTEST] is colored in #6BA3D6
+note bottom
+  Gates the aperture: undiluted oil is opaque
+  in the blue, so anything above the dark
+  offset is the wall-bypass path.
+  f = (S_opaque - D) / (R - D)
+end note
+
+[Slide-in sample holder: design, print, fit] as [APERTURE] lasts 1 day
+[APERTURE] starts at [FTEST]'s end
+[APERTURE] is colored in #E8A33D
+note bottom
+  ⚠ TAIL RISK: assumes the print fits on the
+  first or second try. Two apertures, both at
+  the jar's INNER diameter.
+end note
+
+' ── 2 · the preparation path ──────────────────────────────────────────────────────
+[Gates G1 + G2, settle the capillary recipe] as [GATES] lasts 2 days
+[GATES] starts at [APERTURE]'s end
+[GATES] is colored in #6BA3D6
+note bottom
+  ⛔ G1 FIRST: are the capillaries heparinised?
+  Heparin is insoluble in IPA and would add
+  SCATTER to the one system whose open problem
+  is a scattering pedestal. A failure here is a
+  re-sourcing detour, not an evening.
+  G2: weigh ten filled capillaries (+-10 % ID band).
+end note
+
+[Re-run green-vs-brown and green-vs-green] as [RERUN] lasts 2 days
+[RERUN] starts at [GATES]'s end
+[RERUN] is colored in #6BA3D6
+note bottom
+  On the oils ALREADY HELD (Kiendler,
+  Steirerkraft, S-Budget) — NOT the validation
+  panel. This is where the thresholds come from.
+  Green-vs-green is the capability gate:
+  d ~ 1.34 today, ~3.5-5 projected.
+end note
+
+[GO / NO-GO: is green-vs-green d >= 3 ?] as [GONOGO] happens at [RERUN]'s end
+
+' ── 3 · freeze, then validate out-of-sample ───────────────────────────────────────
+[Derive + WRITE DOWN the thresholds] as [FREEZE] lasts 1 day
+[FREEZE] starts at [RERUN]'s end
+[FREEZE] is colored in #7FB069
+note bottom
+  ⛔ Dated, written down, and NEVER re-fitted
+  after the validation sees an oil. Re-fitting
+  converts a validation into a demonstration.
+end note
+
+[THRESHOLDS FROZEN] as [FROZEN] happens at [FREEZE]'s end
+
+[P3a: 8 oils, 24 fills] as [P3AMEAS] lasts 2 days
+[P3AMEAS] starts at [FREEZE]'s end
+[P3AMEAS] is colored in #6BA3D6
+note bottom
+  2 brown / 2 non-premium green / 4 premium green.
+  ⭐ OUT-OF-SAMPLE: eight oils the thresholds
+  have never seen. Fresh per fill (the ageing
+  rule) — ~3-4 fills per evening.
+end note
+
+[Blind judging: 2 judges] as [JUDGE] lasts 1 day
+[JUDGE] starts at [P3AMEAS]'s end
+[JUDGE] is colored in #C58BC5
+note bottom
+  ⚠ Scores SEALED before any instrument output
+  is revealed. Judge perceived ROAST / greenness
+  — NOT "premium", which is a market label and
+  may not track roast at all. Record the premium
+  label separately as a second variable.
+end note
+
+[Analysis + write-up] as [WRITEUP] lasts 1 day
+[WRITEUP] starts at [JUDGE]'s end
+[WRITEUP] is colored in #7FB069
+
+[FIRST PRESENTABLE STATE] as [PRESENT] happens at [WRITEUP]'s end
+
+' ── the parked research track ─────────────────────────────────────────────────────
+[PARKED: calibration extension + 660-680 quiet-window test] as [PARKED] lasts 3 days
+[PARKED] starts at [TRIM]'s end
+[PARKED] is colored in #CFCFCF
+note bottom
+  ⚠ PARALLEL RESEARCH TRACK — deliberately OUT
+  of the critical path. Cheap and worth doing,
+  but its result must NOT enter the shipped
+  metric before the freeze: you cannot be
+  post-research and still exploring the range.
+end note
+
+@endgantt

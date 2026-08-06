@@ -683,6 +683,12 @@ corrupt-data exposure to avoid). **Remaining debt is runtime/doc only** (R1 LAN-
 
 ## ▶ RESUME POINT — 2026-08-06  *(Edwin's priorities; supersedes the ordering below, not its content)*
 
+> ⭐ **The path below is scheduled**: [`first_presentable_state.svg`](first_presentable_state.svg) — a Gantt of
+> the **FIRST PRESENTABLE STATE** milestone (12 working days, the two tail risks marked). Prose spec with the
+> gates, risks and definition-of-done:
+> [`spectracsPy/docs/SPEC_first_presentable_state.md`](../spectracsPy/docs/SPEC_first_presentable_state.md).
+> Regenerate the diagram with `java -jar plantuml.jar -tsvg first_presentable_state.puml`.
+
 **▶ PRIORITY ORDER SET BY EDWIN 2026-08-06:**
 
 ### ⭐⭐ NEXT TASK — trim the SORET window 440–460 → **448–460** *(Edwin 2026-08-06: "next task to do")*
