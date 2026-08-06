@@ -681,6 +681,135 @@ corrupt-data exposure to avoid). **Remaining debt is runtime/doc only** (R1 LAN-
   (preparation protocol)**: it puts a clock on a fill even after filtration, and it is the reason the ladder above
   must interleave.
 
+## ▶ RESUME POINT — 2026-08-06  *(Edwin's priorities; supersedes the ordering below, not its content)*
+
+**▶ PRIORITY ORDER SET BY EDWIN 2026-08-06:**
+
+### ⭐⭐ NEXT TASK — trim the SORET window 440–460 → **448–460** *(Edwin 2026-08-06: "next task to do")*
+
+`SPEC_metric_research.md` **§7.13** (ADOPTED 2026-08-04, now scheduled). One constant:
+`DevSpectralPlugin.PB_SORET_BAND = (440.0, 460.0)` → `(448.0, 460.0)`.
+
+**Why:** `DOC_pedestal_correction.md` §7 established the **440–447 bins read 2.0–2.6 DN against a reference near
+88 — they are not measurements**, and they sit inside the metric's numerator. Measured on the post-rebuild
+corpus (`diagnostics/soret_448_since_0729.py`, 37 runs / 8 fills):
+
+| axis | 440–460 | **448–460** |
+|---|---|---|
+| class separation *d* (green vs brown) | 6.54 | **7.50** |
+| within-green *d* | 1.21 | **1.34** |
+| dilution spread (same oil, 2 strengths) | +8.1 % | **+3.0 %** |
+| ⚠ within-fill CV | 3.6–6.2 % | +0.2…0.5 pp *worse* |
+
+⭐ And the mechanism is measured, not assumed: `A(440–447)/A(448–460)` should be a **shape constant** under
+Beer–Lambert, and it falls **11 %** across the concentration range (**r = −0.94**, n = 8 fills) — the signature
+of a detector floor eating a larger share of the darker band. The trim removes **47 % of the pedestal intercept
+and 28 % of `r_Q`**.
+
+⚠ **It moves the scale** (`B_Soret` 1.03 → 0.69), so it goes into the single threshold re-derivation together
+with the 1/3 reduction band and, if built, the PRIO 1 aperture. ⚠ The plugin is **signed**, so this needs a
+re-sign and a publish→assign pass.
+
+⚠ **Deliberately NOT bundled:** the right-hand edge. `diagnostics/soret_right_edge_sweep.py` swept 456→500 nm
+and a paired bootstrap put every difference's 95 % CI across zero — **460 stays**, and §16.26's revisit trigger
+is the capillary, not this change.
+
+
+
+### ⭐⭐ PRIO 1 — a new SAMPLE HOLDER with a proper aperture *(slide-in-the-jar solution)*
+
+`spectracsPy/docs/SPEC_capture_quality.md` **§16.25.2**. Edwin will build it as a **slide-in** part rather than
+a fixed ring. Two apertures, both sized to the jar's **INNER** diameter:
+
+| | position | removes |
+|---|---|---|
+| **lower** | lamp → jar | light **entering** the glass wall at all — ⚠ the existing ring is as thin as the jar wall, so it does not |
+| **upper** | jar → camera | wall-**exit** light at the rim, plus wall scatter |
+
+⚠ **The upper cannot do the lower's job:** light guided up the wall by total internal reflection leaks into the
+liquid en route (frustrated TIR — for oil the indices nearly match), crosses a *partial* path length and
+arrives through the clean aperture looking like signal. Build both.
+
+⭐ A slide-in also fixes **tilt**, which §16.26 identified as what a cylindrical jar actually punishes — and it
+is a second, independent payoff: an aperture between jar and slit **fixes the angular acceptance**, making the
+instrument blind to the beam re-aiming that a reseat causes.
+
+▶ **Measure `f` first — it costs ten minutes and sets the whole payoff.** Undiluted oil in the jar (opaque in the
+blue), read 440–460; whatever is above the dark offset is the wall path. Repeat with the outer wall taped.
+`f = (S_opaque − D)/(R − D)`. ⚠ At today's recipe the trimmed 448–460 window only loses **2.3 % per 1 % of `f`**,
+so the aperture is mainly an **enabler for a stronger fill** (at 3× concentration the same `f` costs 14 %).
+
+### ⭐⭐ PRIO 2 — redo GREEN-vs-BROWN and GREEN-vs-GREEN on the capillary protocol
+
+`SPEC_capture_quality.md` **§16.23** (protocol) and **§16.23.7** (why). The capillary is now the measured
+blocker, not a convenience: §16.26 put the **instrument floor at 0.42 %** and a filled-jar **reseat at 1.28 %
+rms**, against an archive CV of **3–5 %** — so **~3.8 % is the preparation**, and §16.23.7 measured that as
+dosing: green-green signal **0.98 units against 1.665 units of fill spread, SNR 1.8 → 18** with the capillary.
+
+⛔ **Gates G1/G2 first** (heparin blank; weigh ten filled capillaries). ⚠ Re-run BOTH pairs — green-vs-brown to
+confirm the class call survives the new recipe, green-vs-green because that is the one the capillary is *for*
+and the one the capability gate needs (*d* ≈ 1.3–2.0 today against ≳ 3 required).
+
+### ⭐ The 660–680 nm QUIET-WINDOW test *(added to the backlog 2026-08-06)*
+
+`SPEC_metric_research.md` **§7.14.4** + `SPEC_capture_quality.md` §16.26. **One number decides whether the whole
+scatter-correction family reopens:** the ratio of raw absorbance in the far anchor to the near anchor.
+
+```
+   scattering MUST fall toward the red  =>  far/near < 1  (Rayleigh ~0.39, Mie ~0.63)
+   measured today at 620-630:  1.47 - 2.50 on all five sets   <- the far anchor is the Qy FLANK, not a blank
+```
+
+⇒ If a 660–680 window comes back **below 1** it is a genuine turbidity window, and: Morton–Stubbs (which
+§7.14.1 shows we already use) stops violating its own precondition; the λ⁻ⁿ baseline becomes fittable with a
+physical `n`; the pedestal is **measured** instead of inferred; and ⭐⭐ **620–630 is freed from anchor duty to
+become a third signal band** — §16.12.12 showed it tracks oil class at 5.1 σ, information currently spent as
+background.
+
+⚠ **Two prerequisites, in order.** (a) **Does the lamp even reach there?** NOT established — the "Sansi 24 DN at
+680 nm" figure came from a screenshot whose frame stops at ~676 nm and whose wavelength scale was *transferred*,
+not measured. What IS solid is that the **instrument** reaches ~680 (CFL-calibrated, Eu³⁺ 650.7 resolves).
+▶ One Sansi capture in the same configuration as the CFL frame settles it. (b) **The calibration must extend
+past 630** — free, software, and needed for every path here.
+
+⚠ Even if the window is NOT quiet, the extension still delivers §7.14.4's *other* requirement — a **resolved Qy
+peak with curvature** (measured 2026-08-06: every archive fill is still **convex at 626 nm**, so the maximum has
+never been observed). The two requirements are independent.
+
+### ⚠ Bundled into the next threshold re-derivation *(item 3 of the 08-03 list — the list has grown)*
+
+| change | effect on the scale |
+|---|---|
+| Soret window **440–460 → 448–460** (`SPEC_metric_research.md` §7.13, ADOPTED) | `B_Soret` 1.03 → 0.69 |
+| Spatial reduction **inset 0.2 → 1/3** (§16.26.9, IMPLEMENTED 2026-08-06) | raw S/Q +2.2 % |
+| PRIO 1 aperture, if built | changes the optical path |
+
+⇒ **Do them once, together.** ⭐ Edwin 2026-08-06: thresholds are work-in-progress and nothing is shipped, so
+this is a bookkeeping cost, not a blocker.
+
+### What else changed 2026-08-06
+
+- ⭐⭐ **The null-run method** (§16.26): same empty beam as reference *and* sample, so everything returned is
+  error. Eleven runs. Instrument floor **0.42 %**; reseat **1.28 % rms** filled-jar, **6.60 %** empty-jar.
+- ⛔ **RETRACTED:** an earlier reading that re-seating explains the whole archive CV. It was computed over
+  *empty-jar* runs — a configuration that never occurs in practice — which inflated the population rms from
+  1.4 % to 4.5 %. ⚠ **Run nulls in the operating configuration.**
+- ⛔ **Decoys, all measured:** wavelength shift (re-registering recovers nothing), overall level (`M` is exactly
+  invariant, §16.24.9), and "do the R/S curves coincide?" (run 010 looks alarming, costs 0.46 %; run 007 looks
+  mild, costs 8.83 %).
+- ⛔ **The paper diffuser is rejected** (§16.26.6): 14× light loss, −32…38 % relative blue, and 83–85 % of the
+  along-slit non-uniformity is a *gradient* no diffuser fixes. **Centre the lamp first.**
+- ⭐ **Lamp question:** reseat sensitivity is lamp-independent (1.44 % Yuji vs 1.50 % Sansi) ⇒ choose on
+  spectrum. LED-combination simulation exists (`diagnostics/led_combination_search.py`, §16.25.4a); best
+  7-emitter design is **3 × 6500 K + 2 × 430 + 1 × 515 + 1 × 660**, robust across four weightings. ⚠ **Do not
+  build yet** — the decisive test needs no new hardware.
+- ⭐ **A capture-path crash fixed:** `VideoSignal` was a `QObject` marshalled over a queued cross-thread
+  connection while its only reference was a local abandoned on the stop path — a use-after-free that
+  **segfaults** when reproduced in isolation. Now a plain Python class; guarded by
+  `tests/test_video_signal_queued_delivery.py`. Rig-confirmed by Edwin: the app no longer crashes.
+
+---
+
 ## ▶ RESUME POINT — 2026-08-03  *(the metric changed; the rig work is what is outstanding)*
 
 **Shipped and green (329 tests), NOT COMMITTED.** The DEV plugin now shows **three verdicts** on a
