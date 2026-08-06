@@ -38,6 +38,21 @@ ganttDiagram {
 }
 </style>
 
+' ── PARALLEL: the only item that depends on anyone but Edwin ──────────────────────
+[Oil shopping: 8 oils for P3a] as [SHOP] lasts 8 days
+[SHOP] is colored in #7EC4C4
+note bottom
+  ⚠ LEAD TIME, not effort — a few hours of actual
+  shopping spread over the window. It is on the chart
+  because it is the ONLY item that depends on shops
+  being open and stocked rather than on Edwin.
+  2 brown / 2 non-premium green / 4 premium green.
+  ⛔ MUST be in hand before P3a starts (Wed 19 Aug).
+  ⚠ Keep receipts/labels: the premium/non-premium
+  label is a SECOND variable in the study, recorded
+  separately from the judges' roast scores.
+end note
+
 ' ── 0 · unblock the plugin path ───────────────────────────────────────────────────
 [No-op bump, then Soret trim 440-460 -> 448-460 + re-sign] as [TRIM] lasts 1 day
 [TRIM] is colored in #E8756B

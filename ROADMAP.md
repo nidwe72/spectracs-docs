@@ -774,6 +774,22 @@ claim PRIO 2 measures in the lab. ⇒ P3a is the field confirmation of P2's numb
 
 **Judges:** two — Edwin (developer) and the colleague (chemist).
 
+#### ⭐ PARALLEL TASK — the oil shopping *(start it in week 1)*
+
+⚠ **The only item on the whole path that depends on anyone but Edwin.** Everything else is bench or desk work
+under his control; this one needs shops to be open and stocked.
+
+- **8 oils: 2 brown · 2 non-premium green · 4 premium green.**
+- ⛔ **In hand before P3a starts** — on the current schedule that is **Wed 19 August**, i.e. **8 working days
+  of lead time** from day 1. It is *lead time, not effort*: a few hours of actual shopping spread over the
+  window.
+- ⚠ **Keep the receipts and labels.** The premium / non-premium designation is a **second variable** in the
+  study, recorded separately from the judges' roast scores — so where each oil sits in the market matters and
+  must be written down at purchase, not reconstructed later.
+- ⚠ Sourcing 8 oils is what makes P3a cheap where PRIO 3 is expensive. If any tier cannot be filled locally,
+  say so early: **2 browns is already the minimum** that lets the class claim rest on more than one bottle
+  (§2.2), and dropping to one would put P3a back where the archive is today.
+
 #### ⚠ Three design conditions. The third is the one that could sink it.
 
 **1 · BLIND, and scored before any instrument output is shown.** Both judges record their scores first,
