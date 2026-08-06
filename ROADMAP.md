@@ -750,7 +750,87 @@ dosing: green-green signal **0.98 units against 1.665 units of fill spread, SNR 
 confirm the class call survives the new recipe, green-vs-green because that is the one the capillary is *for*
 and the one the capability gate needs (*d* ≈ 1.3–2.0 today against ≳ 3 required).
 
-### ⭐⭐ PRIO 3 — THE VALIDATION STUDY *(added 2026-08-06; `SPEC_metric_research.md` §9.1 item 6)*
+### ⭐⭐ PRIO 3a — THE SMALL VALIDATION *(Edwin 2026-08-06; the milestone that freezes the thresholds)*
+
+**A scaled-down validation that removes the part of PRIO 3 that was months.** Eight shop-available oils is a
+weekend's shopping, not a mill relationship; two judges is a diary entry, not a panel.
+
+**Panel — 8 oils, three tiers:**
+
+| tier | n |
+|---|---|
+| brown (over-roasted) | 2 |
+| green, **non-premium** | 2 |
+| green, **premium** | 4 |
+
+⭐ **The three tiers make this a WITHIN-GREEN test in the field**, which is exactly the half of the capability
+claim PRIO 2 measures in the lab. ⇒ P3a is the field confirmation of P2's number, not a separate exercise.
+
+**Judges:** two — Edwin (developer) and the colleague (chemist).
+
+#### ⚠ Three design conditions. The third is the one that could sink it.
+
+**1 · BLIND, and scored before any instrument output is shown.** Both judges record their scores first,
+sealed, then the measurements are revealed. ⚠ Edwin knows what the instrument says; *"we scored first"* is the
+only answer that survives a knowledgeable reader.
+
+**2 · There is NO objective ground truth here.** PRIO 3 has roast level from the mill; shop-bought oils do not
+carry it. ⇒ P3a validates **agreement with expert judgement**, not *"the instrument measures roast"*. A good
+claim — but it must be stated as that one.
+
+**3 · ⚠⚠ Judge perceived ROAST / greenness, NOT "premium".** "Premium" is a market label — seed origin,
+pressing, packaging, price positioning — and may not correlate with roast at all. If premium and non-premium
+come out indistinguishable you could not tell whether the metric failed or whether premium simply does not
+mean less-roasted. ⇒ **Score the thing the instrument claims to measure**, and record the premium/non-premium
+label **separately, as a second independent variable**. Then a disagreement between the two is a *finding*
+rather than a confound.
+
+#### ⭐ Keep P2 and P3a on DIFFERENT oils
+
+Run **P2 on the oils already held** (Kiendler, Steirerkraft, S-Budget) and **P3a on the eight new ones**.
+
+⚠ Otherwise the thresholds are frozen on the same data they are then validated against — circular, and
+visible to anyone who looks. Kept separate, **P3a is a genuine OUT-OF-SAMPLE test on oils the thresholds have
+never seen**, which is a far stronger claim for the same effort.
+
+⛔ **Write the thresholds down, with a date, before the first P3a fill.** If P3a then disagrees they must NOT
+be re-fitted to make it agree — that converts a validation into a demonstration retroactively.
+
+#### What it licenses — and what it does not
+
+✅ *"Eight oils, two independent experts scoring blind, thresholds frozen in advance and never seen by these
+oils. The instrument agrees with expert judgement, separates roasted from unroasted with no overlap, and ranks
+within the green class."* ⇒ **A defensible appetizer for the lab owner.**
+
+⛔ **Not** *"it measures roast level"* (no objective ground truth) and **not** *"it generalises"* (n = 8, one
+region, one season). PRIO 3 remains the study that earns those.
+
+#### Effort — the agreed plan
+
+| | days |
+|---|---|
+| 448 trim + publish path | 1 |
+| **P1** `f` test + aperture | 2 |
+| **P2** gates G1/G2 (incl. settling the capillary recipe) | 2 |
+| **P2** green-vs-brown + green-vs-green re-runs | 1–2 |
+| **P3a** measurement, 24 fills | 2–3 |
+| **P3a** blind judging | 1 |
+| **P3a** analysis + threshold freeze | 1 |
+| **total** | **10–12 days** ⇒ ~2–2.5 weeks at 5 sessions/week |
+
+⚠ **Two items carry a tail.** The **448 publish path** — one constant, but publish→assign→load has never been
+run end to end; ▶ do a **no-op version bump through the flow first** so a failure there is not tangled with a
+metric change. And the **aperture**, which assumes the print fits first or second try. ⇒ **13–15 days** with
+those carrying normally.
+
+⇒ ⭐ **At the end of P3a the metric and its thresholds are FROZEN** — the first quasi-fixed milestone, and the
+end of the research state (see §16.26.13's criteria).
+
+### ⭐⭐ PRIO 3 — THE FULL VALIDATION STUDY *(added 2026-08-06; `SPEC_metric_research.md` §9.1 item 6)*
+
+⚠ **PRIO 3a above comes FIRST and is not a substitute for this.** P3a freezes the thresholds and buys a
+defensible demonstration; **this** is what earns the two claims P3a cannot make — *"it measures roast level"*
+(objective ground truth) and *"it generalises"* (panel size, more than one region and season).
 
 **Never done, and until now not on any milestone.** Everything measured so far shows the numbers *separate*.
 Nothing shows they **mean what we say they mean**.
