@@ -689,7 +689,27 @@ corrupt-data exposure to avoid). **Remaining debt is runtime/doc only** (R1 LAN-
 > [`spectracsPy/docs/SPEC_first_presentable_state.md`](../spectracsPy/docs/SPEC_first_presentable_state.md).
 > Regenerate the diagram with `java -jar plantuml.jar -tsvg first_presentable_state.puml`.
 
-**▶ PRIORITY ORDER SET BY EDWIN 2026-08-06:**
+> **⭐⭐ UPDATE 2026-08-07/08 — THE FOUR-OIL SESSION RAN, and it changed the recipe, the gauge and PRIO 2.**
+> [`SPEC_capture_quality.md`](../spectracsPy/docs/SPEC_capture_quality.md) **§16.27**; tool
+> `diagnostics/spar_three_oils.py`. Four oils on the capillary protocol, one night, three re-seats each:
+> **Steirerkraft 9.956 · Spar ggA 8.755 · Spar Premium 7.691 · S-Budget 6.505** (`M448`), **all six pairs
+> resolved**, *d* 4.09–15.57. Five things came out of it:
+> 1. ⭐ **PRIO 2's green-vs-green ran** — on one protocol, one rig, one night, with no session confound. The
+>    *signal* side of the gate is confirmed; ⚠ **σ_fill is not** (every set is re-seats of ONE fill), so the
+>    gate is **not closed** — see the new σ_fill item below.
+> 2. ⭐ **The dose is now measured: 2 capillaries / 10 mL** (§16.23.2a). 2/12 mL left two oils under the `A_Q`
+>    floor; ⛔ 3/12 mL was rejected because it puts every oil's 448–460 band **at or below the 16 DN guard**.
+>    **The dose and the 448 trim are one decision** — the stronger fill is only safe on the trimmed metric.
+> 3. ⭐⭐ **The exposure control §16.24.1 was missing now exists** — one fill measured at AE 90 and 104 four
+>    minutes apart moved `M448` by **+0.04 %**, with a leg-scale mismatch of 2.70 % (larger than the corrupted
+>    run's 2.5 %). Exposure alone does **not** corrupt the metric at working strength; §16.24.1 is *bounded*,
+>    not overturned. And the entire exposure sensitivity sits in **440–447 nm** — the best argument yet for the
+>    NEXT TASK trim.
+> 4. ⛔ **Two shape statistics retired across exposure states** — `rise/Q amp` and 590–610/Soret (state effect
+>    184 % and 160 %, larger than the gaps they were asked to carry). Within-state use stands.
+> 5. ⭐ **The gauge/verdict split** — see the new item below.
+>
+> **▶ PRIORITY ORDER SET BY EDWIN 2026-08-06:**
 
 ### ⭐⭐ NEXT TASK — trim the SORET window 440–460 → **448–460** *(Edwin 2026-08-06: "next task to do")*
 
@@ -756,6 +776,60 @@ dosing: green-green signal **0.98 units against 1.665 units of fill spread, SNR 
 confirm the class call survives the new recipe, green-vs-green because that is the one the capillary is *for*
 and the one the capability gate needs (*d* ≈ 1.3–2.0 today against ≳ 3 required).
 
+### ⭐⭐ PRIO 2b — σ_fill: MULTIPLE FILLS PER OIL *(Edwin 2026-08-07, "yes, the multiple fills per oil is one test to be done")*
+
+**The one term the whole archive has never measured.** Every set on record — series D, Kiendler A/B/C,
+Steirerkraft B/C, all four fills of §16.27 — is **re-seats of ONE fill**, so every *d* and every CV in this
+document prices **seating**, not **preparation**. `SPEC_capture_quality.md` §16.21.1 F1 has carried this as the
+gate number since 2026-08-03 and it is now the only thing between PRIO 2 and a closed capability claim.
+
+**The run:** ⭐ **3 independent tubes per oil × 3 re-seats each**, on the new 2/10 mL dose, ≥ 2 oils (one green,
+one brown). Nine runs per oil, one evening per oil. What it returns: σ_fill against the 0.4–2 % seating term
+already measured (§16.26) — i.e. *does the capillary deliver on §16.23.7's SNR 1.8 → 18 projection?*
+
+⛔ **HOLD THE DOSE FIXED** — three tubes at ONE nominal dose, **not** another dilution series. That is the one
+design point §16.27.9a adds, and it is what every existing multi-fill pair fails to be: the archive already
+holds three Steirerkraft fills, three Kiendler fills and two S-Budget fills, but **every pair also varies the
+concentration on purpose**, so none of them prices preparation alone. What they do give is a crude bound —
+Steirerkraft B/C agree to **0.22 %** (*t* = 0.09) across a deliberate 17 % concentration difference, while the
+best `A_Q`-matched pair on record (Kiendler B/C) differs by **4.15 %** (*t* = −1.82, n = 2 runs each). ⇒ σ_fill
+is **bounded under ~4 % and may be far smaller**, and the two most informative pairs disagree.
+
+⚠ **It also gates the jury study** (`SPEC_roast_ampel.md` §9.4): a study comparing *oils* must carry the term
+that says whether two bottles of the same oil land closer together than two different oils do.
+
+### ⭐⭐ THE GAUGE / VERDICT SPLIT + the user-defined target *(Edwin 2026-08-07/08; `SPEC_roast_ampel.md` §9 — DESIGN, build on explicit request)*
+
+> Edwin: *"the green gauge per se is okay when one interprets it purely as greenness. But the verdict is
+> misleading."*
+
+The shipped Ampel asserts *"green = fine, nothing to act on"* (§0/§2), which encodes a **monotone quality
+model** that has never been tested. Four items, in build order:
+
+| # | change | blocked on |
+|---|---|---|
+| **1** | ⭐ gauge renders **symmetric**, **verdict text removed from the green end** — it stops making an unsupported claim | nothing; do it first |
+| **2** | verdict metric **`M base+ped` → `M448`**, over-roast line **7.17**, labelled PROVISIONAL. `M448` gives the brown line **2.7 σ** of margin against the shipped metric's **1.3 σ** — the pedestal correction *costs* class separation because it compresses the greener oils more | the NEXT TASK 448 trim |
+| **3** | ⭐ **user-defined target greenness** + signed deviation readout, **default unset**. The miller stores a batch he knows is good and the gauge shows deviation from *his own* profile | 1, 2 |
+| **3a** | 📌 **PARKED — a deviation THRESHOLD on that target**, alarming when a batch leaves a tolerance band around the user's own reference (`SPEC_roast_ampel.md` §9.3a). ⭐ The only alarm in the spec that needs **no universal optimum and no jury**. **To be discussed** — not designed | 3, and **PRIO 2b** (a band tighter than σ_fill alarms on the tube, not the oil) |
+| **4** | a shipped **default** target | ⛔ the jury study, §9.4 |
+
+⭐ **Cheapest open item on the whole gauge: a SECOND BROWN OIL (Hofer).** The over-roast line rests on one
+product (S-Budget) measured twice; it reproduced to 1.7 % across a week, a new bottle and a changed recipe, so
+it is well *reproduced* and not broadly *calibrated*. One bottle and one evening begin to fix that, and step 2
+above is gated on it.
+
+⭐ **A colleague-facing one-pager exists** — `spectracs-references/business/internal/commmunication/
+Spectracs_Oil_Panel_2026-08-07.pdf` (+ its generator; not in git, like everything under `business/`). First
+result presentable outside the project: the four oils on `M448` alone, the trust numbers, the drift alarm, the
+brown alarm, the jury study, and every open caveat on the page. ⚠ **Numbers are transcribed, not recomputed** —
+regenerate it when the 448 trim lands, when σ_fill is measured, or when the second brown oil arrives
+(`SPEC_capture_quality.md` §16.27.10).
+
+⛔ **A universal ideal of 8.0 was tested against the corpus and refuted**: it would rank the S-Budget closer to
+ideal than any Kiendler fill. And a mid-scale target must not sit on uncorrected `M448` — that metric carries a
+**9.4 % fill-turbidity artifact**, larger than the deviations it would be reading.
+
 ### ⭐⭐ PRIO 3a — THE SMALL VALIDATION *(Edwin 2026-08-06; the milestone that freezes the thresholds)*
 
 **A scaled-down validation that removes the part of PRIO 3 that was months.** Eight shop-available oils is a
@@ -815,6 +889,25 @@ blind, before seeing any output — and the gap exceeds the within-oil scatter. 
 against a within-oil σ of Y", never as a bare ordering.**
 
 **Judges:** two — Edwin (developer) and the colleague (chemist).
+
+#### ⭐⭐ ASK FOR SUB-SCORES, NEVER A TOTAL *(Edwin 2026-08-07 — "put this somewhere so it is not forgotten")*
+
+⛔ **A single overall score cannot answer this study's question.** A tasting total conflates roast with
+**rancidity, oxidation and seed quality**. If a green oil scores badly for rancidity, that is **not** evidence
+against greenness — and with only a total there is no way to tell the two apart. One bad bottle scored on the
+wrong axis would look exactly like the metric failing.
+
+⇒ **The score sheet must separate at least: roast/aroma · rancidity/oxidation · bitterness · overall.**
+
+- the **dependent variable** is the **roast/aroma sub-score** — that is the axis the metric claims to measure;
+- the others are **controls**: an oil marked down for rancidity is **excluded from the roast regression**, not
+  counted against the metric;
+- ⚠ **applies to bought-in scores too** (`SPEC_roast_ampel.md` §9.4's "measure oils that have already been
+  juried"): **a source that publishes only totals cannot answer this question.** Say so and use a different
+  source rather than regressing on a total.
+
+⭐ Same rule, one level up: **record the market tier and the price at purchase** (§16.27.6b) — a second
+variable, never ground truth.
 
 #### ⭐ PARALLEL TASK — the oil shopping *(start it in week 1)*
 
