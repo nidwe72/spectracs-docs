@@ -1053,6 +1053,47 @@ past 630** — free, software, and needed for every path here.
 peak with curvature** (measured 2026-08-06: every archive fill is still **convex at 626 nm**, so the maximum has
 never been observed). The two requirements are independent.
 
+### ⭐ INSTRUMENT TEST — the Q-band red-side landmarks as an INTERNAL WAVELENGTH RULER *(added 2026-08-13; easy, no rig time, no calibration capture)*
+
+`SPEC_capture_quality.md` **§16.31.5b**. Two features on the red flank of the Q band sit at the **same place in
+every oil measured so far**, green or brown, across eleven fills, two lamps and five weeks:
+
+```
+   mu1     narrow sub-band centre (two-component fit)   580.4 +/- 0.4  nm    total spread 1.3 nm
+   lam_f   red-flank inflection (d1 minimum)            582.1 +/- 0.36 nm    total spread 1.2 nm
+   ---- for contrast ----
+   lam_r   BLUE-flank inflection                        563.6                total spread 7.2 nm
+```
+
+⇒ ⭐ **If a landmark does not move with oil state, then whatever movement it DOES show is wavelength-scale
+error** — measured directly from ordinary oil spectra, with no calibration lamp and no extra capture.
+
+**What it delivers, in order of usefulness:**
+
+1. ⭐⭐ **A bound on scale stability, from the archive, today.** The total spread is **≤ 1.3 nm** *including*
+   any genuine oil-to-oil variation. §16.30.7b assumed **±1.5 nm** when it computed the doublet's wavelength
+   sensitivity and concluded the doublet was unusable — that assumption was an over-estimate, so the
+   objection is partly retired. §16.30.6 lists the scale as an open question; this narrows it without the
+   Eu³⁺ capture.
+2. ⭐ **A per-capture QC check, in the same family as the DN guard** — flag a run whose measured `lam_f`
+   departs from 582.1 by more than a set tolerance. That is a wavelength-calibration alarm the operator
+   currently has no way to trigger.
+3. A **cross-check on the 607 nm lamp line**, whose apparent wander (§16.30.6b) is currently unexplained —
+   two independent position references disagreeing would localise the cause to the lamp rather than the scale.
+
+**Why it is easy.** Both landmarks come out of code already written for `SPEC_capture_quality.md` §16.30.7f /
+§16.31.5: the two-component Gaussian fit over 560–590 nm for `mu1`, and a Savitzky-Golay first derivative for
+`lam_f`. No new maths, no new hardware, and it runs on every archived spectrum.
+
+⚠ **What it CANNOT do, stated so it is not oversold.** Using the band alone it gives an **UPPER BOUND** on
+scale error, not a measurement — it cannot separate *"the scale moved"* from *"the band moved"*. Separating
+those needs a reference that is not the pigment: the 607 nm lamp line, or §16.28.4's queued Eu³⁺ capture
+(687.7 / 693.7 / 707.0 nm). ⇒ This item **narrows** that question cheaply; it does not replace it.
+
+⚠ And the landmarks' constancy is itself an **observation on eleven fills of six oils**, not a law. A future
+oil whose Q band genuinely shifts would be misread as a calibration fault. The tolerance in item 2 should be
+set loose enough to allow that, and any alarm should be phrased as *"wavelength check"*, never as a verdict.
+
 ### ⚠ Bundled into the next threshold re-derivation *(item 3 of the 08-03 list — the list has grown)*
 
 | change | effect on the scale |
