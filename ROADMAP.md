@@ -1094,6 +1094,34 @@ those needs a reference that is not the pigment: the 607 nm lamp line, or §16.2
 oil whose Q band genuinely shifts would be misread as a calibration fault. The tolerance in item 2 should be
 set loose enough to allow that, and any alarm should be phrased as *"wavelength check"*, never as a verdict.
 
+### ⚪ LOW PRIORITY — automatic detection of an UNDISSOLVED fill *(added 2026-08-13; the operator's eye already does this well)*
+
+`SPEC_capture_quality.md` **§16.33**. Two oils (`BillaClever`, `Billa Ja! Natürlich`) do **not dissolve** in
+the standard capillary recipe — the fill stays visibly muddy. ⭐ Edwin's operator rule is the primary control
+and it is sufficient today:
+
+> **If the fill still looks muddy after the standard recipe, do not measure it.**
+
+⚠ **Why it matters that this is caught at all:** a scattering pedestal inflates the small `B_Q` denominator
+proportionally more than the numerator, so an undissolved fill reads **brown-shifted with normal-looking
+scatter inside a single burst**. It looks confident and it is wrong.
+
+**The automatic version, if it is ever wanted.** The condition is measurable from **two consecutive captures**
+with no new hardware — turbidity drift per run:
+
+```
+   Billa oils (undissolved)   -27 % per run
+   every other oil             -3 .. -8 % per run      <- 7.5x separation
+```
+
+⇒ Flag when `A(520-540)` falls by more than ~15 % between consecutive captures of one fill. Cheap, but it
+costs the operator a second capture before any verdict, so it is **not** worth building while the visual check
+works.
+
+⚠ **n = 2 products, one brand.** Edwin is checking the three remaining untested oils for clarity; until then
+the brand association may be coincidence, and whether a different solvent / warming / longer agitation would
+dissolve them is **untested** — "cannot be measured" is a statement about THIS protocol, not the product.
+
 ### ⚠ Bundled into the next threshold re-derivation *(item 3 of the 08-03 list — the list has grown)*
 
 | change | effect on the scale |
