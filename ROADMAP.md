@@ -711,6 +711,73 @@ corrupt-data exposure to avoid). **Remaining debt is runtime/doc only** (R1 LAN-
 >
 > **▶ PRIORITY ORDER SET BY EDWIN 2026-08-06:**
 
+---
+
+## ▶▶▶ HIGHEST PRIORITY — σ_fill, AND IT NOW GATES THE PRODUCT  *(Edwin 2026-08-13; supersedes the 08-06 ordering below)*
+
+> ⭐⭐ **This is the only number between "this looks like a product" and "this is a product."**
+> `SPEC_capture_quality.md` **§16.34.3** (the gate) + **§16.21.1** (the original design) + §16.34 (why it
+> matters now). Promoted from PRIO 2b, which stays below as the historical framing.
+
+**What changed on 2026-08-13.** A day of metric work (§16.30–§16.32) established that **no statistic separates
+the oils in a way that survives the class labels** — two candidates separate under *opposite* labellings
+(§16.31.3), so the labels were carrying the results. ⇒ The absolute "is this oil good?" claim is blocked on
+**ground truth**, which the spectra cannot supply.
+
+⭐ **But a HISTORY / QM product needs none of that** (§16.34): no labels, no ground truth, no absolute
+threshold, and no cross-instrument calibration — a mill compares against its own history on its own
+instrument. It needs **one** thing: reproducibility across independent fills. **That is σ_fill.**
+
+### The run
+
+```
+   7 oils  x  3 INDEPENDENT fills  x  3 runs      = 63 captures, ~2 evenings
+   (3 oils x 3 fills answers the sigma_fill question alone — the rest adds per-oil variation)
+```
+
+⛔ **HOLD THE DOSE FIXED.** Three fills at ONE nominal dose (2 capillaries / 8 mL), **not** another dilution
+series. Every existing multi-fill pair in the archive also varies concentration on purpose, which is exactly
+why none of them prices preparation alone.
+
+**Three controls, or the answer will be wrong (§16.34.3a):**
+
+1. ⛔ **Standardise the settling time** — one protocol, **15 min**, held for every fill. Different settle
+   times put drift into σ_fill and return a pessimistic number that is not preparation variance.
+2. ⛔ **Keep the muddy oils out of the pooled figure** (§16.33) — `BillaClever` and `Ja! Natürlich` drift
+   −27 %/run against −3…−8 % for everything else. Measure them, label them, exclude them from the pool.
+3. ⛔ **Record `B_Q` per fill** — it decides which oils are trackable at all (break at ≈ 0.065), and it is free.
+
+### ⭐⭐ The criterion — FIXED BEFORE THE RUN
+
+⛔ *"The metrics look the same"* is **not** a criterion. With `n` runs averaged,
+`detection = 3 x CV / sqrt(n)`; at n = 3 that is `1.73 x CV`:
+
+| across-fill CV measured | detection claim for the datasheet | verdict |
+|---|---|---|
+| ≤ 3 % | **"detects a 5 % change"** | strong |
+| **~4 %** | **"detects a 7 % change"** | ⬅ **the prior from today's data** |
+| ~6 % | "detects a 10 % change" | usable |
+| ⛔ ≳ 12 % | "detects a 20 % change" | **NO PRODUCT** — the eye already does that |
+
+⇒ **The go/no-go sits only at the bottom.** Above ~10 % across-fill CV there is no history product; below it
+there is one, and the claim scales with whatever number comes out. **The experiment calibrates the datasheet,
+it does not pass or fail it.**
+
+### It returns three more answers free
+
+* ⭐ the **muddy check on the three untested oils** — turns §16.33 from n = 2 into a real class, or kills the
+  brand association
+* ⭐ **whether `B_Q` ≥ 0.065 is reachable at the standard recipe, per oil** — the trackable / not-trackable list
+* ⭐ a **σ_fill per oil** rather than pooled; if it tracks `B_Q` that is a predictive rule, not a lookup table
+
+⚠⚠ **What the "go" does NOT mean.** It establishes the instrument is **reproducible**. It does **not**
+establish that a change it detects is a change a customer cares about — that is still the ground-truth gap
+(§16.31.4), and it is why the product framing must be **deviation alarm feeding a lab relationship**, never
+*quality meter*. Reproducibility is necessary and it is not sufficient.
+
+---
+
+
 ### ⭐⭐ NEXT TASK — trim the SORET window 440–460 → **448–460** *(Edwin 2026-08-06: "next task to do")*
 
 `SPEC_metric_research.md` **§7.13** (ADOPTED 2026-08-04, now scheduled). One constant:
@@ -777,6 +844,11 @@ confirm the class call survives the new recipe, green-vs-green because that is t
 and the one the capability gate needs (*d* ≈ 1.3–2.0 today against ≳ 3 required).
 
 ### ⭐⭐ PRIO 2b — σ_fill: MULTIPLE FILLS PER OIL *(Edwin 2026-08-07, "yes, the multiple fills per oil is one test to be done")*
+
+> ⭐⭐ **PROMOTED 2026-08-13 to HIGHEST PRIORITY** — see the block near the top of this file. It now
+> gates the **product**, not just the capability claim: `SPEC_capture_quality.md` §16.34.3 fixes the pass
+> criterion and the datasheet mapping. What follows is the original framing and the archive bounds.
+
 
 **The one term the whole archive has never measured.** Every set on record — series D, Kiendler A/B/C,
 Steirerkraft B/C, all four fills of §16.27 — is **re-seats of ONE fill**, so every *d* and every CV in this
