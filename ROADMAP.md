@@ -713,7 +713,110 @@ corrupt-data exposure to avoid). **Remaining debt is runtime/doc only** (R1 LAN-
 
 ---
 
+## ▶▶▶▶▶ HIGHEST PRIORITY — ONE FILL, ONE WAIT, ONE BEST MEASUREMENT  *(Edwin 2026-08-15; ahead of EVERYTHING)*
+
+> ⭐⭐ **Spec: [`SPEC_settled_measurement.md`](../spectracsPy/docs/SPEC_settled_measurement.md).**
+> Evidence: [`SPEC_capture_quality.md` §16.36](../spectracsPy/docs/SPEC_capture_quality.md).
+> Working prototype: `diagnostics/clearing_time_course.py`.
+
+**⛔ WHY THIS COMES FIRST, BEFORE THE σ_fill RUN AND BEFORE THE LAMP REBUILD.** On 2026-08-14/15 the
+Lugitsch session established that the lamp **changes the sample while measuring it** — its heat CLEARS a
+muddy fill (reversible) and its light BROWNS it (irreversible: 13.7 % of the pigment destroyed in 72 min,
+`Q%` drifting +1.0 to +1.6 per hour, a 90-minute session moving 1.5 units against a 0.21 refill floor).
+
+⭐⭐ **The consequence is a retired premise, and Edwin's words are the right ones:** *"we are no longer
+misled by measurements on the 'same oil' as the oil IS IN FACT NOT THE SAME OIL — otherwise we would have
+hunted things and searched for explanations for weeks."* Every multi-run session in the archive treated
+the fill as a fixed object being measured repeatedly. It was two processes with OPPOSITE signs on `Q%`,
+overlapping in time — which is precisely why the scatter resisted explanation (§16.36.8).
+
+**WHAT TO BUILD.** The device measures a **time course** during ACQUISITION, gates on `|ΔA_valley| < 0.005`
+(the CAUSE, not `Q%`'s turn — which costs 10 further minutes of light), reads the `Q%` minimum as a
+**parabola vertex**, reports the zero-dose extrapolation separately, and stops. One fill, one wait, one
+value. ⚠ The 15-minute wait is ACCEPTED deliberately — ordinary lab equilibration, explainable to a
+miller, and it avoids the heated-holder complication.
+
+**EVERYTHING ELSE WAITS, AND HERE IS WHY:**
+
+| queued work | why it must wait |
+|---|---|
+| ⭐ **σ_fill / the 3-refill run** | it measures the reproducibility OF A MEASUREMENT. Until the measurement is defined, it measures the protocol's own drift. ⇒ and it is now **one measurement per fill**, so spend the captures on MORE FILLS: 9 × 1 beats 3 × 3 by 4× on σ_fill (§16.34.3d) |
+| **the DIY lamp rebuild** | a lamp swap moves the scale 4.84 units. Re-deriving thresholds on a drifting measurement bakes the drift into the new scale |
+| **the internal PDFs** | they would document numbers the next protocol supersedes |
+| **PRIO 3a ground truth** | labels compared against a moving measurement are labels compared against nothing |
+
+⇒ **Everything downstream assumes a measurement that can be trusted. This is that measurement.**
+
+---
+
+## ▶▶▶▶ WAS HIGHEST PRIORITY — IMPLEMENT THE `V` METRIC IN THE DEV PLUGIN  *(Edwin 2026-08-14; ✅ IMPLEMENTED 2026-08-14, V2–V7 + V9/V10)*
+
+> ⭐⭐ **`V` is the best metric this project has produced, and it is the next thing to build.**
+> Definition, threshold, band, weaknesses and pre-registration:
+> [`SPEC_metric_research.md` §10](../spectracsPy/docs/SPEC_metric_research.md). Every number
+> reproduces with `diagnostics/box_metrics.py`.
+
+```
+V = (A_valley − A_Q) / A_Soret          on the DE-SPIKED RAW absorbance — NO baseline
+    A_valley = mean over 500–560 nm     A_Q = mean over 565–580 nm     A_Soret = mean over 448–460 nm
+    reported as V × 100 · less negative = greener
+    T_V = −18.57   (corridor midpoint, §16.20.4's own 18-run corpus)
+    history-tracker band  ±1.0
+```
+
+**Why it wins.** Class gap **5.05 σ** against M448's 3.80 · **17 of 18** archive fills ordered
+correctly · separates under **both** contested labellings where M448 manages only one · denominator
+stays **10 σ** from zero where M448's `B_Q` comes within **6** (which is why `Ja! Natürlich` inflates
+to 22.24 and `20260811A` returns **−9.72**) · **no fitted baseline**, so the fill-dependent chord tilt
+of `SPEC_capture_quality.md` §16.35 cannot touch it · dose-robust to ±40 %.
+
+**Build order in the DEV plugin:**
+
+| # | task |
+|---|---|
+| **V1** | `V` computed on the de-spiked raw absorbance, alongside the existing metrics — display only, no verdict |
+| **V2** | declare the three windows in `declaredEvalBands()` so they are visible in the report, as §16.20 did for the far anchor |
+| **V3** | `W = (A_Q − A_valley)/(A_Soret − A_valley)` as the explain-it number — the Q : Soret band ratio the physics talks about |
+| **V4** | `T_V` verdict + the **±1.0** deviation band against a stored reference (this is the history tracker; `SPEC_history_tracker.md` §7 for the protocol) |
+| **V5** | ⛔ guards: a fill whose runs **straddle `T_V`** gets NO verdict; `S1` outside −0.372 ± 0.04 flags an invalid run |
+
+⛔ **Two weaknesses that must be surfaced in the UI, not buried:** a **lamp swap moves `V` by 4.89** —
+more than the whole class gap — so a stored reference is void after a lamp change; and **half
+concentration moves it 2.18**, so the capillary recipe is a precondition, not a nicety.
+
+⚠ **Do NOT re-tune the windows.** They are frozen for the PRIO 2c test — `V` was found by scanning ~9
+candidates on 13 fills, and re-tuning would destroy the only thing that can retire that selection risk.
+
+⚠ **`T_V` may not be quoted as classifying the two Spar g.g.A. oils** — the derivation corpus excludes
+them, exactly as it does for M448 (§16.30.1a, §16.31.3a).
+
+### ▶▶▶ NEXT — UPDATE THE INTERNAL PDFs FOR `V` AND THE FAR-ANCHOR FINDING  *(Edwin 2026-08-14)*
+
+The 2026-08-14 session changes what several shipped documents assert. Each has a markdown master and a
+generator under `spectracsPy/docs/tools/`, so the work is edit-then-regenerate:
+
+| document | master · generator | what changed |
+|---|---|---|
+| ⭐⭐ **Spectracs_MetricAlgebra.pdf** | `DOC_metric_algebra.md` · `build_metric_algebra_pdf.py` | **the biggest one.** Its whole subject is `M448`'s algebra and dilution-invariance proof. Needs `V`/`W`, the Gouterman reading, and §16.35's finding that the chord's far foot sits on the Qy band |
+| **Spectracs_PedestalCorrection.pdf** | `DOC_pedestal_correction.md` · `build_pedestal_correction_pdf.py` | `r_Q` corrects a chord whose far anchor is on a band — that framing needs §16.35 |
+| **Spectracs_CapabilityProof status** | `build_capability_status_pdf.py` | quotes `M448` numbers and thresholds |
+| **Spectracs_Oil_Panel_2026-08-07.pdf** | `business/internal/commmunication/build_oil_panel_pdf.py` | ⚠ its numbers are **transcribed, not recomputed** (§16.27.10); it quotes `M448` only. Not in git |
+| `DOC_sample_physics.md`, `DOC_capture_fidelity.md` | their generators | check for `M448`/anchor claims |
+
+⚠ **Sequence it after V1–V3**, so the documents describe what the plugin actually computes rather than
+a proposal. ⛔ And do not regenerate the Oil Panel PDF without re-deriving its numbers — §16.27.10
+already flags the transcription as a dating hazard.
+
+---
+
 ## ▶▶▶ HIGHEST PRIORITY — σ_fill, AND IT NOW GATES THE PRODUCT  *(Edwin 2026-08-13; supersedes the 08-06 ordering below)*
+
+> ⭐ **UPDATED 2026-08-14:** this run is now also the **pre-registered test of `V`**
+> (`SPEC_metric_research.md` §10). Compute `V` alongside `M448` from the same captures — it costs
+> nothing extra and it is the only thing that can retire `V`'s selection risk. **Pass condition:
+> across-fill sd of `V × 100` ≤ ~0.3 units on the capillary recipe.** The archive's prior is
+> **0.21**, but from the *drop-based* recipe — ⛔ **no refill pair exists on the capillary recipe with
+> a non-Billa oil**, which is precisely the gap this run fills.
 
 > ⭐⭐ **This is the only number between "this looks like a product" and "this is a product."**
 > `SPEC_capture_quality.md` **§16.34.3** (the gate) + **§16.21.1** (the original design) + §16.34 (why it
@@ -843,6 +946,34 @@ dosing: green-green signal **0.98 units against 1.665 units of fill spread, SNR 
 confirm the class call survives the new recipe, green-vs-green because that is the one the capillary is *for*
 and the one the capability gate needs (*d* ≈ 1.3–2.0 today against ≳ 3 required).
 
+### ⭐ PRIO 2c — THREE MORE `Spar Premium` FILLS *(added 2026-08-14; one evening, and it unblocks three statistics at once)*
+
+⛔ **`Spar Premium g.g.A.` has exactly ONE fill in the whole archive** — `20260807C`, one evening, three runs.
+That single tube is currently the load-bearing member under **`Q_snv`**, **`S2`** and **`M448`'s entire
++0.51 σ margin**, because it is the one fill that sits on the class boundary and it decides in every case
+whether a statistic separates or overlaps
+([`SPEC_capture_quality.md`](../spectracsPy/docs/SPEC_capture_quality.md) §16.30.1a, §16.31.3a).
+
+**The run:** 2–3 independent fills, standard 2 cap / 10 mL recipe, 3 runs each, one session, one exposure
+state, 15-minute settle. **~1 evening.**
+
+⚠ **What it CANNOT do:** settle the class. `Spar Premium` has now been labelled brown → green → brown in
+three days, and §16.30.1a establishes that **no spectral quantity can be independent evidence about that
+label** — one pigment system means every statistic is a projection of the same axis (ρ = 0.84–0.94 between
+all pairs measured, colour included). The class needs taste, roast records or provenance — PRIO 3a.
+
+⭐ **What it CAN do, and why it is worth an evening:** settle whether that one tube is *representative*.
+Three outcomes, all useful:
+
+| outcome | what it means |
+|---|---|
+| stays low on the red slope | the one fill was real; the boundary problem is about the LABEL, not the data |
+| moves up among the greens | the 08-13 green label is supported, `S2` is dead, and `M448`'s real margin is far better than +0.51 σ |
+| scatters across both | σ_fill for this product is enormous — which explains the whole boundary mess and is a finding in itself |
+
+⇒ Cheapest item on this page that changes what three separate results are worth. ⚠ Not a substitute for
+**σ_fill** above (which needs several oils) — but it is the same protocol, so it can ride along with it.
+
 ### ⭐⭐ PRIO 2b — σ_fill: MULTIPLE FILLS PER OIL *(Edwin 2026-08-07, "yes, the multiple fills per oil is one test to be done")*
 
 > ⭐⭐ **PROMOTED 2026-08-13 to HIGHEST PRIORITY** — see the block near the top of this file. It now
@@ -883,7 +1014,7 @@ model** that has never been tested. Four items, in build order:
 | **1** | ⭐ gauge renders **symmetric**, **verdict text removed from the green end** — it stops making an unsupported claim | nothing; do it first |
 | **2** | verdict metric **`M base+ped` → `M448`**, over-roast line **7.17**, labelled PROVISIONAL. `M448` gives the brown line **2.7 σ** of margin against the shipped metric's **1.3 σ** — the pedestal correction *costs* class separation because it compresses the greener oils more | the NEXT TASK 448 trim |
 | **3** | ⭐ **user-defined target greenness** + signed deviation readout, **default unset**. The miller stores a batch he knows is good and the gauge shows deviation from *his own* profile | 1, 2 |
-| **3a** | 📌 **PARKED — a deviation THRESHOLD on that target**, alarming when a batch leaves a tolerance band around the user's own reference (`SPEC_roast_ampel.md` §9.3a). ⭐ The only alarm in the spec that needs **no universal optimum and no jury**. **To be discussed** — not designed | 3, and **PRIO 2b** (a band tighter than σ_fill alarms on the tube, not the oil) |
+| **3a** | ⭐ **UN-PARKED 2026-08-14 — a deviation THRESHOLD on that target**, alarming when a batch leaves a tolerance band around the user's own reference (`SPEC_roast_ampel.md` §9.3a). ⭐ The only alarm in the spec that needs **no universal optimum and no jury**. ⭐ **DESIGNED as a SHAPE alarm** — [`SPEC_history_tracker.md`](../spectracsPy/docs/SPEC_history_tracker.md): SNV-quotient shape distance `D = √(1−r²)` over 550–600 nm, which needs no metric choice, no denominator and no labels. Its control limit is **σ_fill**, so the run below prices it **free**. The *scalar* form of the same alarm is still undesigned | 3, and **σ_fill** (a band tighter than σ_fill alarms on the tube, not the oil) |
 | **4** | a shipped **default** target | ⛔ the jury study, §9.4 |
 
 ⭐ **Cheapest open item on the whole gauge: a SECOND BROWN OIL (Hofer).** The over-roast line rests on one
