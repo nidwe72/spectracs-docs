@@ -1,0 +1,212 @@
+@startuml monitor_record_model
+' Spectracs — the MonitorRecord object model: what a monitored acquisition produces,
+' where each piece lives, and which of them reach the PDF.
+' Companion to spectracsPy/docs/SPEC_settled_measurement.md §15.2 / §18 / §27.12 / §27.13.
+' Regenerate:  java -jar plantuml.jar -tsvg monitor_record_model.puml
+
+title Spectracs — MonitorRecord & the settling views\nwhat a monitored run produces, and where it lives (as-built 2026-08-17)
+
+hide circle
+hide empty methods
+skinparam linetype ortho
+skinparam classFontSize 12
+skinparam shadowing false
+skinparam defaultFontName Sans
+skinparam class {
+  BackgroundColor White
+  BorderColor #333333
+  BackgroundColor<<runtime>> #FFFFFF
+  BorderColor<<runtime>> #666666
+  BackgroundColor<<persisted>> #CDE7CE
+  BorderColor<<persisted>> #2E7D32
+  BackgroundColor<<sdk>> #FFE6CC
+  BorderColor<<sdk>> #B36A00
+  BackgroundColor<<view>> #EAF2FB
+  BorderColor<<view>> #3A6EA5
+  BackgroundColor<<enum>> #FFF7E6
+  BorderColor<<enum>> #B58900
+}
+skinparam note {
+  BorderColor #B36A00
+  BackgroundColor #FFF7E6
+}
+
+legend right
+  |= colour |= tier |
+  | <#FFE6CC>  | plugin_sdk (Qt-free, spectracsPy-core) |
+  | <#FFFFFF>  | runtime only — dies with the run |
+  | <#CDE7CE>  | persisted (app DB) |
+  | <#EAF2FB>  | view-model (renders to Qt AND to paper) |
+endlegend
+
+' ===================== the run's product =====================
+
+class MonitorResult <<sdk>> {
+  + outcome : MonitorOutcome
+  + rows : [MonitorRow]          'ALL rows, ~1700 for 20 min
+  + spectrum                     '⭐ the ANSWER's window mean
+  + answer : {valueKey, value, t,\n   frameIndex, readAs, branch}
+  + columns : [{key,label,unit}] '⭐ self-describing
+  + policy : MonitorPolicy
+  + evaluatorId / evaluatorVersion
+  + clearingSeconds              '⭐ a sigma_fill component
+  + cancelled / capsHit / error
+  + distinctFraction             '§23/V1 duplicate-frame budget
+  + notes : [str]
+  + views : [ReportableView]     '⭐ §27.12 — the SAME objects on the step
+  --
+  + hasValue()
+  + decisionRows()               '⭐ only THESE persist (~35)
+  + toRecord() : MonitorRecord
+}
+
+class MonitorRow <<sdk>> {
+  + t          '⚠ window CENTRE, not "when the line was written"
+  + frameIndex 'global index of the window's LAST frame
+  + n / nAccepted
+  + values : {}  '⚠ the PLUGIN's scalars — MAY BE EMPTY
+  + provisional / isDecisionRow
+  --
+  + toDict()   'flattens `values` into the row
+}
+
+class MonitorPolicy <<sdk>> {
+  + windowFrames / retentionFrames
+  + minWindowFrames
+  + evaluateEveryNFrames
+  + maxSeconds   '⛔ NEVER None — §12.2 termination
+  + maxFrames
+}
+
+enum MonitorOutcome <<enum>> {
+  SETTLED_IMMEDIATE
+  SETTLED_AFTER_CLEARING
+  COMPLETED
+  --
+  NEVER_SETTLED
+  MEASUREMENT_BROKEN
+  CANCELLED
+  STALLED
+  FAILED
+}
+
+MonitorResult "1" *-- "0..*" MonitorRow
+MonitorResult --> MonitorPolicy
+MonitorResult --> MonitorOutcome
+
+note bottom of MonitorRow
+  ⛔ NOTHING in the engine may index into `values`.
+  The host knows `t` and `answer["valueKey"]` —
+  never what `Q%` means (§15.2).
+end note
+
+' ===================== the travelling record =====================
+
+class "MonitorRecord\n(a plain dict — JSON only)" as REC <<persisted>> {
+  outcome / cancelled / capsHit
+  evaluatorId / evaluatorVersion
+  policy : {}      'two runs under different rules
+  clearingSeconds  '  must never be compared silently
+  distinctFraction
+  columns : []
+  answer : {}
+  rows : []        '⚠ a LIST with `t` as a VALUE —
+  notes : []       '  never a map keyed by a float
+}
+
+MonitorResult ..> REC : toRecord()
+
+class SpectralWorkflow <<persisted>> {
+  + monitorRecordJson : Text
+  + sectionedPhasesJson : Text   '⭐ D4 — which phases
+  --                             '  are sectioned by STEP
+  + getMonitorRecord() / setMonitorRecord()
+  + getSectionedPhases() / setSectionedPhases()
+  + toReportJson() -> {..., "monitorRecord",\n                    "sectionedPhases"}
+}
+
+note right of SpectralWorkflow #E3F2FD
+  ⭐⭐ D4 (§27.14a) — THE STRUCTURE IS PART OF THE
+  RECORD. The plugin declares it once (stamped at
+  run start from NavigationPolicy.stepChevronPhases);
+  the chevron, the PDF's section headings and a
+  plugin-free LIMS addon all read it from HERE.
+  ⛔ Before this it lived only in the live host, so a
+  re-opened run showed one "Acquisition" chevron
+  where the measurement showed Reference > Sample.
+  ⚠ Only the STRUCTURE persists — `mode`
+  (STEP/AUTO_ADVANCE) is interaction, not a fact
+  about the measurement.
+end note
+
+class "PDF /EmbeddedFiles\n  workflow.json" as PDFJSON <<runtime>>
+
+REC --> SpectralWorkflow : stored whole, for EVERY outcome\n⭐ incl. the runs with no value
+SpectralWorkflow ..> PDFJSON : the MACHINE half of the report
+
+' ===================== the human half =====================
+
+class SpectralWorkflowStep <<persisted>> {
+  + role  'SAMPLE
+  + _view '⚠ TRANSIENT (@reconstructor) — see note
+  + container
+  + evaluationResult
+}
+
+class EvaluationResult <<persisted>> {
+  + resultJson : Text
+  + items : [ReportableView]
+}
+
+class TabGroupView <<view>> {
+  + tabs : [(label, view | [view])]
+  + isShownInReport = True
+  + isMonitorView  '✅ round-trips (D2)
+}
+
+class "Overview\nLabelView + 11x MetricFieldView" as OV <<view>>
+class "Q% · Turbidity · Rate\n3x SeriesPlotView" as CURVES <<view>>
+class "Health · Decisions\n2x TableView" as TABLES <<view>>
+
+SpectralWorkflowStep *-- EvaluationResult
+EvaluationResult *-- TabGroupView
+TabGroupView *-- OV
+TabGroupView *-- CURVES
+TabGroupView *-- TABLES
+MonitorResult --> TabGroupView : views[0] is the SAME object\n⭐ ONE construction, ONE home
+
+note right of TabGroupView #C8E6C9
+  ✅ §27.13b / D1 — FIXED 2026-08-17
+  The curve and table tabs carry
+  isShownInReport = False and are now
+  HONOURED: willDrawInReport() filters
+  the children, so paper gets the
+  Overview alone (3 pages -> 1, measured)
+  while the SCREEN still shows all six —
+  the GUI ignores the flag by contract.
+end note
+
+note right of SpectralWorkflowStep #E3F2FD
+  ⭐ WHY THE TABS ARE INVISIBLE LIVE AND
+  VISIBLE WHEN RE-OPENED (§27.12 / §27.13d):
+  renderStep() routes a step whose _view is a
+  CaptureView to the capture panel, which never
+  reads the EvaluationResult. `_view` is
+  @reconstructor-transient ⇒ a step loaded from
+  the DB has none, falls through to the passive
+  visitor, and the tabs come back.
+  ✅ No longer an accident: pinned by
+  test_saved_run_shows_the_settling_tabs.py and
+  argued in renderStep()'s own comment, because
+  "persist the view descriptor" would otherwise
+  delete the tabs from every re-opened run.
+end note
+
+note bottom of EvaluationResult #C8E6C9
+  ✅ §27.13c / D2 — FIXED 2026-08-17. The tag has a
+  class default on ReportableView and is written and
+  read by TabGroupView, so it survives the real DB ⇒
+  a re-measure inside a reloaded run REPLACES.
+end note
+
+@enduml

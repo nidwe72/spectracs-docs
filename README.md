@@ -17,6 +17,16 @@ for optical spectroscopy with a DIY spectroscope).
 - **[`ROADMAP.md`](ROADMAP.md)** — the working backlog / agreed next steps to build (resume point).
   Diagram: [`roadmap_map.svg`](roadmap_map.svg) — status + dependency graph (what is done, what is
   next/unblocked, what blocks what).
+- **Monitored acquisition ("one fill, one wait")** — a settling run and the provenance it produces
+  ([`spectracsPy/docs/SPEC_settled_measurement.md`](../spectracsPy/docs/SPEC_settled_measurement.md),
+  §27.12/§27.13). Diagrams:
+  [`monitored_capture_sequence.svg`](monitored_capture_sequence.svg) — Measure click → monitor loop →
+  the ONE view object attached to the SAMPLE step → the screen tab and the PDF section;
+  [`monitor_record_model.svg`](monitor_record_model.svg) — `MonitorResult`/`MonitorRow`/`MonitorRecord`,
+  the `TabGroupView` tree, and which parts are transient, persisted or printed.
+  ✅ Both were updated on 2026-08-17 when §27.13's defects were fixed (D1–D4): the report honours
+  `isShownInReport` at every depth, the monitor tag round-trips, and the section structure is part of the
+  record.
 - **Doc-automation harness** — the "Director" screencast tooling
   ([`spectracsPy/docs/SPEC_doc_automation.md`](../spectracsPy/docs/SPEC_doc_automation.md), IMPLEMENTED).
   Diagram: [`doc_automation_architecture.svg`](doc_automation_architecture.svg) — the two-process

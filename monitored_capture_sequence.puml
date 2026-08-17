@@ -1,0 +1,131 @@
+@startuml monitored_capture_sequence
+' Spectracs — a MONITORED capture, from the Measure click to the PDF on disk.
+' Companion to spectracsPy/docs/SPEC_settled_measurement.md §27.12 / §27.13 (as-built 2026-08-17).
+' Regenerate:  java -jar plantuml.jar -tsvg monitored_capture_sequence.puml
+
+title Spectracs — monitored capture: ONE view object, two surfaces\nSPEC_settled_measurement.md §27.12 / §27.13 (as-built 2026-08-17)
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName Sans
+skinparam sequenceMessageAlign left
+skinparam ArrowColor #5A7D8C
+skinparam ArrowFontColor #3A5A68
+skinparam participant {
+  BorderColor #5A5A5A
+  FontColor #222222
+}
+skinparam note {
+  BorderColor #B36A00
+  BackgroundColor #FFF7E6
+  FontColor #333333
+}
+
+actor "Operator" as OP
+participant "CapturePanel\n(Qt host)" as PANEL #E8F5E9
+participant "SpectralWorkflowEngine\n(Qt, app tier)" as ENGINE #E8F5E9
+participant "Plugin\n(DevSpectralPlugin)" as PLUGIN #FFE6CC
+participant "the monitor:\nMonitorEngine (SDK)\n+ FrameRing (SDK)\n+ ClearingEvaluator (plugin)" as MON #FFE6CC
+participant "SAMPLE step\n· EvaluationResult" as STEP #CDE7CE
+participant "WorkflowReportBuilder\n+ MatplotlibWorkflowRenderer" as REPORT #EAF2FB
+
+== 1 · does this role get a monitor?  (the ONLY role gate in the whole path) ==
+
+OP -> PANEL : click **Measure** on the Sample step
+PANEL -> PANEL : __monitorFor(step, role, frames)
+note right of PANEL
+  ⛔ role == REFERENCE  -> None
+  ⛔ no reference captured yet -> None
+  ⇒ None means today's plain burst, unchanged
+end note
+PANEL -> PLUGIN : createMonitor(reference, mode=PRODUCT, frames)
+note right of PLUGIN
+  ⭐ COMPOSITION, not inheritance (§10.1a-bis):
+  the plugin ASSEMBLES MonitorEngine(ring=FrameRing,
+  evaluator=its own ClearingEvaluator) and hands it over.
+  ⛔ Nothing calls back INTO the plugin during the run.
+  ⚠ `mode` is a HOST argument (§17/D3):
+     PRODUCT = stop at the read (the bench / wizard)
+     DIAGNOSTIC = keep observing to a fixed 20-min arc
+     (diagnostics/settling_run.py). Safe only because
+     the answer is LATCHED at the read (§14.6).
+end note
+PLUGIN -> MON ** : assemble
+PLUGIN --> PANEL : monitor  (duck-typed: offer / result)
+
+== 2 · the run — the host pumps, the plugin decides ==
+
+PANEL -> ENGINE : captureMonitoredStep(step, frameProvider, monitor, onRow)
+loop until monitor.isFinished()   (cancel = provider returns None)
+  ENGINE -> PANEL : frameProvider()
+  PANEL --> ENGINE : QImage
+  ENGINE -> ENGINE : __frameSpectrum(image)   'the SAME per-frame reduction as the burst path
+  ENGINE -> MON : offer(frame, clock())
+  MON --> ENGINE : row?
+  ENGINE -> PANEL : onRow(row, monitor)   '~2 s throttle: status bar + live spectrum
+end
+ENGINE -> MON : result()
+MON --> ENGINE : MonitorResult
+
+== 3 · ⭐ ONE CONSTRUCTION, ONE HOME  (§27.12) ==
+
+ENGINE -> ENGINE : __attachMonitorViews(step, result)
+note right of ENGINE
+  ⚠ DUCK-TYPED SEAM, not an SDK method:
+  hasattr(plugin, "settlingView") inside a try.
+  ⛔ A diagnostic must never break the capture
+  it documents — a raise prints one line.
+  ⇒ §27.13a: declare it on the SDK base class.
+end note
+ENGINE -> PLUGIN : settlingView(result.toRecord())
+PLUGIN --> ENGINE : TabGroupView\n(shownInReport = True)
+ENGINE -> STEP : drop any existing isMonitorView item,\nthen addItem(view)  'REPLACE, never accumulate
+ENGINE --> PANEL : result  (result.views = [the SAME object])
+
+== 4 · surface A — the screen ==
+
+PANEL -> PANEL : __showSettlingTab(result)\nQtWorkflowRenderer().render(result.views)
+note right of PANEL
+  ⭐ Renders the very objects now on the step.
+  ⛔ The panel builds NO copy of its own —
+  that duplication is what made a report-only
+  step look necessary (§27.11).
+end note
+
+== 5 · surface B — the paper ==
+
+REPORT -> STEP : getEvaluationResult().getItems()
+note right of REPORT
+  ⭐ Filed under **Acquisition** — the step's PHASE.
+  ⛔ No role, label or step-kind is matched anywhere.
+end note
+REPORT -> REPORT : keep items where willDrawInReport(item)\n-> visitTabGroup prints only the FLAGGED children
+note right of REPORT #C8E6C9
+  ✅ FIXED 2026-08-17 (§27.13b / D1)
+  isShownInReport is honoured at EVERY depth,
+  through one shared predicate. Measured:
+  3 pages -> 1 page, 0 curve axes, summary intact.
+  ⛔ The filter NEVER prunes the view object —
+  the panel renders the SAME TabGroupView (Z1).
+  ⭐ D4: a sectioned phase is headed per STEP,
+  so this lands under "Sample".
+end note
+REPORT -> REPORT : pypdf embeds workflow.json\n(carries monitorRecord — the machine half)
+
+== 6 · saved, and re-opened ==
+
+PANEL -> STEP : (on Save) EvaluationResult.syncToColumn()
+note over STEP #C8E6C9
+  ✅ FIXED 2026-08-17 (§27.13c / D2): isMonitorView
+  has a default on ReportableView and round-trips
+  through TabGroupView ⇒ a re-measure inside a
+  RELOADED run replaces rather than appends.
+  ⭐ And the tabs come back on re-open because
+  step._view is @reconstructor-transient, so the
+  reloaded step falls past the capture branch into
+  the passive visitor (§27.13d) — no longer an
+  accident: pinned by a test, explained in
+  renderStep()'s own comment.
+end note
+
+@enduml
