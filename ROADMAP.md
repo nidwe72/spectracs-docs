@@ -757,6 +757,34 @@ water bath, and it is the hardest test of the θ = 0.005 gate.
 the history tracker's band (`SPEC_history_tracker.md` §11 — its σ is a by-product) · and whether series F's
 0.276 was a good night or the new normal.
 
+### ▶▶▶▶ 3 · IS THIS A GOOD FILL? — a verdict about the FILL, not the oil  *(Edwin 2026-08-18; TO BE SPECIFIED)*
+
+⛔ **Preparation is now the dominant error term, and the app is silent about it.** Series F measured the
+instrument at **σ 0.276** when the handling was careful — and a **0.47** gap between two halves of one
+dilution when it was not (`SPEC_settled_measurement.md` §28.5). ⇒ the largest remaining variable is the
+person holding the pipette, and a miller will not be as careful as the person who built the rig.
+
+⭐⭐ **AND THE APP ALREADY HOLDS THREE INDEPENDENT SIGNALS ABOUT THE FILL — it just never combines them:**
+
+| signal | where it comes from | what it says about the FILL |
+|---|---|---|
+| **DN guard** | `SPEC_capture_quality.md` §16.23.10 — min(S) in 500–560 against the target pair | too thick / too thin — a dilution error |
+| **clearing time** | `MonitorRecord.clearingSeconds` (§2.4) | how muddy it arrived, and whether the bath did its job |
+| ⭐ **browning rate** | `SPEC_settled_measurement.md` §29.5 (new) | how fast this fill degrades under the lamp — 0.291 vs 0.008 `Q%`/min across series F, a factor of 35 |
+
+⇒ **specify a FILL verdict, separate from and shown beside the OIL verdict**: *"this measurement is sound"*
+versus *"this measurement is about a good oil"*. ⭐ Cheap, because all three numbers are already computed
+and already travel in the record — nothing new is measured, only combined and said out loud.
+⚠ ⛔ **It must never be folded into the oil verdict** — the §2 rule that keeps the zero-dose extrapolation
+separate applies here for the same reason: a quality number that quietly contains a handling number cannot
+be argued with.
+
+⭐ **Why it is the highest-value usability work after 1 and 2**: it is what lets someone who is not Edwin
+trust — or correctly distrust — their own measurement, which is the precondition for the wizard ever
+leaving the bench.
+
+---
+
 ---
 
 ## ✅▶▶▶▶▶ BUILT — ONE FILL, ONE WAIT, ONE BEST MEASUREMENT  *(Edwin 2026-08-15; implemented and rig-proven 2026-08-17/18 — §27 as-built, §28 series F. ⭐ The proof: a muddy fill that a fixed-time read would have called 15.005 was carried to 13.990 — **1.015 units**. Superseded as "next" by the two items above.)*
