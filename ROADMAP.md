@@ -713,7 +713,53 @@ corrupt-data exposure to avoid). **Remaining debt is runtime/doc only** (R1 LAN-
 
 ---
 
-## ▶▶▶▶▶ HIGHEST PRIORITY — ONE FILL, ONE WAIT, ONE BEST MEASUREMENT  *(Edwin 2026-08-15; ahead of EVERYTHING)*
+## ▶▶▶▶▶▶ HIGHEST PRIORITY — TWO ITEMS, IN THIS ORDER  *(Edwin 2026-08-18)*
+
+> ⭐⭐ The measurement below (ONE FILL, ONE WAIT) is **BUILT and PROVEN ON THE RIG** — see
+> [`SPEC_settled_measurement.md`](../spectracsPy/docs/SPEC_settled_measurement.md) §27 (as-built) and §28
+> (series F, the first measurements it produced). These two items are what remains between the instrument
+> and a product that can be trusted on brown oil.
+
+### ▶▶▶▶▶▶ 1 · THE CLEAR-CASE READ — `SPEC_settled_measurement.md` §29  *(small, and it blocks the other one)*
+
+⛔⛔ **The clear branch reports the most lamp-damaged look it saw.** `readAs = FIRST_SETTLED_WINDOW`
+returns the LAST look, not the first: the gate needs ~105 s to confirm a fill is stable and the lamp
+bleaches the sample throughout. Measured biases on series F: 0.013 · 0.037 · 0.084 · **0.482**.
+⇒ visible, one-directional (so it never averages out), fill-specific (0.291 vs 0.008 `Q%`/min — a factor
+of 35, so nothing can be subtracted afterwards), and ⚠ **it hits the GOOD fills**: a clean sample takes
+this branch every time, while the muddy path — where all the design effort went — is the protected one.
+
+⭐ **THE FIX (§29.3), and it also simplifies the algorithm.** The branch decision moves off turbidity and
+onto the curve being read: **how far below the FIRST look does the `Q%` minimum sit?** Series F separates
+into two clusters with a **15× gap** (0.000 · 0.010 ‖ 0.149 · 0.279 · 7.233) and the threshold — 2σ of the
+measured window noise — falls inside it, DERIVED rather than chosen. ⇒ `A_valley` is the GATE (*when to
+stop*), `Q%` depth is the READ (*what to report*); interior minimum → vertex, otherwise → the first look.
+⚠ §29.6 flags the trap inside its own fix: **2σ = 0.13 is only right at W = 60** (noise ∝ 1/√W) — derive
+it from the window, do not paste the number.
+
+⛔ **WHY IT BLOCKS ITEM 2:** a +0.48 bias is **37 % of brown's margin to `T`**, and brown is the binding
+class. Running the load-bearing measurement through a known one-directional bias spends the session and
+produces a number nobody can use.
+
+### ▶▶▶▶▶ 2 · THE BROWN OIL SERIES — series E, finally runnable  *(`SPEC_capture_quality.md` §16.11.11)*
+
+⭐ Brown is where the risk lives: it sits **1.297** from `T` against green's 1.651, so it is the class that
+decides whether ONE measurement is enough (§16.13's σ_fill ≤ 0.307 boundary). It has waited since
+2026-07-30 for a measurement worth spending it on; §28 says there now is one.
+
+**The run:** six fills of ONE brown stock, identical handling — the capillary recipe and the 3-minute bath,
+nothing varied — each measured ONCE, all in one sitting. ⭐ Plus **one deliberately UNWARMED muddy fill**,
+which costs one extra slot and buys three things: it exercises §27.25's retention fix (still unexercised —
+series F's vertex winners all sat 1–3 rows back, inside the old window), it is §17/C1's field case with no
+water bath, and it is the hardest test of the θ = 0.005 gate.
+
+**What one session then answers:** σ_fill for the binding class · the §16.13 decision table's open row ·
+the history tracker's band (`SPEC_history_tracker.md` §11 — its σ is a by-product) · and whether series F's
+0.276 was a good night or the new normal.
+
+---
+
+## ✅▶▶▶▶▶ BUILT — ONE FILL, ONE WAIT, ONE BEST MEASUREMENT  *(Edwin 2026-08-15; implemented and rig-proven 2026-08-17/18 — §27 as-built, §28 series F. ⭐ The proof: a muddy fill that a fixed-time read would have called 15.005 was carried to 13.990 — **1.015 units**. Superseded as "next" by the two items above.)*
 
 > ⭐⭐ **Spec: [`SPEC_settled_measurement.md`](../spectracsPy/docs/SPEC_settled_measurement.md).**
 > Evidence: [`SPEC_capture_quality.md` §16.36](../spectracsPy/docs/SPEC_capture_quality.md).
@@ -809,7 +855,7 @@ already flags the transcription as a dating hazard.
 
 ---
 
-## ▶▶▶ HIGHEST PRIORITY — σ_fill, AND IT NOW GATES THE PRODUCT  *(Edwin 2026-08-13; supersedes the 08-06 ordering below)*
+## ▶▶▶ σ_fill, AND IT NOW GATES THE PRODUCT  *(Edwin 2026-08-13; ⭐ **FIRST DATA 2026-08-18 — series F, `SPEC_settled_measurement.md` §28: σ 0.276 across five separate preparations, 4.5× tighter than the archive's WITHIN-FILL scatter of 1.255.** The binding number is still brown's — see item 2 at the top.)*
 
 > ⭐ **UPDATED 2026-08-14:** this run is now also the **pre-registered test of `V`**
 > (`SPEC_metric_research.md` §10). Compute `V` alongside `M448` from the same captures — it costs
