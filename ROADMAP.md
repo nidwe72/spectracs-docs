@@ -45,6 +45,56 @@ the mill's roast record, provenance — is the only permanent answer, and it is 
 
 ---
 
+## ▶▶▶▶▶▶▶▶ WHAT WE CAN CLAIM FOR `Q%` — defend vs advertise  *(Edwin 2026-08-21 evening)*
+
+> ⭐⭐ **The one sentence:** `Q%` is defensible today as **an instrument that reproducibly measures a real
+> chemical quantity**. It is **not yet** defensible as **a classifier that assigns a verdict to an arbitrary
+> oil**. Those are different claims, and "advertise" usually means the second.
+
+### ⭐ What carries the DEFENCE — strong, and strong in the way that matters
+
+| | |
+|---|---|
+| ⭐⭐ **it reads a named chemical step** | loss of the central Mg²⁺, protochlorophyll → protopheophytin. **Mechanism, not correlation** — not *"these two bottles differ"* |
+| ⭐⭐ **and the mechanism is MEASURED** | the see-saw: bands anti-coupled at **−0.832** between oils, **+0.811** within one fill, and a **conserved sum** (CV 5.4 %, class-blind at *d* = 0.28). That is a conversion signature (`SPEC_metric_research.md` §13.5) |
+| **its construction is justified term by term** | the **difference** kills what adds, the **division** kills what multiplies — one nuisance each (`DOC_metric_algebra.md` §5.2) |
+| ⭐ **the first objection is already answered** | *"does it separate because the ruler shrinks for brown oils?"* Measured: `A_Soret` is class-blind at *d* = **0.16**, and the discrimination sits in the **numerator** (*d* = 1.69). ⇒ the failure mode a sceptic reaches for first **is not there** |
+| **it reproduces** | pooled within-oil **1.100** units; two pours of one dilution agree to **0.076** |
+| **the number is not an accident of timing** | the settling algorithm decides when the fill is ready, documented on real trajectories (`DOC_metric_algebra.md` ch. 6) |
+| ⭐ **it has a picture a person can check by eye** | `SNV(Q) − SNV(Qy)` **is** the metric. Almost no fitted index can be audited that way |
+
+### ⚠ What an outsider WILL find — and we wrote it down ourselves
+
+⛔ **The classes overlap across the archive: 7 of 88.** Alongside it: the threshold has never been checked
+against **independent ground truth**; `Q%` is **not solvent-portable** (it reads a green oil as brown in
+white spirit); it has not been tested across a lamp change; σ_fill is confirmed on **four fills of one
+oil**; and one oil in the panel (`Spar Premium`) has **no defensible label** (§13.2a).
+
+⇒ Anyone serious will test it and find these. **They are not to be hidden, and there is nothing to gain by
+trying** — they are already in three internal PDFs.
+
+### ⭐⭐ THE REFRAME — for the lab channel, the defensible claim IS the product claim
+
+`spectracs-references/business/SPEC_wirtschaftliches.md` makes **lab-as-channel-partner** the key route.
+⭐ A lab does not want a green/brown pill. It wants **a reproducible number with a documented error budget,
+a stated mechanism, and an honest account of what breaks it** — which is exactly what now exists, in three
+PDFs, with every constant traced to a measurement and every weakness named.
+
+⇒ ⭐ **The honesty is an ASSET on that route, not a liability.** A document set that opens with *"here is
+what is wrong with it"* is far more persuasive to someone who will test it than one that does not.
+
+### What closes the gap to the MILLER-facing verdict
+
+| | |
+|---|---|
+| **M9 — the pre-registration** | see the block above. Turns the next fills into a test instead of another fit |
+| ⭐⭐ **reference oils with ground truth from OUTSIDE the spectrum** | taste, the mill's roast record, provenance. ⛔ §16.31.4's standing blocker: no spectral quantity can supply it, because one pigment system means every spectral statistic is a projection of the same chemistry. **Mostly a conversation with a mill, not an engineering task** |
+
+⇒ **Advertise "a measurement you can audit", not "a verdict you can trust on any bottle".** The first is
+true today; the second is one honest evening plus a phone call away.
+
+---
+
 > **Big-picture view:** [`roadmap_map.svg`](roadmap_map.svg) — the **product value-chain** the items below
 > serve: the path one measurement travels (Setup → Capture → Process → Evaluate → Report → Publish → Bill)
 > over the platform/foundation layer, each stage **shaded by how complete the real end-user path is**
