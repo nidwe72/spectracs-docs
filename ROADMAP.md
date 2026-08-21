@@ -755,7 +755,23 @@ corrupt-data exposure to avoid). **Remaining debt is runtime/doc only** (R1 LAN-
 relabel was derived from the red far slope — which is the same region `dQ100` reads. `M448` cleared that bar
 by separating under **all three** treatments. **`dQ100` does not.** ⇒ it may not be quoted as evidence for the
 relabel it agrees with, and if `Spar Premium` is really green the main metric owns two errors.
-⭐ **This makes ROADMAP's extra `Spar Premium` fills block a SHIPPED decision, not a research one.**
+⚠⚠ **AND MORE FILLS OF IT MAY NOT SETTLE IT — corrected 2026-08-21 evening.** Excluded from the fit, `B`
+opens a **15-unit** gap (green max 52.93 → brown min 67.93) and `Spar Premium`'s three runs land **inside
+it**, at 63.08 / 63.06 / 65.78 — 70–85 % of the way across, on neither side. If the oil is genuinely
+intermediate then more fills locate that intermediate value more precisely and **settle nothing about the
+label**. What the tube actually blocks is any claim of the form *"metric X scores 0/88"*, because that
+count depends on a label the spectrum cannot justify (§16.31.3a: one pigment system, so every spectral
+statistic is a projection of the same chemistry).
+
+⇒ **Two ways out, and neither is more fills:**
+
+| | |
+|---|---|
+| ⭐ **exclude it and say so** | report **0 / 85** with the exclusion stated. This is the branch §16.31.3a explicitly allows, and both `dQ100` and `B` pass it |
+| ⭐⭐ **get ground truth from OUTSIDE the spectrum** | taste, the mill's roast record, provenance — for that one oil. Settles it permanently, and nothing else does |
+
+⚠ The extra fills are still worth taking for the *other* question they answer — whether that single tube is
+representative — but that is a research item, not a gate.
 
 **2 · ⚠ Every constant in the candidate family is fitted on the corpus it is scored on** — the `563–573`
 half-width (already flagged), and now also every mixing weight and threshold found this evening. Broad
@@ -1126,9 +1142,17 @@ produces a number nobody can use.
 
 ### ▶▶▶▶▶ 2 · THE BROWN OIL SERIES — series E, finally runnable  *(`SPEC_capture_quality.md` §16.11.11)*
 
+> ⚠⚠ **UPDATED 2026-08-21 — this is no longer a FIRST measurement, and the item is smaller than it reads.**
+> The Billa Clever sessions did what series E asks: `SPEC_settled_measurement.md` §39.7 records a **clean
+> set of four fills of one brown stock at sd 0.198–0.220**, comfortably inside the ≤0.3 pass condition.
+> ⛔ **What is owed is a CONFIRMATION, not a first run**, and for one specific reason: §39 then discovered
+> that light on the *waiting aliquot* is worth **+1.34 / +0.74 units — larger than the 0.20 scatter the
+> clean set reports.** That number was therefore taken before its dominant confound was known, with one
+> fill hand-rescued. ⇒ **the run is §35's T1 under P6′** (aliquots dark from the moment they are drawn),
+> five fills, one evening.
+
 ⭐ Brown is where the risk lives: it sits **1.297** from `T` against green's 1.651, so it is the class that
-decides whether ONE measurement is enough (§16.13's σ_fill ≤ 0.307 boundary). It has waited since
-2026-07-30 for a measurement worth spending it on; §28 says there now is one.
+decides whether ONE measurement is enough (§16.13's σ_fill ≤ 0.307 boundary).
 
 **The run:** six fills of ONE brown stock, identical handling — the capillary recipe and the 3-minute bath,
 nothing varied — each measured ONCE, all in one sitting. ⭐ Plus **one deliberately UNWARMED muddy fill**,
