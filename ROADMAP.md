@@ -1,5 +1,50 @@
 # Spectracs — Roadmap (working backlog)
 
+## ▶▶▶▶▶▶▶▶▶ WHAT TO DO NEXT  *(the standing TODO list — set 2026-08-21 evening. Ask "what to do next?" and start here.)*
+
+> ⭐ **Four desk items, then ONE lab evening.** The ordering is not preference — it is forced by one
+> dependency and one deadline, both named below. Everything else on this page is background to it.
+
+### ⛔ DESK — all four BEFORE any rig time
+
+| # | item | why it is here | where |
+|---|---|---|---|
+| **1** | ⛔⛔ **The clear-case read** | **the only item that fixes something currently WRONG.** `readAs = FIRST_SETTLED_WINDOW` returns the LAST look, not the first — up to **0.482 units**, one-directional, and it hits the GOOD fills. ⭐ And it **gates item 5**: σ_fill measured through a fill-specific bias (0.291 vs 0.008 `Q%`/min, a factor of 35) would bake that bias in, and fixing the read afterwards would invalidate the number | `SPEC_settled_measurement.md` §29 · ⚠ §29.6's trap: 2σ = 0.13 holds only at W = 60 — **derive it from the window, do not paste the number** |
+| **2** | **M3 — the `A_valley` ceiling** | metric-independent, and it is what refuses the fill that made `Q%` print a confident **8.45** — a GREEN verdict on a brown oil. Refuses a fill that should not be measured at all, whatever the metric | this file, M3 · `SPEC_settled_measurement.md` W3 |
+| **3** | ⏳ **W8 — record `A(563–573)` and `A(623–626)` per frame** | ⛔ **NOT RETROACTIVE, and that is the deadline.** Every run taken before this exists is permanently un-analysable for `dQ100` trajectories — including the next lab evening's, if it is not in first | `SPEC_settled_measurement.md` §52.7 |
+| **4** | ⭐ **M9 — the PRE-REGISTRATION** | **last**, so it freezes the constants as they will actually run. Windows · `k` (or `w`) · `T` · **and the prediction each makes for the fills about to be taken**. ⛔ This is the only route from "best candidate" to "validated"; everything else is another fit on the same 88 runs | this file, M9 · `SPEC_metric_research.md` §13.2 |
+
+### ⭐⭐ THEN — ONE LAB EVENING: `T1` under `P6′`
+
+**Five fills, aliquots DARK from the moment they are drawn.** One session now returns four things:
+
+| | |
+|---|---|
+| brown **σ_fill** confirmed | ⚠ not a first measurement — §39.7's clean set already gives sd **0.198–0.220** over four fills. What is owed is a confirmation under `P6′`, because §39 then found light on the waiting aliquot worth **+1.34 / +0.74 units — larger than the scatter being measured** |
+| the **pre-registered test** | item 4's frozen predictions, on fills the constants have never seen |
+| the first **`dQ100` trajectory** ever recorded | via item 3 |
+| item 1 **exercised on real fills** | |
+
+### 🔵 OFF THE RIG — decide `Spar Premium`
+
+⭐ Take the **exclude-and-say-so** branch now: report **0 / 85 with the exclusion stated**, which
+§16.31.3a explicitly permits. ⛔ More fills of that oil **cannot** settle its label — excluded from the fit
+it lands *inside* the 15-unit gap (63.08 / 63.06 / 65.78). Ground truth from outside the spectrum — taste,
+the mill's roast record, provenance — is the only permanent answer, and it is opportunistic, not a gate.
+
+### ⛔ DELIBERATELY NOT NEXT
+
+| | why not |
+|---|---|
+| **more metric algebra** | §13.1 — there is ONE axis and the variants differ in conditioning, not information. The next real gain needs the clamp moved, not another candidate |
+| **the lamp rebuild** | still blocked on testing the metrics against it — and after M9 that test becomes meaningful instead of another fit |
+| **the red extension** (item 5) | four arguments now point at it (§13.6), but it should FOLLOW the pre-registered test, so we know what we are extending *for* rather than re-deriving everything downstream |
+
+> ⭐ **If only one thing gets done: item 1.** It is the only entry on this list that repairs something
+> currently wrong rather than making something future better.
+
+---
+
 > **Big-picture view:** [`roadmap_map.svg`](roadmap_map.svg) — the **product value-chain** the items below
 > serve: the path one measurement travels (Setup → Capture → Process → Evaluate → Report → Publish → Bill)
 > over the platform/foundation layer, each stage **shaded by how complete the real end-user path is**
