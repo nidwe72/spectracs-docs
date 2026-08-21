@@ -713,7 +713,217 @@ corrupt-data exposure to avoid). **Remaining debt is runtime/doc only** (R1 LAN-
 
 ---
 
-## ▶▶▶▶▶▶ HIGHEST PRIORITY — TWO ITEMS, IN THIS ORDER  *(Edwin 2026-08-18)*
+## ▶▶▶▶▶▶▶ DECIDED 2026-08-21 — `dQ100` BECOMES THE MAIN METRIC, AND ISOPROPANOL STAYS  *(Edwin; DESIGN SETTLED, nothing built)*
+
+> ⭐⭐ Two decisions, taken after a night of analysis on `20260821LugitschA` / `20260821BillaCleverA` and a
+> re-reading of the whole archive. The write-up is [`SPEC_metric_research.md`](../spectracsPy/docs/SPEC_metric_research.md)
+> §12; the session that produced it is `SPEC_capture_quality.md` §16.12.7f and `SPEC_settled_measurement.md` §52.
+
+### The two decisions
+
+| | |
+|---|---|
+| ⭐⭐ **`dQ100 v2` is the main metric** | it owns the verdict pill |
+| ⭐ **`Q%` stays, as a NUMBER only** | ⛔ its gauge is retired — the report must never show two contradictory pills (they disagree on 5 of 6 runs of the Spar session). `Q%` remains the reference reading and the tracker's fallback |
+| ⭐⭐ **the shipping solvent stays ISOPROPANOL** | white spirit is **deferred to an experiment on an already-shipped metric**, not a prerequisite for shipping one |
+| ⚠ **white spirit's contribution stands** | it is what made the 624 nm band visible enough to find. That debt is real and is recorded in §16.12.7f |
+
+### The metric
+
+```
+                mean A over [563, 573]  -  mean A over [623, 626]
+  dQ100 = 100 x ---------------------------------------------------
+                       sd of A over [448, 626]
+```
+
+- on the **de-spiked RAW absorbance** — ⛔ no baseline, no pedestal correction, no SNV applied first
+- ⭐⭐ **NATIVE SAMPLING**, the same convention `V` uses (§10.1a) — ⛔ **not** a resampled grid. Measured:
+  a 0.25 nm resample shifts every run by up to 0.889 units and moves `T` from 30.03 to 29.64. The two
+  give different numbers and only one of them is the one that was validated.
+- **higher = browner.** Negative means the 624 nm band stands *taller* than the 563–573 one — the
+  intact-pigment state. ⭐ Zero is a real landmark, not an arbitrary origin, which is why there is **no shift**.
+- ⭐ dilution- and flat-pedestal-invariant **by construction**: the numerator is a difference (an additive
+  `b` cancels) and `sd` is offset-blind and scales with `c`.
+
+### The gauge — it draws itself, and no number in it is invented
+
+```
+   within-session sd, median over 15 sessions  =  7.65 % of the 40.5 gap  =  3.10 units
+   T +/- 1 sigma                               =  26.9 .. 33.1
+   the archive's own EMPTY CORRIDOR            =  26.6 .. 33.5     <- the same interval
+```
+
+| | |
+|---|---|
+| `dQ100 < 26.6` | good — green |
+| `26.6 .. 33.5` | **borderline — re-measure** ⭐ = the empty corridor = the measured within-fill sd |
+| `dQ100 > 33.5` | probably too brown |
+| band `[-35, +65]` | headroom past the corpus (−26.9 … +59.2) |
+| domain guard | same withhold-don't-clamp contract as `V_VERDICT_BAND`: outside the band the numbers and the plot survive, only the **pill** is withheld |
+
+⭐ `T = 30.0`. Three classes, not two, for the same reason `RoastQPercentGaugeView` has three: a fill whose
+runs straddle the line has no verdict and the gauge must say so.
+
+### Why — the evidence, all of it on the ISOPROPANOL archive
+
+```
+  68 runs · 8 named oils · 16 sessions · both rig eras · all isopropanol
+  ----------------------------------------------------------------------
+                            Q%           dQ100 v2
+   corridor               -1.660          +6.85
+   misclassified          5 / 68          0 / 68
+  ----------------------------------------------------------------------
+  the 5 runs Q% gets wrong are ALL the Spar session — the two adjacent oils
+  it has never separated, and 4.3 already flags as an extrapolation:
+     Spar ggA    /001 /002 /003   Q% 18.06-18.80 -> BROWN   dQ100 +17..+23 -> green
+     Spar Premium/001      /003   Q% 17.14,17.87 -> GREEN   dQ100 +35,+37  -> brown
+  ⭐ and dQ100 agrees with §16.30.1a's relabel of Spar Premium, where T_V contradicts it.
+```
+
+**Out of sample, across the rig rebuild** (2026-07-27, a *different lamp*, judged on the post-rebuild
+threshold it never saw, diffuser-IN runs excluded):
+
+```
+   Q%      green 8/11 correct · brown 9/9   corridor -1.558  OVERLAP
+   dQ100   green 11/11        · brown 9/9   corridor +17.33  CLEAN     <- 20 of 20
+```
+
+⭐ And it sees ageing where `Q%` cannot: the 24 h set moves `dQ100` to **1.93×** its own alarm threshold
+against `Q%`'s **1.04×**.
+
+### ✅⭐⭐ R1 IS DONE — 2026-08-21, and the turbidity confound is NOT THERE  *(`SPEC_metric_research.md` §12.11)*
+
+The one question that gated the pill: does `dQ100` separate green from brown **because brown oils scatter
+more**? Answered on 68 archived runs, analysis only, no rig time. Turbidity index
+`tau = A(510–540)/A_Soret`, concentration-free.
+
+```
+  ⭐⭐ THE DECIDING TEST — ANCOVA, the turbidity coefficient pooled from WITHIN-session
+     deviations only, so every between-oil difference is removed:
+
+              within-session slope      between-class slope     ratio
+   dQ100          -21.4  (r -0.13)          +1349.1           -63x   OPPOSITE SIGN
+   Q%             +10.4  (r +0.36)           +138.5           +13x   same sign
+
+  If turbidity drove the separation the two slopes would AGREE. For dQ100 they point in
+  OPPOSITE directions. => adjusting for turbidity makes the corridor WIDER: +6.846 -> +6.950
+
+  ⭐ AND AT MATCHED TURBIDITY THE CLASSES STILL SEPARATE, IN EVERY BIN:
+     tau 0.060-0.090  gap 27.50 CLEAN | 0.090-0.110  gap  6.85 CLEAN
+     tau 0.110-0.130  gap 21.81 CLEAN | 0.130-0.160  gap 14.53 CLEAN
+```
+
+⚠ **The contamination belongs to `Q%`, not `dQ100`** — `Q%`'s within-session slope has the SAME sign as its
+between-class slope, and turbidity explains 21 % of its variance against `dQ100`'s 12 %.
+
+⛔ **Two corrections to this project's own earlier alarm** (§12.11d): the `r = −0.94` figures were
+per-session correlations on n ≈ 6 whose slopes scatter from −718 to +75 — noise wearing a coefficient; and a
+naive **pooled** regression of `dQ100` on `tau` is the wrong adjustment, because the classes differ in both
+variables and a pooled fit removes the class signal along with the covariate.
+
+⚠ **R1 is an ELIMINATION, not an identification.** It rules out the one alternative we could name. **S1, the
+acid test, is what would make the claim positive**, and it is still unrun. The designed version of R1 is
+still **R2** — one monitored fill with `W8`'s columns, read through a full clearing curve.
+
+⇒ ⭐ **THE PILL IS NO LONGER BLOCKED.**
+
+### ⚠ What remains open
+
+Two debts. The `563–573` window half-width was chosen on the same corpus it is scored on
+(leave-one-oil-out 94 %, but still fitted); and the green class is **bimodal** — Ja!Natürlich (−26) and
+Lugitsch (−16) sit 30 units below Kiendler / Steirerkraft / Spar ggA (+11…+19), four corridor-widths
+apart. Real structure or a mislabel, and worth knowing before the threshold hardens.
+
+### The settling algorithm — ⭐ DO NOT REPOINT IT YET
+
+`ClearingEvaluator` keeps watching `Q%`. §51 shipped it, 511 tests are green, and it is correct.
+⛔ **`dQ100` has never been recorded per-frame** — the `MonitorRecord` carries `qPercent · soret · valley ·
+qBand` and neither `A(563–573)` nor `A(623–626)` exists in any run ever taken. **No `dQ100` settling curve
+has ever been observed**, and designing a gate for a curve nobody has seen is how §16.17 happened.
+
+⚠ Theory and evidence disagree about what that curve looks like, which is exactly why it must be measured:
+
+| | |
+|---|---|
+| theory says | a flat pedestal cancels in the numerator and leaves `sd` untouched ⇒ clearing is **invisible** to `dQ100` ⇒ flat, then rising ⇒ **no minimum**, the first look is the answer, and §40's drawdown / §41's D2 / the hunt / the vertex are simply **inapplicable** |
+| the data says | `r = −0.94` against `A_valley` ⇒ it may well **have** a clearing limb after all |
+
+⇒ **W8 then one run decides it.** If flat-then-rising: read the first look and do not apply the vertex
+machinery to `dQ`. If V-shaped: the existing rules transfer unchanged and only the column changes.
+⭐ Nothing is deleted either way.
+
+### The build list
+
+```
+ ==============================================================================================
+  DESK — no rig time
+ ----------------------------------------------------------------------------------------------
+  M1  dQ100 v2 metric row beside Q%; both bands marked on the "Absorption (bands)" plot
+  M2  W8 — record A(563-573) and A(623-626) as MONITOR_COLUMNS
+      ⛔ BEFORE any further lab session, and ⛔ NOT retroactive: every run taken before
+         this is permanently un-analysable for dQ trajectories.
+      ⭐ Specified in SPEC_settled_measurement.md §52.7
+  M3  W3 — extend `tooDark` with an absolute A_valley ceiling (0.21)
+      reuses D1's dropping, §32.4a's carryOn and NEVER_SETTLED's no-value contract;
+      metric-independent — it refuses a fill that should not be measured at all.
+      On BC-1 all nine rows become "not a look" and the run waits instead of latching at 6.7 s
+  M4  the gauge above; retire Q%'s gauge, keep its row
+  M5  a core `bandSd(spectrum, lo, hi)` — the plugin tier carries no numpy (§1)
+  M6  tests: the worked example, the 8-oil ladder as a fixture, the 5 Spar runs as a
+      regression guard, and a native-vs-resample assertion so the convention cannot drift
+  M7  ✅ DONE 2026-08-21 — four spec corrections written:
+        · §16.11.16 item 3 — LIGHT DOSE is a fourth confound on set A; the mechanism
+          paragraph predates §16.36 and §39 and attributed the browning to time+temperature
+        · §16.11.15's working-window note — the binding requirement is DARK (P6'), not FAST;
+          ⚠ the DARK ageing rate has still never been measured (-> S2)
+        · KB_spectroscopy_physics §4.1a — ⛔ the Q band is ~568 nm, NOT ~574; the "574" is
+          the ramp into the 581 nm Bayer crossover. The Qy at 623-626 is unaffected and is
+          now confirmed a FOURTH time by the white-spirit fills (622.8-625.0 nm)
+        · DOC_lamp_rebuild §6.1 — NEW: what the ~583 nm step COSTS. It sits inside the
+          shipped A_Q window (565-580); `Pigment D_Q` finds the ramp rather than the pigment
+          in 93 % of 110 isopropanol runs; ⚠ and trimming A_Q off it does NOT rescue Q%
+          (measured: d 2.78 -> 2.33-2.45, still overlapping) so V's windows must NOT be re-tuned
+  M8  ⛔ resolve the STALE SEALED dev-plugin row v1.1.0 (§51.0) BEFORE publishing —
+      a core/plugin skew fails SILENTLY; §45's readPhase is the detector
+ ==============================================================================================
+  MEASUREMENT
+ ----------------------------------------------------------------------------------------------
+  R1  ✅ DONE 2026-08-21 — the turbidity arm. dQ100 survives at matched turbidity in all
+      four populated bins; within-session and between-class slopes have OPPOSITE signs.
+      §12.11. ⇒ the pill is unblocked. ⚠ an elimination, not an identification.
+  R2  one monitored fill WITH W8 -> the first dQ100 trajectory ever recorded -> decides
+      the settling question above, AND is the DESIGNED version of R1
+ ==============================================================================================
+  OPEN SCIENCE — unscheduled
+ ----------------------------------------------------------------------------------------------
+  S1  the ACID TEST, in isopropanol. Pheophytinisation is acid-catalysed and irreversible;
+      if a trace of acid drives dQ100 hard in the brown direction it stops being a
+      correlation on 8 oils and becomes a measurement of the protopheophytin :
+      protochlorophyll ratio that `KB_spectroscopy_physics.md` §4.1 already nominates as
+      THE quality axis. ⚠ Do it in IPA, not white spirit — acids barely dissociate in a
+      de-aromatised hydrocarbon.
+  S2  DARK ageing rate — one foil-wrapped vial, read 0 / 4 h / 1 d / 3 d / 7 d.
+      Separates "time" from "light dose", which no run on disk does (§39.6/P6').
+  S3  the bimodal green class — real structure, or a mislabel?
+  S4  WHITE SPIRIT, as an experiment: 5 oils x >= 3 INDEPENDENT dilutions, GATE 0/1/2 first,
+      P6' dark aliquots, arm B (dilution invariance — still untested and can still refuse
+      the solvent), and one deliberate optics perturbation.
+      ⚠ Its cost is now visible: a solvent switch ZEROES the history tracker's reference
+      library (143 IPA reports -> 0) and needs 3 fills per oil before it can alarm once.
+ ==============================================================================================
+```
+
+### ⛔ The known failure mode, carried forward
+
+**A paper diffuser erases the 624 nm band.** `20260727B` is the archive's diffuser A/B test (§16.7.2f):
+diffuser IN → `R` 0.121 ± 0.126 with `P2` collapsing to ~0; diffuser OUT → 0.635 ± 0.013. `dQ100 v2` is the
+only candidate that survives it — but by **0.9× its corridor**, i.e. an optics change of that size eats 92 %
+of the decision margin. ⚠⚠ **`SPEC_lamp_rebuild.md`'s rebuild is a far larger optical change than a
+diffuser. Test `dQ100` against it BEFORE ordering, not after.**
+
+---
+
+## ▶▶▶▶▶ PREVIOUS TOP PRIORITY — TWO ITEMS, IN THIS ORDER  *(Edwin 2026-08-18; ⚠ still open, now BELOW the 2026-08-21 decision above)*
 
 > ⭐⭐ The measurement below (ONE FILL, ONE WAIT) is **BUILT and PROVEN ON THE RIG** — see
 > [`SPEC_settled_measurement.md`](../spectracsPy/docs/SPEC_settled_measurement.md) §27 (as-built) and §28
