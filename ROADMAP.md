@@ -710,10 +710,183 @@ corrupt-data exposure to avoid). **Remaining debt is runtime/doc only** (R1 LAN-
 > 5. ⭐ **The gauge/verdict split** — see the new item below.
 >
 > **▶ PRIORITY ORDER SET BY EDWIN 2026-08-06:**
+>
+> ⭐⭐ **UPDATE 2026-08-21 (evening) — `Q%` KEEPS THE VERDICT; `dQ100 v2` SHIPS AS A SCALAR.** The morning's
+> *"`dQ100` owns the pill"* decision is **reversed on the verdict half** — `dQ100` fails §16.31.3a's bar
+> under the `Spar Premium` relabel, and every constant in the family is still fitted on the corpus it is
+> scored on. `Q%` keeps the gauges, the history tracker and the too-brown verdict; `dQ100 v2` is printed
+> as a number beside it. ⭐ The evening also produced two better packagings (`B`, `Q%_k`), the rule that
+> *differences survive and ratios do not*, and four independent arguments for the **red extension past
+> 660 nm**. ⬇ First section below.
 
 ---
 
-## ▶▶▶▶▶▶▶ DECIDED 2026-08-21 — `dQ100` BECOMES THE MAIN METRIC, AND ISOPROPANOL STAYS  *(Edwin; DESIGN SETTLED, nothing built)*
+## ▶▶▶▶▶▶▶▶ DECIDED 2026-08-21 (evening) — `Q%` KEEPS THE VERDICT; `dQ100 v2` BECOMES A SCALAR UNDER EVALUATION  *(Edwin; DESIGN, nothing built)*
+
+> ⭐⭐ **This REVERSES the verdict half of the decision immediately below, taken the same morning.** The metric
+> research behind `dQ100` is unchanged and still stands — what changed is how much of it may be *shipped*
+> before it has been tested on data it was not fitted on. The evening session re-measured the whole archive
+> from the reports on disk (133 traces, 88 labelled runs) and answered four of Edwin's questions in order:
+> is `Q%` more reproducible · can `A_valley` be the baseline · can the two bands be compared against a local
+> reference · can `Q%` and `dQ100` be combined. ⭐ **The research record is `SPEC_metric_research.md` §13.**
+
+### The decision
+
+| | |
+|---|---|
+| ⭐⭐ **`Q%` keeps the gauges, the history tracker and the "too brown" verdict** | it stays exactly as shipped — `RoastQPercentGaugeView`, `T_V = -18.6`, the tracker band, `ClearingEvaluator`'s `qPercent` column. ⛔ **Nothing is repointed** |
+| ⭐ **`dQ100 v2` is evaluated as a metric SCALAR** | printed as a number beside `Q%`, both band pairs marked on the plot. ⛔ **No pill, no gauge, no verdict, no tracker alarm** until it is pre-registered and tested out of sample |
+| ⛔ **`M4` is WITHDRAWN** | *"retire `Q%`'s gauge"* does not happen. The report shows ONE pill — `Q%`'s — and `dQ100` as a figure beside it |
+| ⭐ **the shipping solvent stays ISOPROPANOL** | unchanged from the morning decision |
+
+### Why the reversal — three measurements, in order of weight
+
+**1 · ⛔⛔ `dQ100`'s `0 / 68` is conditional on ONE contested label, and it fails `SPEC_capture_quality.md`
+§16.31.3a's own bar.** Scored under all three treatments of `Spar Premium`:
+
+```
+                       Premium BROWN        Premium GREEN        Premium EXCLUDED
+                    corridor    mis      corridor    mis       corridor    mis
+   Q%                 -2.807   7 / 88      -2.807   6 / 88       -2.807   6 / 85
+   dQ100 v2           +6.846   0 / 88   ⛔ -0.280   2 / 88      +10.011   0 / 85
+```
+
+§16.31.3a's rule is *"no statistic may be quoted under a labelling derived from it"*, and the `Spar Premium`
+relabel was derived from the red far slope — which is the same region `dQ100` reads. `M448` cleared that bar
+by separating under **all three** treatments. **`dQ100` does not.** ⇒ it may not be quoted as evidence for the
+relabel it agrees with, and if `Spar Premium` is really green the main metric owns two errors.
+⭐ **This makes ROADMAP's extra `Spar Premium` fills block a SHIPPED decision, not a research one.**
+
+**2 · ⚠ Every constant in the candidate family is fitted on the corpus it is scored on** — the `563–573`
+half-width (already flagged), and now also every mixing weight and threshold found this evening. Broad
+plateaus and 100 % leave-one-oil-out say the *choices* are stable; they do not make the corridor numbers
+free. ⇒ **pre-registration is the remedy** (see the build list).
+
+**3 · ⭐ For the TRACKER specifically, `Q%` is the better scalar, and this is now measured.** On repeat fills
+of one oil `Q%` resolves 0.076–0.128 units between pours; `dQ100`'s within-fill scatter is several times
+larger in the same terms, and on the capillary panel's Steirerkraft it reads 8.64 → 12.88 → 18.62 across
+three runs (sd **5.01**) while `Q%` moves 0.45. ⇒ `[[spectracs-history-tracker-spec]]`'s drift scalar stays
+`Q%`. *(The reverse is also true and is why `dQ100` stays on the page: per unit of the green→brown DECISION
+`dQ100` is 2.4× better — within-fill scatter 10.7 % of the class gap against `Q%`'s 26.2 %.)*
+
+**4 · the settling algorithm could not be repointed anyway** — `W8` is still unbuilt, `dQ100` has never been
+recorded per frame, and no `dQ100` settling curve has ever been observed (`SPEC_settled_measurement.md`
+§52.7a). Unchanged by this decision.
+
+### ⚠ The two risks this decision accepts, recorded openly
+
+| risk | measured | mitigation |
+|---|---|---|
+| ⛔ **`Q%` misreads a green oil in WHITE SPIRIT** | `20260821LugitschA` — a green oil, both runs read 20.79 / 20.62 ⇒ **BROWN**. `dQ100` (−4.9), `Q%₀.₇₅` (4.16) and `B` (28.55) all read green. The only genuinely out-of-sample data in the settled set, and `Q%` goes 2 / 4 while the red-band forms go 4 / 4 | white spirit is deferred to `S4`; ⚠ the verdict pill must **never** be shown on a non-IPA fill until `S4` runs |
+| ⚠ **`Q%`'s brown margin is thin where it matters** | matched-recipe pair (Lugitsch 7 runs vs Billa Clever 6, both fully settled): `Q%`'s worst brown fill clears `T` by **1.8 sd = 6.9 % of the gap**, against `dQ100` 4.4 sd / 14.7 % and `B` 7.4 sd / 18.8 %. The green side is comfortable (12–16 sd) on every metric | the brown class is the binding one — this is the same finding series E was already commissioned for (§16.11.11) |
+| ⛔ **`Q%` returns a badly wrong GREEN on an opaque fill** | `20280819BillaClever/003` → `Q%` 8.45 ⇒ green on a brown oil. `dQ100` (180.7) and `B` (194.3) stay BROWN — but with obviously-broken values, which is the safer failure | `M3` — the `A_valley` ceiling in `tooDark` — is what actually fixes this, and it is metric-independent. ⭐ **Raised in priority by this decision** |
+
+### ⭐ What the evening session ADDED to the metric picture
+
+**The two packagings that came out of it** — both `0 / 88`, both 100 % leave-one-oil-out, both DESIGN only:
+
+```
+   B      =  dQ100 + 1.617 x Q%                                   T = 58.0
+   Q%_k   =  100 [ (A_Q - A_valley) - k (A_Qy - A_valley) ] / A_Soret     k = 0.75, T = 11.36
+```
+
+| | |
+|---|---|
+| `Q%_k` — what it is | **`Q%` with a red-band term.** `k = 0` is `Q%` exactly; anywhere in `k = 0.5 … 1.0` it goes from `7 / 88` to `0 / 88`. Best noise-to-margin measured all session: **0.28×** against `dQ100`'s 0.63×. ⭐ Keeps `Q%`'s units, its pill, and continuity with 143 archived reports — **one new constant and one extra band mean** |
+| `B` — what it is | best robustness measured: diffuser **0.71×**, dose **0.23×**, and `0 / 88` under all three `Spar Premium` treatments |
+| ⭐⭐ **and they are the same axis** | `r(Q%₀.₇₅, dQ100) = 0.990` · `r(B, dQ100) = 0.997`. **Once the red band is in `Q%`, `dQ` has been re-derived.** The variants differ in CONDITIONING, not in information |
+| ⚠ the bar-passing is not a deep property | whether a form clears §16.31.3a is a continuous function of how much `Q%` weight it carries (`k = 0.50` and `B` pass; `k = 0.75` gives 3; `dQ100` gives 2). It costs ~30 % of the decision margin and must be chosen deliberately |
+
+**⭐⭐ The finding that decides where the metric research goes next:** the measured green→brown direction in
+SNV space is **+0.12 at 571 nm and −0.14 at 624–626 nm** — i.e. the optimal linear read available in
+440–630 nm is a positive weight on the Q band and a negative one on the Qy band, **which is what `dQ100`
+already computes.** ⇒ **metric algebra inside this window has hit diminishing returns.** What is left is
+windows, conditioning, and the clamp.
+
+### ⛔ What was REFUTED this evening — the durable part
+
+| idea | result |
+|---|---|
+| `A_valley` as the DENOMINATOR of `dQ` | worst option measured, `11 / 88`. The level swings **19×** across the archive (0.013–0.248 A) — it is the fill's pedestal, not the oil's property |
+| a chord through the valley and ~600 nm | ⭐ it *works* — corridor doubles, noise-to-margin 0.63× → 0.24× — but ⛔ **it is a third band read, not a baseline**: `A(600–606)/A_Soret` carries class signal at *d* = 1.23 while `A(623–626)/A_Soret` is the QUIETEST window in the red (*d* = 0.45). A right-anchor scan shows a broad plateau 588–603 and a **cliff at 606** — the 607 nm lamp line, which the ~1 nm de-spike does not remove |
+| the 590–615 rise as a SLOPE or a STEP | ⛔ 5–43 misclassified. The 607 nm line sits in the middle and the two sides behave differently |
+| the trough between the bands as a baseline | ⛔ **there is no trough.** The argmin pins against its own search edge in 43 / 93 runs; with the bump excised the deepest point is a coin flip between two sides 10 nm apart (sd 5–7 nm) |
+| one horizontal line + the two band AREAS above it | ⛔ `7–15 / 88`, under all four ways of drawing the line, for the same reason as `/A_valley` |
+| the two-species (protochlorophyll → protopheophytin) model, *inside our window* | ⛔ PC1 of the SNV'd red region is the **lamp**, not the oil (46 % of variance, loading a dipole on 608–610 nm, and it does **not** separate the classes) · ⛔ **no isosbestic point** (every class-mean crossing has *d'* = 0.01–0.48) · ⛔ the archive cannot supply the degradation direction (within-fill drift vs the class axis, cos ≤ 0.57; the +24 h aged pair only +0.40) |
+| the Qy peak POSITION by parabola | ⛔ unconstrained on a shoulder (green 626.4 ± 129.6 nm) |
+| the RED CENTROID | ⭐ the one position metric that works — green **617.31 ± 0.63 nm** vs brown **611.87 ± 1.39 nm**, `0 / 88`, and the **best diffuser robustness of anything measured (0.26×)**. ⚠ But it integrates to 626 nm — the clamp — so it is a truncated statistic. Parked as a candidate |
+
+⭐⭐ **THE RULE THAT UNIFIES ALL OF IT, and it is worth more than any single candidate:**
+
+> **Differences of equal-width windows survive; ratios of baseline-subtracted quantities do not.**
+> Every candidate baseline in this spectrum — valley, trough, flat bottom, the 607 nm bump — varies **more
+> between fills than between oils**. A difference cancels it exactly. A ratio multiplies by it.
+
+That is `SPEC_metric_research.md` §12.8c's `R`-versus-`(3)/(2)` finding, re-derived from three independent
+directions on the same evening. ⇒ **no future candidate may divide by a locally-estimated baseline.**
+⚠ One trap inside the rule: the windows must be **equal width**, or the baseline does not fully cancel
+(20 nm vs 9 nm leaves a residual `b × Δwidth` term — measured, r = 0.926 rather than 1.000).
+
+### ⭐⭐ THE CLAMP IS NOW THE BINDING CONSTRAINT — not the arithmetic
+
+Four independent lines hit the same 630 nm wall in one evening:
+
+| line | how it hits the clamp |
+|---|---|
+| the red centroid | integrates to 626 nm ⇒ a truncated centroid is biased by wherever you truncate |
+| the two-species model | the chl→pheo isosbestic lives near 660–680 nm, outside |
+| valley-to-valley baselines | there is only ONE real valley inside the window (500–560); the second sits ~640–660 nm |
+| Qy itself | read as a **shoulder**, never as a band — which is why the parabola fit is unconstrained |
+
+⇒ `ROADMAP` item 5's **red extension past ~660 nm** now has four arguments it did not have this morning,
+on top of `KB_spectroscopy_physics.md` §4.1's own note that the widening *"should be re-costed"* on the
+≈625 nm Qy finding. ⚠ Nothing here is a metric problem.
+
+### ⭐ DOC ITEMS — for the next internal PDF  *(Edwin's call, 2026-08-21 evening)*
+
+| | to be written up, with the figure |
+|---|---|
+| ⭐⭐ **the band relation, and that it IS the metric** | `SNV(Q) − SNV(Qy)` equals `dQ100 / 100` **exactly** — verified to **1.1e-15** over 133 runs, because the SNV mean cancels in the difference and only the SNV scale survives. Brown sits ABOVE green at the Q band (*d* = **+2.03**) and BELOW it at the Qy band (*d* = **−2.33**) — the relation **reverses**. ⭐ Turbidity does not fake it: the within-fill slopes (green −0.84, brown +1.18) cannot even agree with each other, and the classes stay apart at every pedestal level. ⚠ The identity holds **only** when the SNV window is `dQ100`'s own 448–626 (a 440–626 window shifts it by −8.90 ± 16.30 units). ⇒ **the metric has a picture a person can verify by eye**, which almost no fitted index has |
+| ⭐ **two metrics, distinct bands, one direction** | `r(Q%, dQ100) = +0.842` — they use different bands and different references, yet point the same way; ~29 % of the variation is independent, which is exactly why blending them gains anything at all. ⭐ And once the red band enters `Q%`, `r` rises to **0.990** ⇒ one axis, three packagings |
+| figure | rendered: `~/spectracs_band_relation.png` (4 panels — raw / SNV / per-oil / turbidity control) and `~/spectracs_recipe_pair.png` (the 13 matched-recipe settled runs, margins to threshold). ⚠ Both are scratch renders — the doc versions must be regenerated from a committed script |
+
+### Build-list changes
+
+```
+ ==============================================================================================
+  CHANGED BY THIS DECISION
+ ----------------------------------------------------------------------------------------------
+  M1  UNCHANGED and now the whole of the dQ100 delivery: a dQ100 v2 metric ROW beside Q%,
+      both band pairs marked on the "Absorption (bands)" plot. A NUMBER, not a verdict.
+  M3  RAISED IN PRIORITY - the A_valley ceiling in `tooDark`. It is metric-independent and
+      it is what actually protects against the 003-style opaque fill that made Q% print 8.45.
+  M4  |X| WITHDRAWN - Q%'s gauge is NOT retired. One pill, and it is Q%'s.
+  M6  add to the test list: a regression guard pinning Q% as the verdict source, so a later
+      refactor cannot silently repoint the pill.
+  M9  NEW - PRE-REGISTRATION BLOCK. Before the next rig session, freeze IN WRITING:
+      the windows, k (or w), and T for whichever red-band form is carried forward, plus the
+      prediction each makes for the fills about to be taken. Then let the new fills test it
+      on data it has never seen. |X| This is the ONLY thing that converts today's best
+      candidate into a validated one; everything else is another fit on the same 88 runs.
+  M10 |X| DONE 2026-08-21 - the write-ups landed, with committed generators:
+      . SPEC_metric_research.md §13 - the research record: one axis, the RULE, the refuted
+        list, the coupling + conserved sum, the Soret correction, the clamp, the solvent
+      . DOC_sample_physics.md §3.4a  -> Spectracs_LightPigmentSolvent.pdf  (Figure 5)
+      . DOC_metric_algebra.md RESTRUCTURED -> Q% is chapter 5, the settling algorithm is 6,
+        dQ100 is 7; the Pigment Index moved to Appendix E, its far-anchor history to Ea;
+        §5.8 carries the see-saw and §5.2 the numerator/denominator decomposition
+      . docs/tools/build_tilt_figures.py      -> figures/tilt_seesaw.svg
+      . docs/tools/build_settling_figures.py  -> settling_sequence / _cases / _drawdown .svg
+      . diagnostics/metric_algebra_plots.py   -> Figure 2 now shades the SHIPPED windows and
+        draws NO baseline (it implied Q% subtracts something, and it subtracts nothing)
+      |X| STILL OWED: the three settling figures read their trajectory cache from a /tmp
+          scratch file. Fold that extraction into the generator before relying on them.
+ ==============================================================================================
+```
+
+---
+
+## ▶▶▶▶▶▶▶ ⚠ SUPERSEDED ON THE VERDICT 2026-08-21 (evening) — `dQ100` BECOMES THE MAIN METRIC, AND ISOPROPANOL STAYS  *(Edwin; the METRIC RESEARCH stands, the VERDICT half is reversed by the section above)*
 
 > ⭐⭐ Two decisions, taken after a night of analysis on `20260821LugitschA` / `20260821BillaCleverA` and a
 > re-reading of the whole archive. The write-up is [`SPEC_metric_research.md`](../spectracsPy/docs/SPEC_metric_research.md)
@@ -723,8 +896,8 @@ corrupt-data exposure to avoid). **Remaining debt is runtime/doc only** (R1 LAN-
 
 | | |
 |---|---|
-| ⭐⭐ **`dQ100 v2` is the main metric** | it owns the verdict pill |
-| ⭐ **`Q%` stays, as a NUMBER only** | ⛔ its gauge is retired — the report must never show two contradictory pills (they disagree on 5 of 6 runs of the Spar session). `Q%` remains the reference reading and the tracker's fallback |
+| ⛔ ~~**`dQ100 v2` is the main metric — it owns the verdict pill**~~ | **REVERSED the same evening** — `Q%` keeps the pill, `dQ100 v2` ships as a scalar under evaluation. See the section above |
+| ⛔ ~~**`Q%` stays, as a NUMBER only**~~ — **REVERSED**, `Q%` keeps its gauge, the tracker and the verdict | ~~its gauge is retired — the report must never show two contradictory pills (they disagree on 5 of 6 runs of the Spar session)~~. ⭐ The two-pill argument still holds and is why `dQ100` ships as a NUMBER: **one pill, and it is `Q%`'s** |
 | ⭐⭐ **the shipping solvent stays ISOPROPANOL** | white spirit is **deferred to an experiment on an already-shipped metric**, not a prerequisite for shipping one |
 | ⚠ **white spirit's contribution stands** | it is what made the 624 nm band visible enough to find. That debt is real and is recorded in §16.12.7f |
 
@@ -867,7 +1040,7 @@ machinery to `dQ`. If V-shaped: the existing rules transfer unchanged and only t
       reuses D1's dropping, §32.4a's carryOn and NEVER_SETTLED's no-value contract;
       metric-independent — it refuses a fill that should not be measured at all.
       On BC-1 all nine rows become "not a look" and the run waits instead of latching at 6.7 s
-  M4  the gauge above; retire Q%'s gauge, keep its row
+  M4  |X| WITHDRAWN 2026-08-21 evening - Q%'s gauge is NOT retired. One pill, and it is Q%'s.
   M5  a core `bandSd(spectrum, lo, hi)` — the plugin tier carries no numpy (§1)
   M6  tests: the worked example, the 8-oil ladder as a fixture, the 5 Spar runs as a
       regression guard, and a native-vs-resample assertion so the convention cannot drift
