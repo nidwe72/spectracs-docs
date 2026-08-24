@@ -45,6 +45,31 @@ the mill's roast record, provenance — is the only permanent answer, and it is 
 
 ---
 
+### ✅ DONE SINCE — the colour pass  *(2026-08-24; does not change the four items above)*
+
+The colour chips were rebuilt end to end: HSL retired from the readout, one CIE path for every chip,
+eleven chips became four, and **all 203 archived reports re-rendered onto them**. 583 tests green,
+`SDK_VERSION` unchanged. `SPEC_color_retrieval.md` §7.15 is the contract; **`spectracs-docs/internal/
+Spectracs_ColourGeometry.pdf`** ("From Spectrum to Colour", 30 pp) is the documentation.
+
+⛔ **Three colour claims died on the 88-run archive, and that is the useful part:** purity does not
+discriminate ($d$ = 0.56), dominant wavelength is undefined on 31 % of runs and correlates with the
+capture's blue edge at $r$ = 0.923, and the complement is outside the spectrum locus on 10 %.
+⭐ The absorbed direction is **244.06 ± 1.25° across the whole archive** — a constant of the pigment
+family. **Colour is a visual aid; it is not a discriminator, and now that is measured rather than
+suspected.**
+
+⏸ **What it ADDS to the backlog — one rig item, and it is cheap:**
+
+| | item | why |
+|---|---|---|
+| **E3** | measure the **WIDTH of the 608–610 nm lamp line** with an isopropanol fill and with a white-spirit fill | decides whether an emulsion costs spectral RESOLUTION. If it does, `R` is the most scatter-sensitive quantity in the project and the SOLVENT is part of its specification — `SPEC_metric_research.md` §12.4a, `SPEC_color_retrieval.md` §7.16.5. **One number off two spectra that would be taken anyway** — fold it into the next lab evening rather than scheduling one |
+| ⏸ | rig click-through of the new chips | nothing colour-related has been seen on the bench; the evidence is 583 tests |
+
+⚠ **Not a reason to reopen anything above.** The metric work is untouched: colour never fed a verdict.
+
+---
+
 ## ▶▶▶▶▶▶▶▶ WHAT WE CAN CLAIM FOR `Q%` — defend vs advertise  *(Edwin 2026-08-21 evening)*
 
 > ⭐⭐ **The one sentence:** `Q%` is defensible today as **an instrument that reproducibly measures a real
