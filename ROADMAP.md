@@ -63,7 +63,7 @@ suspected.**
 
 | | item | why |
 |---|---|---|
-| **E3** | measure the **WIDTH of the 608–610 nm lamp line** with an isopropanol fill and with a white-spirit fill | decides whether an emulsion costs spectral RESOLUTION. If it does, `R` is the most scatter-sensitive quantity in the project and the SOLVENT is part of its specification — `SPEC_metric_research.md` §12.4a, `SPEC_color_retrieval.md` §7.16.5. **One number off two spectra that would be taken anyway** — fold it into the next lab evening rather than scheduling one |
+| **E3** | ⭐ **the SPLIT SAMPLE** — one oil, one dilution, split between isopropanol and white spirit, same session, same rig. Report `area(624)/area(Soret)` | §12.6's open question ("the cause is unsettled") and §7.16.4a are both limited by the SAME confound: 7 index-matched fills of one oil pair against 72 isopropanol runs over a year, two rigs and a rebuild. A split sample removes all of it in one evening. ⛔ The first version of E3 — measure a narrow lamp line's WIDTH — is unrunnable: there is no narrow OPTICAL feature in this beam, both candidates are detector artefacts. `SPEC_color_retrieval.md` §7.16.5 · `SPEC_metric_research.md` §12.4a. **Two spectra.** Use the GREEN oil — its 624 band is taller, so the isopropanol arm sits furthest from the noise floor |
 | ⏸ | rig click-through of the new chips | nothing colour-related has been seen on the bench; the evidence is 583 tests |
 
 ⚠ **Not a reason to reopen anything above.** The metric work is untouched: colour never fed a verdict.
