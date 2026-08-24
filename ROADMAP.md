@@ -45,29 +45,84 @@ the mill's roast record, provenance — is the only permanent answer, and it is 
 
 ---
 
-### ✅ DONE SINCE — the colour pass  *(2026-08-24; does not change the four items above)*
+### ✅ DONE 2026-08-24 — the colour pass, and a solvent thread that came out of it
 
-The colour chips were rebuilt end to end: HSL retired from the readout, one CIE path for every chip,
-eleven chips became four, and **all 203 archived reports re-rendered onto them**. 583 tests green,
-`SDK_VERSION` unchanged. `SPEC_color_retrieval.md` §7.15 is the contract; **`spectracs-docs/internal/
-Spectracs_ColourGeometry.pdf`** ("From Spectrum to Colour", 30 pp) is the documentation.
+⚠ **None of it changes the four desk items above.** Colour never fed a verdict, and the metric work is
+untouched. What it adds to the backlog is two rig items, both cheap, neither needing its own evening.
 
-⛔ **Three colour claims died on the 88-run archive, and that is the useful part:** purity does not
-discriminate ($d$ = 0.56), dominant wavelength is undefined on 31 % of runs and correlates with the
-capture's blue edge at $r$ = 0.923, and the complement is outside the spectrum locus on 10 %.
-⭐ The absorbed direction is **244.06 ± 1.25° across the whole archive** — a constant of the pigment
-family. **Colour is a visual aid; it is not a discriminator, and now that is measured rather than
-suspected.**
+#### Shipped
 
-⏸ **What it ADDS to the backlog — two rig items, both cheap, and neither needs its own evening:**
+The colour chips rebuilt end to end (P0–P8): **HSL out of the readout**, **one CIE path for every chip**
+— the 2026-08-23 red-tail fix had reached **one chip of eleven** for a year — **eleven chips down to
+four** with the `×3 path` chip first, an out-of-gamut marker in both renderers, and **all 203 archived
+reports re-rendered onto them**. 583 tests green, `SDK_VERSION` unchanged, five repos pushed.
+
+`SPEC_color_retrieval.md` §7.15 is the contract · **`Spectracs_ColourGeometry.pdf`** *("From Spectrum to
+Colour", 30 pp)* is the documentation · the pre-2026-08-24 reports are an exact 205-file mirror at
+`spectracs-references/tmp/oldPdfs/`, ⛔ which sits INSIDE the archive root and is therefore excluded in
+five walkers — anything else added under `tmp/` needs the same treatment or every archive statistic
+doubles.
+
+#### ⭐⭐ The one result
+
+**θ_W = 244.06 ± 1.25° across all 88 archive runs** — green and brown alike, *d* = −0.02. The absorbed
+direction is a **constant of the pigment family**. That is why the chips cannot discriminate, and it is
+chemistry rather than software: what differs between oils is the *radius*, which is exactly what a
+dilution-invariant chip discards. **Colour is a visual aid — measured now, not merely suspected.**
+
+#### ⛔ What died on the archive, which is the useful part
+
+| claim | how it died |
+|---|---|
+| purity discriminates | *d* = 0.56, ranges overlapping, 88 runs |
+| dominant wavelength discriminates *(proposed as purity's replacement)* | undefined on **31 %** of runs; **r = 0.923 with the capture's blue edge** — it reports where the measurement starts |
+| "LCh everywhere" improves the hue | *h_ab* 5.60° against the retired HSL's 4.15° — **worse than what it replaced** |
+| turbidity explains the solvent difference | cutting the turbid runs makes the separation **worse** |
+| a scattering floor explains the red peak | wrong asymmetry — it bites the Soret, not the red |
+| resolution loss explains it *(proposed as that one's replacement)* | **convolution conserves area**, and the area is 16.6× down |
+
+⭐ Two survived: the white-point complement's hue re-measured at **2.50°** against the `+180°` flip's
+**52.7°** — better than the original claim on both sides — and the "transparent above 636 nm" red tail,
+which reproduced byte-identically across the rewrite.
+
+#### ⭐ The solvent thread — from a bench observation, not from the data
+
+Edwin: the two oils separate by eye in sunflower, and the red peak grows in **both** sunflower and white
+spirit. Both true, and the archive could not have seen either — `T = S/R` divides the solvent out by
+construction (`SPEC_color_retrieval.md` §7.16.1).
+
+**Sunflower carries it alone**: `area(624)/area(Soret)` = **13.6×** isopropanol at matched dose, no
+overlap, weakest sunflower fill still 3.2× the strongest isopropanol one. **The ordering survives** —
+green above brown in all three solvents, gap widening 0.0009 → 0.0095. ⭐ And the sunflower fill
+**settled at 106 s and did not move** (span 0.03 against a 0.38 benchmark): the whole
+`SPEC_settled_measurement.md` apparatus exists because isopropanol fills drift for twenty minutes.
+
+⭐⭐ **And it found a gap in `DOC_sample_physics.md` §4.9.** That ligand table sorts by POLARITY — alcohols
+coordinate the magnesium's fifth site, hydrocarbons cannot. A **triglyceride is nonpolar AND carries
+ester carbonyls**, so sunflower occupies a corner the table does not have: a true solution *and* a ligand
+in vast excess. ⛔ Then the step §4.9 does not take: it dismisses aggregation on a **nominal**
+concentration argument, but **inside a droplet the concentration is that of NEAT OIL** — the regime where
+aggregation lives. The packaging that makes dilution-invariance *structural* also pins the pigment where
+it can self-interact. ⚠ An argument, not a measurement (§16.12.7g).
+
+#### ⏸ What it adds to the backlog
 
 | | item | why |
 |---|---|---|
-| **E3** | ⭐ **the SPLIT SAMPLE — SUNFLOWER vs ISOPROPANOL**, four fills in one evening on one rig: green and brown oil × both solvents. Report `area(624)/area(Soret)` | Sunflower carries the effect on its own — **13.6×** the isopropanol band area at matched dose, no overlap, weakest sunflower fill still 3.2× the strongest isopropanol one — and unlike white spirit it can go in a product. Two fills answer "does the band grow when only the solvent changes?"; four also answer "do the oils keep their ORDER?", which decides whether a solvent migration is a free 2–16× signal gain or a new confound. `SPEC_color_retrieval.md` §7.16.4a.1/§7.16.5 · `SPEC_metric_research.md` §12.4a. ⚠ The ordering currently rests on ONE brown fill. ⛔ The first version of E3 — measure a narrow lamp line's WIDTH — is unrunnable: there is no narrow OPTICAL feature in this beam, both candidates are detector artefacts |
-| **Arm B** | ⭐ **UPGRADED, not new** — §16.12.7e's dilution series (1× / 0.5× / 0.25×) now also tests a MECHANISM. If the 624 nm deficit is aggregation *inside the droplets*, the `area(624)/area(Soret)` ratio must be **dilution-INDEPENDENT in isopropanol** — the droplet interior never changes — and fall only at high true concentration in a solution. Same three fills per solvent, and run it in **sunflower** rather than white spirit. `SPEC_capture_quality.md` §16.12.7g |
-| ⏸ | rig click-through of the new chips | nothing colour-related has been seen on the bench; the evidence is 583 tests |
+| **E3** | ⭐ **the SPLIT SAMPLE — sunflower vs isopropanol.** Four fills, one evening, one rig: green and brown oil × both solvents. Report `area(624)/area(Soret)` | Two fills answer *"does the band grow when only the solvent changes?"*; four also answer *"do the oils keep their ORDER?"*, which decides whether a migration is a free 2–16× signal gain or a new confound. ⚠ The ordering currently rests on **ONE brown fill**. ⛔ E3's first version — measure a narrow lamp line's WIDTH — is unrunnable: there is no narrow OPTICAL feature in this beam, both candidates are detector artefacts. `SPEC_color_retrieval.md` §7.16.4a.1/§7.16.5 |
+| **Arm B** | ⭐ **UPGRADED, not new** — §16.12.7e's dilution series (1× / 0.5× / 0.25×) now also tests a MECHANISM | If the 624 nm deficit is aggregation *inside the droplets*, the ratio must be **dilution-INDEPENDENT in isopropanol** — the droplet interior never changes — and fall only at high true concentration in a solution. Same three fills per solvent; run it in **sunflower**, not white spirit. `SPEC_capture_quality.md` §16.12.7g |
+| ⏸ | rig click-through of the new chips | nothing colour-related has been seen on the bench; the evidence is 583 tests and the as-built numbers |
 
-⚠ **Not a reason to reopen anything above.** The metric work is untouched: colour never fed a verdict.
+#### ⚠ The methodological note, recorded because it earned its place
+
+Six substantive claims were wrong today — **including both of the ones this session recommended** — plus
+three defects introduced into working code. **Every one was caught by running code over data. None by
+reasoning, and none by the 583-test suite**, which was green through all of them.
+
+The two archive sweeps killed the two recommendations in succession. The bulk re-render of 203 reports
+caught a regression the unit tests passed. The area test killed a mechanism argued for two messages
+earlier. ⇒ **On this project, a claim is worth what it has been run against.** Seven fills of one oil
+pair is not enough — which is also the honest caveat on the sunflower result above.
 
 ---
 
