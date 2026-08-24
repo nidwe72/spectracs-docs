@@ -1,47 +1,89 @@
 # Spectracs — Roadmap (working backlog)
 
-## ▶▶▶▶▶▶▶▶▶ WHAT TO DO NEXT  *(the standing TODO list — set 2026-08-21 evening. Ask "what to do next?" and start here.)*
+## ▶▶▶▶▶▶▶▶▶ WHAT TO DO NEXT  *(the standing TODO list — RESET 2026-08-25. Ask "what to do next?" and start here.)*
 
-> ⭐ **Four desk items, then ONE lab evening.** The ordering is not preference — it is forced by one
-> dependency and one deadline, both named below. Everything else on this page is background to it.
+> ⭐⭐⭐ **`Rv` IS THE VERDICT METRIC. Edwin's decision, 2026-08-25.** Implementing it is the single
+> highest-priority item on this page. `SPEC_red_ratio_metric.md` is the contract.
+>
+> ```
+> Rv = 100 · (A[622–627] − A_valley) / (A[565–580] − A_valley)      T = 52,  higher = greener
+> ```
+>
+> ⛔ **`Q%` is what the code ships TODAY and keeps the pill until `Rv` lands and clears M9.** Nothing below
+> changes that. What changed is which metric the programme is building toward.
+>
+> ⭐⭐⭐ **AND SUNFLOWER OIL IS THE SOLVENT.** Same decision, same day. `DOC_sample_physics.md` **§4A** is
+> the case; `SPEC_capture_quality.md` §16.12.7g is the technical record.
+>
+> ⭐ **The two decisions fit each other, and that is not a coincidence.** `Rv`'s threshold `T = 52`
+> transfers across solvents **unchanged and with zero errors** — and its margin is **widest in sunflower**
+> (+67.9 against isopropanol's +52.0). `Q%` could not have migrated: the same Lugitsch oil reads 13.5–15.5
+> in isopropanol, 16.2–16.7 in sunflower and 20.6–20.8 in white spirit. **`Rv` is what makes the solvent
+> change cheap; sunflower is where `Rv` works best.**
+>
+> ⛔ **CHOSEN, NOT MIGRATED.** Isopropanol is still the recipe. §4A.5 lists the three things that must
+> happen first — record solvent + bottle in every report, run the preparation arm, and re-run the
+> pre-registered test **in sunflower**.
 
-### ⛔ DESK — all four BEFORE any rig time
+### ⭐⭐⭐ 1 — IMPLEMENT `Rv`  *(highest priority; desk work, no rig time)*
 
-| # | item | why it is here | where |
+| phase | what | gate |
+|---|---|---|
+| **P0** | promote the session scripts to `diagnostics/red_ratio_archive.py`; ✅ the `sorted(os.walk(...))` bug is already fixed | — |
+| **P1** | pull the raw frames of `20270729B/002` — the one archive run `Rv` misclassifies | — |
+| **P2** | ⭐ **`Rv` + two metric rows + band marker (6) at 622–627 on `Absorption (bands)`. NO gauge.** Moves no verdict, so it can ship immediately | P0 |
+| **P3** | record the finding in `SPEC_metric_research.md` §12 as `R`'s valley-referenced sibling | P2 |
+| **P6** | the gauge and `RV_THRESHOLD`, **only after M9 (item 3) passes** | P4, P5 |
+
+⭐ **P2 is the only phase that touches shipping code before a lab session, and it moves no number.**
+
+### ⛔ 2 — THE THREE DESK ITEMS THAT STILL BLOCK RIG TIME
+
+| # | item | why it is still here | where |
 |---|---|---|---|
-| **1** | ⛔⛔ **The clear-case read** | **the only item that fixes something currently WRONG.** `readAs = FIRST_SETTLED_WINDOW` returns the LAST look, not the first — up to **0.482 units**, one-directional, and it hits the GOOD fills. ⭐ And it **gates item 5**: σ_fill measured through a fill-specific bias (0.291 vs 0.008 `Q%`/min, a factor of 35) would bake that bias in, and fixing the read afterwards would invalidate the number | `SPEC_settled_measurement.md` §29 · ⚠ §29.6's trap: 2σ = 0.13 holds only at W = 60 — **derive it from the window, do not paste the number** |
-| **2** | **M3 — the `A_valley` ceiling** | metric-independent, and it is what refuses the fill that made `Q%` print a confident **8.45** — a GREEN verdict on a brown oil. Refuses a fill that should not be measured at all, whatever the metric | this file, M3 · `SPEC_settled_measurement.md` W3 |
-| **3** | ⏳ **W8 — record `A(563–573)` and `A(623–626)` per frame** | ⛔ **NOT RETROACTIVE, and that is the deadline.** Every run taken before this exists is permanently un-analysable for `dQ100` trajectories — including the next lab evening's, if it is not in first | `SPEC_settled_measurement.md` §52.7 |
-| **4** | ⭐ **M9 — the PRE-REGISTRATION** | **last**, so it freezes the constants as they will actually run. Windows · `k` (or `w`) · `T` · **and the prediction each makes for the fills about to be taken**. ⛔ This is the only route from "best candidate" to "validated"; everything else is another fit on the same 88 runs | this file, M9 · `SPEC_metric_research.md` §13.2 |
+| **2a** | ⛔⛔ **The clear-case read** | **the only item that fixes something currently WRONG.** `readAs = FIRST_SETTLED_WINDOW` returns the LAST look, not the first — up to **0.482 units**, one-directional, and it hits the GOOD fills. ⭐ It gates σ_fill for `Rv` exactly as it gated it for `Q%` | `SPEC_settled_measurement.md` §29 · ⚠ §29.6's trap: 2σ = 0.13 holds only at W = 60 — derive it from the window |
+| **2b** | **M3 — the `A_valley` ceiling** | metric-independent, and **`Rv` needs it MORE than `Q%` did**: `A_valley` is `Rv`'s datum, subtracted from both terms | this file, M3 · `SPEC_settled_measurement.md` W3 |
+| **2c** | ⏳ **W8 — record `A(563–573)` and `A(623–626)` per frame** | ⛔ **NOT RETROACTIVE.** ⭐ **Add `A(622–627)` to it** — that is `Rv`'s own numerator, and without it no `Rv` trajectory can ever be reconstructed | `SPEC_settled_measurement.md` §52.7 |
 
-### ⭐⭐ THEN — ONE LAB EVENING: `T1` under `P6′`
+### ⭐ 3 — M9, THE PRE-REGISTRATION — now for `Rv`
 
-**Five fills, aliquots DARK from the moment they are drawn.** One session now returns four things:
+Freeze `SPEC_red_ratio_metric.md` §3's constants **by committing the spec**, then measure fills that did
+not exist when it was written. ⛔ The four fitted degrees of freedom are declared in §7.2: the red window,
+`T = 52`, the pedestal subtraction, and the domain band. **≥ 12 fills, ≥ 3 oils × ≥ 2 fills, eye-labelled
+BEFORE the number is read.** Fails if > 1 error or the threshold has to move.
 
-| | |
-|---|---|
-| brown **σ_fill** confirmed | ⚠ not a first measurement — §39.7's clean set already gives sd **0.198–0.220** over four fills. What is owed is a confirmation under `P6′`, because §39 then found light on the waiting aliquot worth **+1.34 / +0.74 units — larger than the scatter being measured** |
-| the **pre-registered test** | item 4's frozen predictions, on fills the constants have never seen |
-| the first **`dQ100` trajectory** ever recorded | via item 3 |
-| item 1 **exercised on real fills** | |
+### ⭐⭐ 4 — ONE LAB EVENING, and it now buys more than it used to
 
-### 🔵 OFF THE RIG — decide `Spar Premium`
+**Five fills, aliquots DARK from the moment they are drawn** (`P6′`), *plus* the four-fill preparation
+arm below. One session returns σ_fill for **`Rv` and `Q%` together**, the pre-registered test, the first
+recorded trajectory, and item 2a exercised on real fills.
 
-⭐ Take the **exclude-and-say-so** branch now: report **0 / 85 with the exclusion stated**, which
-§16.31.3a explicitly permits. ⛔ More fills of that oil **cannot** settle its label — excluded from the fit
-it lands *inside* the 15-unit gap (63.08 / 63.06 / 65.78). Ground truth from outside the spectrum — taste,
-the mill's roast record, provenance — is the only permanent answer, and it is opportunistic, not a gate.
+### ⭐ 5 — THE PREPARATION ARM  *(new 2026-08-25 — now a SOLVENT-MIGRATION gate, not just a nicety)*
+
+⛔ **This is now item 2 of §4A.5's migration checklist.** Sunflower is viscous, and the preparation
+**stratifies**: the second half of a prepared sample carries **15–45 % more absorber** than the first.
+`Rv` absorbs that (a 40–45 % dose swing moves it < 0.8 %) but nothing level-reading does.
+
+
+`Rv` **is** turbidity-sensitive, and the slopes have **opposite signs**: +105 Rv per unit turbidity on a
+brown oil, −108 to −148 on a green one. Turbidity does not create the separation — it **erodes** it from
+both sides. That is the whole of SparSBudget's 11.3-unit wobble on 2026-08-24.
+
+⇒ One SparSBudget preparation, four ways in one session: shaken/immediate · shaken/fixed 10 min ·
+filtered · sonicated 5 min. **The readout:** if turbidity falls and the pigment bands hold, filtration or
+a centrifuge is safe — adopt it. If the bands fall with it, you are removing pigment, and sonication is
+the right route instead. ⛔ Buy nothing until this has run.
 
 ### ⛔ DELIBERATELY NOT NEXT
 
 | | why not |
 |---|---|
-| **more metric algebra** | §13.1 — there is ONE axis and the variants differ in conditioning, not information. The next real gain needs the clamp moved, not another candidate |
-| **the lamp rebuild** | still blocked on testing the metrics against it — and after M9 that test becomes meaningful instead of another fit |
-| **the red extension** (item 5) | four arguments now point at it (§13.6), but it should FOLLOW the pre-registered test, so we know what we are extending *for* rather than re-deriving everything downstream |
+| **more metric candidates** | §13.1 — one axis, and the decision is made. `dQ100` scores marginally better on the archive and is **not** being adopted: `Rv` wins on being drawable on the existing plot, guard-compatible, and physically interpretable |
+| **the lamp rebuild** | ⛔⛔ **now a `Rv` BLOCKER, not just a queue item.** §6.7: on the archive's own diffuser A/B, 2 of 5 blurred runs of a GREEN oil read brown with **both guards passing**, and no cheap guard can catch it. Any optical change forces a full `Rv` re-validation |
+| **the red extension** | four arguments point at it, and §6.6 adds a fifth — but it must FOLLOW M9 |
 
-> ⭐ **If only one thing gets done: item 1.** It is the only entry on this list that repairs something
-> currently wrong rather than making something future better.
+> ⭐ **If only one thing gets done: P2.** `Rv` printed beside `Q%`, no gauge. It moves no verdict, needs
+> no lab time, and every run from then on accumulates the number the programme is being built around.
 
 ---
 
