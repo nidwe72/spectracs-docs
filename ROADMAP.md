@@ -59,11 +59,12 @@ capture's blue edge at $r$ = 0.923, and the complement is outside the spectrum l
 family. **Colour is a visual aid; it is not a discriminator, and now that is measured rather than
 suspected.**
 
-⏸ **What it ADDS to the backlog — one rig item, and it is cheap:**
+⏸ **What it ADDS to the backlog — two rig items, both cheap, and neither needs its own evening:**
 
 | | item | why |
 |---|---|---|
 | **E3** | ⭐ **the SPLIT SAMPLE — SUNFLOWER vs ISOPROPANOL**, four fills in one evening on one rig: green and brown oil × both solvents. Report `area(624)/area(Soret)` | Sunflower carries the effect on its own — **13.6×** the isopropanol band area at matched dose, no overlap, weakest sunflower fill still 3.2× the strongest isopropanol one — and unlike white spirit it can go in a product. Two fills answer "does the band grow when only the solvent changes?"; four also answer "do the oils keep their ORDER?", which decides whether a solvent migration is a free 2–16× signal gain or a new confound. `SPEC_color_retrieval.md` §7.16.4a.1/§7.16.5 · `SPEC_metric_research.md` §12.4a. ⚠ The ordering currently rests on ONE brown fill. ⛔ The first version of E3 — measure a narrow lamp line's WIDTH — is unrunnable: there is no narrow OPTICAL feature in this beam, both candidates are detector artefacts |
+| **Arm B** | ⭐ **UPGRADED, not new** — §16.12.7e's dilution series (1× / 0.5× / 0.25×) now also tests a MECHANISM. If the 624 nm deficit is aggregation *inside the droplets*, the `area(624)/area(Soret)` ratio must be **dilution-INDEPENDENT in isopropanol** — the droplet interior never changes — and fall only at high true concentration in a solution. Same three fills per solvent, and run it in **sunflower** rather than white spirit. `SPEC_capture_quality.md` §16.12.7g |
 | ⏸ | rig click-through of the new chips | nothing colour-related has been seen on the bench; the evidence is 583 tests |
 
 ⚠ **Not a reason to reopen anything above.** The metric work is untouched: colour never fed a verdict.
