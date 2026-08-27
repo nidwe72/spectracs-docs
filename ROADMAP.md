@@ -25,6 +25,52 @@
 > happen first — record solvent + bottle in every report, run the preparation arm, and re-run the
 > pre-registered test **in sunflower**.
 
+### ⭐⭐⭐ 0 — THE σ_fill RUN  *(NEXT. Set 2026-08-27. One evening. Everything below waits on it.)*
+
+> ⛔⛔ **THE 2026-08-26 SESSION FOUND THE PREPARATION, NOT THE OIL, IS THE DOMINANT TERM.** Six fills
+> across three oils, all under the new recipe, first two distinct reads each:
+>
+> ```
+> WITHIN a fill, Rv repeats to   sd 1.36        <- the measurement is fine
+> BETWEEN fills of ONE oil        8.4 Rv (Lugitsch, 3 fills)
+>                                12.7 Rv (Esterer, 2 fills)     <- ten times the measurement
+> pooled sigma_fill               6.30 Rv       <- from 5 fills / 3 df. THAT IS THE PROBLEM.
+> ```
+>
+> **Nothing else on this page can be judged until this number exists.** Not the 08-24 → 08-26 step
+> (12.8 Rv — indistinguishable from one evening's fill spread), not the Lugitsch-vs-Esterer separation
+> (18.5 Rv, and Esterer's own two fills differ by 12.7), not M9's error count, not the tracker's
+> tolerance. Every one of them is currently being compared against a yardstick that does not exist.
+
+**The run.** **Six fills of ONE oil (Lugitsch), one evening, one bottle, one operator**, two distinct
+reads each ⇒ 12 runs at ~2.6 min. Aliquots **DARK from the moment they are drawn** (`P6′`).
+⛔ **VARY NOTHING ELSE.** Not the oil, not the solvent bottle, not the turnover count, not the order of
+capillary clearing. This run measures one thing and it cannot measure it if anything else moves.
+
+⭐ **The recipe is now recorded per run** — `prepProtocol = "invert-40-after-capillaries-clear"` lands in
+every report header (2026-08-26), so this session is the first whose preparation is machine-readable.
+
+| readout | decision it settles |
+|---|---|
+| **σ_fill for `Rv`** (5 df, not 3) | the yardstick everything above is missing |
+| σ_fill for `Q%` on the same fills | free — both metrics come off one trajectory |
+| **is `±20` earned?** | σ_fill ≤ 4 ⇒ ±20 is ≥ 5σ, the coarse tracker ships. σ_fill ≥ 10 ⇒ the tolerance must widen and the tracker's CLAIM must narrow with it |
+| the first `clearing-4.0` σ_fill | the sunflower read has never been measured against replicates |
+
+⭐⭐ **WHY ±20 AND WHY "COARSE" IS THE HONEST WORD.** Against σ_fill = 6.30, a ±20 alarm sits at 3.2σ —
+it catches Lugitsch→Stekko (28.7 Rv, 4.5σ) and Lugitsch→Spar (69.5 and 77.2 Rv, 11–12σ, and the 08-24
+photographs show that difference plainly by eye). It **cannot** see Lugitsch→Esterer (18.5 Rv, 2.9σ), two
+oils that ARE distinguishable by eye. ⛔ A UI that lets "no alarm" read as "unchanged" is wrong by an
+Esterer-sized margin. The coarse job survives even the recipe change: 12 Rv against a ~70 Rv signal
+leaves ≈ 5σ of headroom with nothing corrected.
+
+⚠ **The number 20 is not yet earned.** With 3 df the confidence interval on σ_fill runs roughly 4–13 Rv;
+at the top of that range ±20 is 1.5σ and false-alarms. This run is what earns it or replaces it.
+
+⛔ **This SUPERSEDES item 4's five-fill evening and sharpens it**: one oil, six fills, nothing else
+varied. Item 4's preparation arm (item 5) is the NEXT evening, not this one — mixing two questions into
+one session is how the 08-26 session ended with three explanations and no way to separate them.
+
 ### ⭐⭐⭐ 1 — IMPLEMENT `Rv`  *(highest priority; desk work, no rig time)*
 
 | phase | what | gate |
@@ -69,6 +115,14 @@ recorded trajectory, and item 2a exercised on real fills.
 brown oil, −108 to −148 on a green one. Turbidity does not create the separation — it **erodes** it from
 both sides. That is the whole of SparSBudget's 11.3-unit wobble on 2026-08-24.
 
+> ⭐ **2026-08-26 corroborates the OPPOSITE-SIGNS claim, and shows why pooling hides it.** Across all 16
+> sunflower runs of that evening `Rv` vs `A_valley` is **r = −0.07** — apparently no dependence at all,
+> because oils with opposite slopes cancel. Split by oil it reappears: Lugitsch's three fills give **+111
+> Rv per unit**, Esterer's two give a **negative** slope. ⛔ A session-wide correlation is therefore
+> **meaningless** for this question and must never be quoted as one — an hour was lost to exactly that.
+> ⚠ Lugitsch's sign is POSITIVE where this section predicts negative for a green oil; n = 3 fills, so it
+> is a discrepancy to resolve in the preparation arm, not a refutation of either.
+
 ⇒ One SparSBudget preparation, four ways in one session: shaken/immediate · shaken/fixed 10 min ·
 filtered · sonicated 5 min. **The readout:** if turbidity falls and the pigment bands hold, filtration or
 a centrifuge is safe — adopt it. If the bands fall with it, you are removing pigment, and sonication is
@@ -82,8 +136,12 @@ the right route instead. ⛔ Buy nothing until this has run.
 | **the lamp rebuild** | ⛔⛔ **now a `Rv` BLOCKER, not just a queue item.** §6.7: on the archive's own diffuser A/B, 2 of 5 blurred runs of a GREEN oil read brown with **both guards passing**, and no cheap guard can catch it. Any optical change forces a full `Rv` re-validation |
 | **the red extension** | four arguments point at it, and §6.6 adds a fifth — but it must FOLLOW M9 |
 
-> ⭐ **If only one thing gets done: P2.** `Rv` printed beside `Q%`, no gauge. It moves no verdict, needs
-> no lab time, and every run from then on accumulates the number the programme is being built around.
+> ⭐ **If only one DESK thing gets done: P2.** `Rv` printed beside `Q%`, no gauge. It moves no verdict,
+> needs no lab time, and every run from then on accumulates the number the programme is being built
+> around.
+>
+> ⭐⭐⭐ **If only one thing gets done AT ALL: item 0, the σ_fill run.** P2 accumulates a number nobody
+> can yet interpret; item 0 is what makes it interpretable. *(2026-08-27)*
 
 ---
 
