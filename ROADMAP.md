@@ -50,6 +50,56 @@ capillary clearing. This run measures one thing and it cannot measure it if anyt
 ⭐ **The recipe is now recorded per run** — `prepProtocol = "invert-40-after-capillaries-clear"` lands in
 every report header (2026-08-26), so this session is the first whose preparation is machine-readable.
 
+### ⛔⛔ 0a — ONE REFERENCE PER FILL. NON-NEGOTIABLE.  *(2026-08-27 — the finding that changes the design)*
+
+**The 2026-08-26 session used TWO references for sixteen runs across nine hours**, and the fills split by
+reference epoch exactly where the numbers change:
+
+| epoch | reference taken | fills | `Rv` |
+|---|---|---|---|
+| **1** | before 17:21 | Esterer A · Stekko A · Lugitsch A · Lugitsch B | 73–102 |
+| **2** | ~00:26 | Lugitsch C · Esterer B · Esterer C? · **Esterer D** | 85–110 |
+
+⭐ **Every `Rv` above 105 is in epoch 2. Every Esterer below 80 is in epoch 1.** Lugitsch's jump
+(99.9 → 107.2) and Esterer's (77.5 → 107.4) both straddle that boundary.
+
+⭐⭐ **AND THE LAMP TILT IS NOW MEASURED, NOT INFERRED.** The report stores the whole `REFERENCE` curve
+(1634 points), so the two epochs can be divided one by the other. The lamp lost ~8 % overall — **and not
+evenly**, normalised at the Soret:
+
+```
+   440 nm  -8.9 %        <- sags
+   480      +2.4 %
+   540      +0.4 %        the body of the spectrum holds
+   600      +0.5 %
+   572      -1.9 %       <- Rv's DENOMINATOR
+   624      -2.8 %       <- Rv's NUMERATOR
+   632      -5.1 %       <- and it accelerates into the clamp
+```
+
+⛔ **The red end fades faster than the middle, and 624 nm is already the dimmest part of the lamp** —
+41.9 counts against 130.7 at the Soret. A −2.8 % relative loss lands on the weakest channel `Rv` has,
+which is also the one with **no reference channel in the monitor record**.
+
+⚠ **A re-captured reference CANCELS a lamp change** — `A = log10(ref/sample)`, so a tilt divides out when
+both are taken under the same lamp. It survives only when the lamp moves **between** the reference and
+the sample. ⇒ the fault is not that the lamp drifts; it is that **one reference served four fills over
+two hours**, so `20260826EstererD` (02:17) was read against a reference taken at 00:26.
+
+⇒ **THE σ_fill RUN MUST TAKE A REFERENCE BEFORE EVERY FILL.** Without it the session measures fill
+variance and lamp drift as a single number, which is exactly what 2026-08-26 did — and why that evening
+cannot say whether a 30 `Rv` Esterer spread is preparation or bench.
+
+⭐ **Two more blocking terms fall out of the same argument:**
+
+* ⛔ **Time and fill are confounded unless the order is broken.** Tonight `Rv` rose monotonically with the
+  CLOCK in both oils — **+1.34 `Rv`/h for Lugitsch, +2.78 for Esterer**, `r = +0.90` and `+0.89`.
+  Concentration correlates too, but with **opposite signs** in the two oils, so it cannot be the common
+  cause; the clock can. ⇒ **re-measure fill 1 at the END of the evening.** If it has moved, the drift is
+  the session's, not the fills'. ⚠ n = 3 fills per oil — the leading hypothesis, not a result.
+* ⭐ **Add the 622–627 reference channel first** (§53.5). It is a few lines, and it turns "the red end may
+  have drifted" into a number on every run instead of an archaeology exercise on two stored curves.
+
 | readout | decision it settles |
 |---|---|
 | **σ_fill for `Rv`** (5 df, not 3) | the yardstick everything above is missing |
