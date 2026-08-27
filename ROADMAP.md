@@ -47,8 +47,24 @@ reads each ⇒ 12 runs at ~2.6 min. Aliquots **DARK from the moment they are dra
 ⛔ **VARY NOTHING ELSE.** Not the oil, not the solvent bottle, not the turnover count, not the order of
 capillary clearing. This run measures one thing and it cannot measure it if anything else moves.
 
-⭐ **The recipe is now recorded per run** — `prepProtocol = "invert-40-after-capillaries-clear"` lands in
-every report header (2026-08-26), so this session is the first whose preparation is machine-readable.
+⚠ **THE RECIPE HAS CHANGED SINCE THIS ITEM WAS WRITTEN.** From 2026-08-27 (Edwin): **1 ml sunflower +
+2 capillaries, which empty themselves — no arm-swing — then ~45 s of FAST rotation at the bottom while
+still concentrated, up to 8 ml, ~60 s more, and 4 ml poured into the jar.** The 40 slow inversions are
+gone. Two capillaries in 8 ml is the same working strength as one in 4 ml, so `A_Q` and the archive stay
+comparable. ⛔ `prepProtocol` in the header is a hardcoded constant and still says
+`invert-40-after-capillaries-clear` — **it must be updated before this run** (§0b).
+
+⭐⭐ **THE 8 ml PREP MAKES THE BATCH BIGGER THAN THE READ — USE THE OTHER HALF.** Pour the remaining 4 ml
+into a second jar and measure it too. Same preparation, two jars ⇒ it **partitions σ_fill into its two
+possible homes**: preparation-and-dilution against jar-and-beam. If the split-batch pair agrees while
+independent fills scatter, the variance is in the dilution and no mixing device is needed; if both
+scatter equally, the preparation is exonerated. It costs one extra read per fill and nothing else.
+⚠ Keep the waiting half **DARK** (§39: +1.34 `Rv` from light on a waiting aliquot) and rotate again
+immediately before the second pour — §6.6 found the prep stratifies.
+
+⭐ **BRACKET THE EVENING.** Measure fill 1 again at the END. The 2026-08-26 session drifted 77 → 107
+across nine hours with oil perfectly confounded against time-of-evening, and afterwards there was no way
+to separate drift from oil. One extra fill turns that into a measurement.
 
 ### ⛔⛔ 0a — ONE REFERENCE PER FILL. NON-NEGOTIABLE.  *(2026-08-27 — the finding that changes the design)*
 
@@ -120,6 +136,64 @@ at the top of that range ±20 is 1.5σ and false-alarms. This run is what earns 
 ⛔ **This SUPERSEDES item 4's five-fill evening and sharpens it**: one oil, six fills, nothing else
 varied. Item 4's preparation arm (item 5) is the NEXT evening, not this one — mixing two questions into
 one session is how the 08-26 session ended with three explanations and no way to separate them.
+
+### ⛔⛔ 0b — RECORD THE INSTRUMENT STATE IN THE REPORT HEADER. BEFORE THE σ_fill RUN.  *(2026-08-27)*
+
+**The exposure is not written down anywhere.** Verified today against `20260826EstererB/001` and
+`20260826EstererE/001`: the header carries `solvent`, `prepProtocol` and `captureDecode` — and nothing
+about the camera. Yet `SPEC_capture_quality.md` **§16.24.1** is the finding that a single exposure change
+moved the verdict **−13.5 %**. ⇒ **the one instrument setting known to move the number is invisible in
+the travelling record**, exactly like the missing red reference channel of §0a.
+
+⭐⭐ **AND THE ARCHIVE ALREADY CONTAINS SEVERAL INSTRUMENT STATES THAT NOBODY CAN NAME.** The only
+retrospective handle is the stored `REFERENCE` curve's own peak:
+
+```
+session                 reference peak DN   at nm     A624 DN   far red 632-636
+20260822Lugitsch              221.3         473.3       46.8        30.8
+20260824 (all three)          226.1         473.3       44.7        28.1
+20260826 A/B/Stekko           217.5         473.3       41.2        25.7
+20260826 C / EstererB-D       203.7         473.6       36.8        22.1
+20260826EstererE              199.4         473.3       34.4        20.3
+```
+
+⛔ **The far red fell 28 % in three days while the peak fell 12 %** — the red end degrades at twice the
+rate of the lamp overall, and that is where `Rv`'s numerator lives. Whether any of this is exposure,
+lamp ageing or re-seating **cannot be recovered**, because only one of the three was ever logged.
+
+**What to add**, beside `captureDecode` in the report header — the `captureDecode` precedent applies, so
+this is a travelling record and needs **no Alembic migration**:
+
+| field | why |
+|---|---|
+| **exposure** (and gain / white balance if separately settable) | §16.24.1's 13.5 %. Without it no run can be compared to another across a settings change |
+| **reference peak DN + its wavelength** | the headroom to clipping, in one number, on every run. A clipped reference is a ruined run and nothing currently says so |
+| **`referenceRed` = mean 622–627 of the reference** | §0a / §53.5. `Rv`'s numerator is the only band with no reference channel in `monitorRecord` |
+| **`prepProtocol` must MOVE WITH THE RECIPE** | it is a hardcoded constant. `20260826EstererE` was made two-stage and the header still claims `invert-40-after-capillaries-clear`. A stale recipe string is worse than none |
+
+⭐⭐ **WHY THIS BLOCKS THE σ_fill RUN AND NOT MERELY IMPROVES IT.** That run is also the **baseline for the
+history tracker** (§0a's ±20 question). A baseline is a claim about an oil *measured on a particular
+instrument*; anchored to a camera state nobody can reconstruct, it cannot be compared to anything six
+months later, and the evening has to be repeated. Recording four fields is a few lines against an
+evening of bench time.
+
+⭐ **The exposure recommendation, once it is logged** — in this order, and not before:
+
+1. ⛔ **Do not change exposure during the σ_fill run.** That run measures preparation variance; an
+   instrument change inside it makes it uninterpretable. One variable.
+2. **Then the A/B**: one fill read at the current exposure and at ×1.25, nothing else touched. Ten
+   minutes. It gives §16.24.1 its **second data point** — the spec has been owed one since it was written
+   on `n = 1` — and it asks the question nobody has: §16.24.1 was measured on the `Q%` verdict, which is
+   anchored on the **Soret**, where the saturation is. **`Rv` never touches the Soret** and may well be
+   invariant where `Q%` was not.
+3. **If `Rv` is invariant**, set exposure so the reference peak lands near **230 DN**, not 245 — most of
+   the free headroom with ~10 % margin, since the lamp wanders several percent between re-seatings.
+   `20260826EstererE` peaks at 199.4 of 255, so ~28 % of the range is currently unused for free.
+4. ⛔ **Leave the 473 nm spike alone.** It is the single binding constraint — letting it clip buys a
+   further ×1.44 — but it sits **12 nm** from the Soret band `Q%` and the domain guard depend on, and
+   §16.24.8 already documents leakage from that line *unsaturated*. Take that gain **optically** (amber
+   filter, or a lower blue drive) as part of `SPEC_lamp_rebuild.md`, where a full `Rv` re-validation is
+   already budgeted under §6.7.
 
 ### ⭐⭐⭐ 1 — IMPLEMENT `Rv`  *(highest priority; desk work, no rig time)*
 
