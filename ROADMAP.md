@@ -181,14 +181,17 @@ evening of bench time.
 
 1. ⛔ **Do not change exposure during the σ_fill run.** That run measures preparation variance; an
    instrument change inside it makes it uninterpretable. One variable.
-2. **Then the A/B**: one fill read at the current exposure and at ×1.25, nothing else touched. Ten
-   minutes. It gives §16.24.1 its **second data point** — the spec has been owed one since it was written
-   on `n = 1` — and it asks the question nobody has: §16.24.1 was measured on the `Q%` verdict, which is
-   anchored on the **Soret**, where the saturation is. **`Rv` never touches the Soret** and may well be
-   invariant where `Q%` was not.
-3. **If `Rv` is invariant**, set exposure so the reference peak lands near **230 DN**, not 245 — most of
-   the free headroom with ~10 % margin, since the lamp wanders several percent between re-seatings.
-   `20260826EstererE` peaks at 199.4 of 255, so ~28 % of the range is currently unused for free.
+2. ⭐⭐ **THE A/B HAS ALREADY RUN — corrected 2026-08-27.** §16.24.1's *"exposure does NOT cancel"* was
+   bounded long ago by **§16.27.1** (`M448` moved **+0.04 %** across a 104/90 step on one fill, three
+   re-seats), and §16.27.1a now computes the same control **for `Rv`**: `20260807B/001` at exposure 104
+   reads **32.17** against B/002 at exposure 90's **32.08** — **0.09 `Rv`** — while the two runs held at
+   the *same* exposure differ by **4.38**. **The exposure effect is an order of magnitude below the
+   re-seat noise**, and structurally so: §16.27.3 localises the whole exposure sensitivity to 440–447 nm,
+   and `Rv` never touches the Soret. ⚠ The tested step is ×1.156; a larger one is not covered.
+3. ⇒ **Set exposure so the reference peak lands near 230 DN**, not 245 — most of the free headroom with
+   ~10 % margin, since the lamp wanders several percent between re-seatings. `20260826EstererE` peaks at
+   199.4 of 255, so ~28 % of the range is currently unused for free, and ×1.15 sits **inside** the step
+   §16.27.1a tested. ⚠ Still take it BEFORE the σ_fill run or AFTER it, never inside it — one variable.
 4. ⛔ **Leave the 473 nm spike alone.** It is the single binding constraint — letting it clip buys a
    further ×1.44 — but it sits **12 nm** from the Soret band `Q%` and the domain guard depend on, and
    §16.24.8 already documents leakage from that line *unsaturated*. Take that gain **optically** (amber
