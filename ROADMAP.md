@@ -73,6 +73,94 @@ immediately before the second pour — §6.6 found the prep stratifies.
 across nine hours with oil perfectly confounded against time-of-evening, and afterwards there was no way
 to separate drift from oil. One extra fill turns that into a measurement.
 
+### ⭐⭐⭐ 0-METRIC — `RvLin` IS THE WORKING CHOICE FOR THE CONTINUOUS NUMBER  *(Edwin, 2026-08-29)*
+
+> ⭐⭐ **`Rv` keeps the VERDICT. `RvLin` becomes the candidate for the NUMBER** — the history tracker, and
+> anything reading `Rv` as a quantity rather than as a side of a threshold. **The boundary is the
+> decision.** Nothing about the shipped classification changes: `Rv` got all seven fills of 2026-08-28/29
+> right with nothing within 25 units of the line.
+>
+> ```
+> RvLin = 100 · (A622-627 − B(624.5)) / (A_Q − B(572.5))
+>         B = the straight line through (530, A_valley) and (613.5, A612-615)
+>         T = 58.0   pre-registered 2026-08-29, same-jar recipe   (SPEC_metric_research §16.10.2)
+> ```
+>
+> ⭐ **The one-sentence case:** with `Δ = A[612–615] − A_valley` = 0 it is `Rv` **exactly**. It is not a
+> rival metric — it is `Rv` with the baseline's slope *measured* instead of assumed, and it is the only
+> candidate that is both affine-invariant and short-lever (11 nm, against `RvCont`'s 20.5).
+>
+> ⛔ **CHOSEN, NOT BUILT** — as §15 was for `Rv`. Threshold fitted on four fills of one night, the
+> pre-registration unrun, and the whole ranking comes from same-jar fills whose blank is still in
+> question (§0-JAR). `SPEC_metric_research.md` §16.11 carries the argument and the three things that
+> would overturn it.
+
+### ⭐⭐⭐ 0-NEXT — THE NEXT LAB EVENING, and it is pre-registered  *(set 2026-08-29, after the six-fill session)*
+
+**Four fills, two reference runs, one evening.** Thresholds are **already fixed** in
+`SPEC_metric_research.md` §16.10.2 and may not move after the numbers are seen.
+
+| # | what | why it is there |
+|---|---|---|
+| **0** | ⭐ **Two-reference run** — `R₁ₐ`, `R₁ᵦ` (same jar re-seated), `R₂` (second jar); 4 mL pure sunflower each, **no oil**, exposure untouched | §0-JAR below. Ten minutes. The jar term, and the session's start state |
+| 1 | **Lugitsch · same-jar** | a green oil `RvLin` has never seen, against the pre-registered `T` = 58.0 |
+| 2 | ⭐⭐ **Lugitsch · TWO-JAR** | **same oil, same evening, only the reference method differs** — the one thing the archive cannot supply, and what decides which blank is right |
+| 3 | **Billa Clever · same-jar** | holds the brown end so the corridor is measured, not assumed |
+| 4 | **Lugitsch · same-jar again** | the **bracket** — separates the session drift from the oil, and supplies the replicate pair the metric test needs |
+| **5** | **Two-reference run again** | does the blank drift across an evening? §16.8a says something does |
+
+⚠ **Two reads per fill, times logged, order kept and written down.** With a drift of this size the order
+is data.
+
+⭐ **If the evening runs short, protect step 2.** Every other fill can be repeated another night; a
+matched same-jar / two-jar pair on ONE oil in ONE evening is the only thing that resolves the blank
+question, and without it every number from the new recipe stays unplaceable against the archive.
+
+**What it returns:** the jar term and its drift · a direct method comparison · a drift measurement ·
+`RvLin`'s first out-of-sample oil · a second brown fill.
+
+> ⭐⭐ **THE RECIPE THAT PRODUCED THIS.** Same jar for reference AND sample — 4 mL solvent into the
+> measurement jar, capture the reference, *then* dose with the capillary — vortex, **no ultrasonic bath**,
+> **6 minutes standing in the dark**. `SPEC_capture_quality.md` §16.23.2b is the written recipe;
+> `SPEC_metric_research.md` §16.8 is the evidence. It gave the steadiest fill ever recorded
+> (`20260828EstererF/002`: 0.003 %/min, `F` and `A_valley` repeating to four decimals).
+> ⛔ **NOT YET ADOPTED** — the session drift is present in the same-jar fills and absent from the two-jar
+> pair, and method is confounded with clock. Step 2 breaks that confound.
+
+### ⭐⭐ 0-JAR — THREE CAPTURES, NO OIL, TEN MINUTES. DO IT BEFORE THE σ_fill RUN.  *(2026-08-29)*
+
+**The cheapest experiment on this page, and it may be the most important.** Every absorbance in the
+archive is `−log10(S/R)` where `S` and `R` come from **two different jars**. `SPEC_capture_quality.md`
+§16.9.3h prices *re-seating one jar* at 2.81 % and two jar operations at 8.4 % — but it never measured
+the **jar-to-jar** term, jar #1's own glass and ring pattern against jar #2's, because every disturbance
+probe used a single jar.
+
+⭐ **And the sample cancels**, so no oil is needed:
+
+```
+A1 − A2 = −log10(S/R1) + log10(S/R2) = log10(R1/R2)
+```
+
+1. Jar #1, 4 mL pure sunflower, seat, capture → **R₁ₐ**
+2. Lift jar #1, replace it, capture → **R₁ᵦ**   ⇒ `log10(R₁ₐ/R₁ᵦ)` = **re-seating alone**
+3. Jar #2, 4 mL pure sunflower, seat, capture → **R₂**   ⇒ `log10(R₁ₐ/R₂)` = **jar-to-jar + re-seating**
+
+⭐⭐ **Run it at the START of a session and again at the END** — that also measures whether the blank
+drifts across an evening, which §16.8a shows something does.
+
+⚠ **Controls:** exposure untouched across all three, and the same fill level in both jars (§16.9.3h
+prices jar *level* separately at 1.68 %, additive and non-cancelling).
+
+**Why it blocks:** Edwin's same-jar method (`SPEC_metric_research.md` §16.8) removes the jar-to-jar term
+by construction, and its six fills of 2026-08-28/29 read **systematically differently** from the archive —
+the two blank shapes differ ~11 % at the Q band, worth 0.060 in `pq` against a within-method scatter of
+0.007. ⛔ **One of the two blanks is wrong, possibly both**, and until that is known no fill made either
+way can be placed against the other. That includes the σ_fill run's own numbers.
+
+⇒ If a structured (λ-dependent) jar term is found, it cancels in **no** metric in the `Rv` family and
+would be the largest single finding of the programme. If it is flat or absent, the archive stands and the
+same-jar method becomes a free improvement.
+
 ### ⛔⛔ 0a — ONE REFERENCE PER FILL. NON-NEGOTIABLE.  *(2026-08-27 — the finding that changes the design)*
 
 **The 2026-08-26 session used TWO references for sixteen runs across nine hours**, and the fills split by
@@ -239,6 +327,22 @@ evening of bench time.
 | **P2** | ⭐ **`Rv` + two metric rows + band marker (6) at 622–627 on `Absorption (bands)`. NO gauge.** Moves no verdict, so it can ship immediately | P0 |
 | **P3** | record the finding in `SPEC_metric_research.md` §12 as `R`'s valley-referenced sibling | P2 |
 | **P6** | the gauge and `RV_THRESHOLD`, **only after M9 (item 3) passes** | P4, P5 |
+
+> ⭐⭐⭐ **THE THRESHOLD AND THE NUMBER ARE TWO DIFFERENT PRODUCTS — 2026-08-29.** The first brown
+> replicate under the settled recipe (`20260828BillaCleverA` vs `B`, same oil, 32 min apart) moves `Rv`
+> by **36.3 units**, four times its worst green-pair scatter. ⭐ And it costs the verdict **nothing**: all
+> seven fills of that night classify correctly against `T` = 52, greens 83–94 and browns −10 and 26, with
+> nothing near the line.
+>
+> ⇒ **`Rv` keeps the verdict.** ⛔ But it cannot carry `SPEC_history_tracker.md`, which needs `Rv` as a
+> *continuous* quantity. `SPEC_metric_research.md` §16.9 makes **`RvLin`** the leading candidate for that
+> job — same brown pair, 6.3 units — on the figure of merit that matters, gap ÷ worst-case replicate
+> scatter: **7.17 against `RvTest` 6.33, `RvCont` 3.53 and `Rv` 1.56**.
+>
+> ⚠ **Not a decision.** `RvLin` loses the archive-wide hold-out (6/36 against `Rv`'s 0/36), its threshold
+> is fitted, and §0-JAR's blank question is open — the fills that produced this ranking use the same-jar
+> reference and cannot yet be placed against the archive. ⇒ **the history tracker stays blocked**, but it
+> is now blocked on a *named candidate and one experiment* rather than on not having a metric at all.
 
 ⭐ **P2 is the only phase that touches shipping code before a lab session, and it moves no number.**
 
