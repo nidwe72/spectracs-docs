@@ -106,7 +106,8 @@ to separate drift from oil. One extra fill turns that into a measurement.
 | 1 | **Lugitsch · same-jar** | a green oil `RvLin` has never seen, against the pre-registered `T` = 58.0 |
 | 2 | ⭐⭐ **Lugitsch · TWO-JAR** | **same oil, same evening, only the reference method differs** — the one thing the archive cannot supply, and what decides which blank is right |
 | 3 | **Billa Clever · same-jar** | holds the brown end so the corridor is measured, not assumed |
-| 4 | **Lugitsch · same-jar again** | the **bracket** — separates the session drift from the oil, and supplies the replicate pair the metric test needs |
+| 4 | **Lugitsch · same-jar again** | a second fill of the same oil — supplies the replicate pair the metric test needs. ⛔ **NOT a drift measurement** |
+| **4a** | ⭐ **RE-READ fill 1**, kept dark and capped all evening | two minutes, no new fill — and it is what makes the drift separable at all |
 | **5** | **Two-reference run again** | does the blank drift across an evening? §16.8a says something does |
 
 ⚠ **Two reads per fill, times logged, order kept and written down.** With a drift of this size the order
@@ -116,8 +117,22 @@ is data.
 matched same-jar / two-jar pair on ONE oil in ONE evening is the only thing that resolves the blank
 question, and without it every number from the new recipe stays unplaceable against the archive.
 
-**What it returns:** the jar term and its drift · a direct method comparison · a drift measurement ·
-`RvLin`'s first out-of-sample oil · a second brown fill.
+> ⛔ **STEP 4 IS NOT A DRIFT MEASUREMENT — corrected 2026-08-29 before the session ran.** Steps 1 and 4 are
+> two DIFFERENT fills, so their difference is `drift + fill scatter`, and that same difference is already
+> the σ_fill estimate — using it for both would be circular. ⭐ **Step 4a is what makes the set solvable:**
+>
+> | comparison | terms |
+> |---|---|
+> | step 0 vs 5 — the reference runs | **instrument + blank**, clean |
+> | **step 1 vs 4a — fill 1 read twice** | + **sample ageing** |
+> | step 1 vs 4 — two fills of one oil | + **fill scatter** |
+>
+> Three comparisons, three unknowns, each recovered by subtracting the row above.
+> ⚠ Keep fill 1 **dark and capped** — §39 measured +1.34 `Rv` from light on a waiting aliquot — and note
+> its jar must survive the whole evening untouched, which competes with step 2 if jars are short.
+
+**What it returns:** the jar term and its drift · a direct method comparison · **a drift measurement that
+is actually separable (0/5, 1-vs-4a, 1-vs-4)** · `RvLin`'s first out-of-sample oil · a second brown fill.
 
 > ⭐⭐ **THE RECIPE THAT PRODUCED THIS.** Same jar for reference AND sample — 4 mL solvent into the
 > measurement jar, capture the reference, *then* dose with the capillary — vortex, **no ultrasonic bath**,
