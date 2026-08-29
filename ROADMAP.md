@@ -54,6 +54,13 @@ gone. Two capillaries in 8 ml is the same working strength as one in 4 ml, so `A
 comparable. ⛔ `prepProtocol` in the header is a hardcoded constant and still says
 `invert-40-after-capillaries-clear` — **it must be updated before this run** (§0b).
 
+⭐⭐ **AND IT CHANGED AGAIN 2026-08-28 — the rotation is now a VORTEX MIXER.** The whole recipe, with its
+volume rule and the two cautions on the ultrasonic bath, is written down at last in
+`SPEC_capture_quality.md` **§16.23.2b**; §16.23.2's inversions are marked superseded. ⛔ The **sonication**
+step is NOT adopted — it is on trial and gated by two fills vortex-only against two vortex+sonic, run
+*before* this evening. ⭐ For the σ_fill run itself nothing else moves: Lugitsch at the 4 mL default lands
+the DN guard at **40.7 DN**, mid-window (§16.23.10j), so there is no dosing question to settle first.
+
 ⭐⭐ **THE 8 ml PREP MAKES THE BATCH BIGGER THAN THE READ — USE THE OTHER HALF.** Pour the remaining 4 ml
 into a second jar and measure it too. Same preparation, two jars ⇒ it **partitions σ_fill into its two
 possible homes**: preparation-and-dilution against jar-and-beam. If the split-batch pair agrees while
@@ -149,16 +156,20 @@ the travelling record**, exactly like the missing red reference channel of §0a.
 retrospective handle is the stored `REFERENCE` curve's own peak:
 
 ```
-session                 reference peak DN   at nm     A624 DN   far red 632-636
-20260822Lugitsch              221.3         473.3       46.8        30.8
-20260824 (all three)          226.1         473.3       44.7        28.1
-20260826 A/B/Stekko           217.5         473.3       41.2        25.7
-20260826 C / EstererB-D       203.7         473.6       36.8        22.1
-20260826EstererE              199.4         473.3       34.4        20.3
+⛔ THESE ARE LINEAR VALUES, NOT DN — corrected 2026-08-28, see item 3 below.
+session                 reference peak     at nm     A624      far red 632-636   ENCODED peak DN
+20260822Lugitsch              221.3         473.3     46.8        30.8                239.1
+20260824 (all three)          226.1         473.3     44.7        28.1                241.4
+20260826 A/B/Stekko           217.5         473.3     41.2        25.7                237.2
+20260826 C / EstererB-D       203.7         473.6     36.8        22.1                230.2
+20260826EstererE              199.4         473.3     34.4        20.3                228.0
 ```
 
 ⛔ **The far red fell 28 % in three days while the peak fell 12 %** — the red end degrades at twice the
-rate of the lamp overall, and that is where `Rv`'s numerator lives. Whether any of this is exposure,
+rate of the lamp overall, and that is where `Rv`'s numerator lives. ⚠ **But it is not near a floor**:
+§16.23.10j measures the *sample* minimum inside 622–627 across the sunflower era at a median **86.3 DN**,
+worst non-opaque run 71.4. The red end is degrading from a comfortable height, which makes this a
+**trend to watch, not a measurement at risk**. Whether any of this is exposure,
 lamp ageing or re-seating **cannot be recovered**, because only one of the three was ever logged.
 
 **What to add**, beside `captureDecode` in the report header — the `captureDecode` precedent applies, so
@@ -167,7 +178,7 @@ this is a travelling record and needs **no Alembic migration**:
 | field | why |
 |---|---|
 | **exposure** (and gain / white balance if separately settable) | §16.24.1's 13.5 %. Without it no run can be compared to another across a settings change |
-| **reference peak DN + its wavelength** | the headroom to clipping, in one number, on every run. A clipped reference is a ruined run and nothing currently says so |
+| **`referencePeakDn` + its wavelength** | the headroom to clipping, in one number, on every run. A clipped reference is a ruined run and nothing currently says so. ⛔ **ENCODED DN, not the linear trace's peak** — reading one for the other is what produced the withdrawn item 3 below |
 | **`referenceRed` = mean 622–627 of the reference** | §0a / §53.5. `Rv`'s numerator is the only band with no reference channel in `monitorRecord` |
 | **`prepProtocol` must MOVE WITH THE RECIPE** | it is a hardcoded constant. `20260826EstererE` was made two-stage and the header still claims `invert-40-after-capillaries-clear`. A stale recipe string is worse than none |
 
@@ -188,10 +199,18 @@ evening of bench time.
    the *same* exposure differ by **4.38**. **The exposure effect is an order of magnitude below the
    re-seat noise**, and structurally so: §16.27.3 localises the whole exposure sensitivity to 440–447 nm,
    and `Rv` never touches the Soret. ⚠ The tested step is ×1.156; a larger one is not covered.
-3. ⇒ **Set exposure so the reference peak lands near 230 DN**, not 245 — most of the free headroom with
-   ~10 % margin, since the lamp wanders several percent between re-seatings. `20260826EstererE` peaks at
-   199.4 of 255, so ~28 % of the range is currently unused for free, and ×1.15 sits **inside** the step
-   §16.27.1a tested. ⚠ Still take it BEFORE the σ_fill run or AFTER it, never inside it — one variable.
+3. ⛔⛔ **WITHDRAWN 2026-08-28 — THERE IS NO FREE HEADROOM, AND THE STEP WOULD CLIP.** This item read
+   *"`20260826EstererE` peaks at 199.4 of 255, so ~28 % of the range is currently unused"* and recommended
+   exposure **×1.15**. ⛔ **199.4 is the LINEAR peak, not DN.** The report stores the linear 0–255 spectrum
+   and the guard encodes once — `DN = 255·(linear/255)^(1/2.2)` — so that reference actually peaks at
+   **228.0 DN**, and the sunflower era spans **228.0–243.7 DN, median 237.2**, against an AE target of 245
+   and a clip at 255. **A ×1.15 step puts 37 of 37 sunflower references at or past 255.**
+   ⇒ **The exposure is already where this item wanted it. Change nothing before the σ_fill run.**
+   `SPEC_capture_quality.md` §16.23.10j is the audit; `diagnostics/dn_guard_audit.py` recomputes it.
+   ⭐ Items 1, 2 and 4 are untouched — the A/B bound and the 473 nm rule stand; what is gone is the *room*.
+   ⭐⭐ **And it sharpens this section's own headline**: the retrospective handle §0b proposed — the stored
+   reference peak — was read in the wrong units by the section proposing it. ⇒ record
+   **`referencePeakDn`, already ENCODED**, and name the field so it cannot be confused with the linear trace.
 4. ⛔ **Leave the 473 nm spike alone.** It is the single binding constraint — letting it clip buys a
    further ×1.44 — but it sits **12 nm** from the Soret band `Q%` and the domain guard depend on, and
    §16.24.8 already documents leakage from that line *unsaturated*. Take that gain **optically** (amber
@@ -200,10 +219,23 @@ evening of bench time.
 
 ### ⭐⭐⭐ 1 — IMPLEMENT `Rv`  *(highest priority; desk work, no rig time)*
 
+> ⛔⛔ **THE BASELINE IS AN OPEN TERM — added 2026-08-29.** Scored over 124 labelled runs in three solvents,
+> **`Rv`'s green and brown OVERLAP by 11.5 units** at its best single threshold (1 error). Two coherent
+> alternatives — `R` (§12) and `RvCont` (a fitted continuum) — both reach **0 errors with a positive
+> corridor** at one shared cut. `SPEC_metric_research.md` **§16** is the write-up,
+> `diagnostics/red_anchor_ab.py` reproduces every number, and `SPEC_red_ratio_metric.md` **§13** carries the
+> summary in `Rv`'s own spec.
+>
+> ⚠ **This does NOT change the build order.** Every cut in §16 is fitted on that corpus and any swap costs a
+> full M9 re-registration. **P2 still ships `Rv` beside `Q%` and moves no verdict** — that is exactly why it
+> was scoped that way. What changes is that **P6, the gauge and `RV_THRESHOLD`, must not be reached without
+> §16 having been answered**, because a threshold is a claim about a baseline.
+
 | phase | what | gate |
 |---|---|---|
 | **P0** | promote the session scripts to `diagnostics/red_ratio_archive.py`; ✅ the `sorted(os.walk(...))` bug is already fixed | — |
 | **P1** | pull the raw frames of `20270729B/002` — the one archive run `Rv` misclassifies | — |
+| ⛔ **P1a** | ⭐⭐ **NEW 2026-08-29 — read `SPEC_metric_research.md` §16 BEFORE P1.** That run is not a raw-frame problem: it is a **baseline** problem. Under a fitted continuum it reads 65.5 against a cut of 58.6 and is classified correctly, and the same change takes `Rv`'s isopropanol corridor from **−11.5 (overlapping) to +18.0** with 0 errors on all 88 runs. ⇒ P1 may be looking in the wrong place | — |
 | **P2** | ⭐ **`Rv` + two metric rows + band marker (6) at 622–627 on `Absorption (bands)`. NO gauge.** Moves no verdict, so it can ship immediately | P0 |
 | **P3** | record the finding in `SPEC_metric_research.md` §12 as `R`'s valley-referenced sibling | P2 |
 | **P6** | the gauge and `RV_THRESHOLD`, **only after M9 (item 3) passes** | P4, P5 |
@@ -251,7 +283,9 @@ both sides. That is the whole of SparSBudget's 11.3-unit wobble on 2026-08-24.
 > is a discrepancy to resolve in the preparation arm, not a refutation of either.
 
 ⇒ One SparSBudget preparation, four ways in one session: shaken/immediate · shaken/fixed 10 min ·
-filtered · sonicated 5 min. **The readout:** if turbidity falls and the pigment bands hold, filtration or
+filtered · sonicated 5 min. ⭐ **The hardware for the last arm arrived 2026-08-28** (vortex mixer +
+ultrasonic bath) and `SPEC_capture_quality.md` §16.23.2b specifies how both are used — heater off, lid
+closed, de-gassing rather than dissolution, since §14.2's scatter floor survived 300 s of ultrasound. **The readout:** if turbidity falls and the pigment bands hold, filtration or
 a centrifuge is safe — adopt it. If the bands fall with it, you are removing pigment, and sonication is
 the right route instead. ⛔ Buy nothing until this has run.
 
