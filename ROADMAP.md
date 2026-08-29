@@ -107,12 +107,29 @@ to separate drift from oil. One extra fill turns that into a measurement.
 | 2 | ⭐⭐ **Lugitsch · TWO-JAR** | **same oil, same evening, only the reference method differs** — the one thing the archive cannot supply, and what decides which blank is right |
 | 3 | **Billa Clever · same-jar** | holds the brown end so the corridor is measured, not assumed |
 | 4 | **Lugitsch · same-jar again** | a second fill of the same oil — supplies the replicate pair the metric test needs. ⛔ **NOT a drift measurement** |
+
+> ⭐⭐ **ALTERNATE THE OILS — L · B · L · B, not L · L · B · B.** This is the highest-value change to the
+> plan and it costs nothing but reordering. On 2026-08-29 the session ran Esterer · Esterer · Esterer ·
+> Billa · Billa, so **"later" and "brown" were the same axis** and the drift could not be told from the
+> oil. Alternating makes the ramp hit both classes equally and cancel out of the comparison — and it works
+> **whatever the drift turns out to be**, temperature or not.
+>
+> ⛔ **THIS IS SESSION PROTOCOL, NOT RECIPE.** The miller never does it, and it must not leak into
+> `SPEC_capture_quality.md` §16.23.2b. The *recipe* — capillary, volume, vortex, box, 6 min — is what
+> ships; the *session protocol* — alternating, the bracket, the reference runs, the running order — exists
+> only to stop OUR comparisons being confounded. The two had been muddled.
 | **4a** | ⭐ **RE-READ fill 1**, kept dark and capped all evening | two minutes, no new fill — and it is what makes the drift separable at all |
 | **5** | **Two-reference run again** | does the blank drift across an evening? §16.8a says something does |
 
 ⚠ **Two reads per fill, times logged, order kept and written down.** With a drift of this size the order
 is data.
 
+> ⭐ **AND SETTLE IN A POLYSTYRENE BOX, not under a bedsheet.** No heater, no thermostat, nothing to plug
+> in — the box does not *hold* a temperature, it slows the room's change from hours to most of a night.
+> ⭐⭐ **Keep the solvent bottle and the clean jars in it**, because six minutes in still air will not
+> equilibrate a jar (still-air time constant ≈ 8 min for 4 mL) — conditioning the inputs removes the lag
+> instead of fighting it. `SPEC_capture_quality.md` §16.23.2b step 7.
+>
 > ⭐⭐⭐ **AND LOG THE SOLVENT / ROOM TEMPERATURE WITH EVERY FILL. One number, a thermometer and a pen.**
 > `SPEC_capture_quality.md` **§16.38**: across 2026-08-29's six fills the scatter floor per unit pigment
 > **more than doubled in 2½ hours, linear against the clock (r = +0.981)** — straight through an oil
@@ -132,6 +149,13 @@ is data.
 > ⭐⭐ **The one-evening test, if you want it settled rather than watched:** two fills at the start and two
 > at the end, with the late pair's solvent **warmed back to the early pair's temperature** before dosing.
 > Ramp disappears ⇒ temperature. Ramp survives ⇒ the clock and something else.
+>
+> ⚠ **AND IT IS A LAB PROBLEM FOR THE VERDICT, A PRODUCT PROBLEM FOR THE TRACKER** (§16.38.5). Scaled to
+> the miller — one measurement, ~20 min — the drift is worth **~1.5 units against a 45-unit corridor**,
+> i.e. invisible. ⛔ But `SPEC_history_tracker.md` compares **January against July**, which is not a
+> 2½-hour drift but a 15 °C one, and it needs 4–6 unit precision. ⇒ **the shipped instrument will need to
+> record temperature with every measurement** — not to control it, but so the tracker can refuse or
+> correct a comparison across a large one. Add it to §0b's header list.
 
 ⭐ **If the evening runs short, protect step 2.** Every other fill can be repeated another night; a
 matched same-jar / two-jar pair on ONE oil in ONE evening is the only thing that resolves the blank
@@ -313,6 +337,7 @@ this is a travelling record and needs **no Alembic migration**:
 | **`referencePeakDn` + its wavelength** | the headroom to clipping, in one number, on every run. A clipped reference is a ruined run and nothing currently says so. ⛔ **ENCODED DN, not the linear trace's peak** — reading one for the other is what produced the withdrawn item 3 below |
 | **`referenceRed` = mean 622–627 of the reference** | §0a / §53.5. `Rv`'s numerator is the only band with no reference channel in `monitorRecord` |
 | **`prepProtocol` must MOVE WITH THE RECIPE** | it is a hardcoded constant. `20260826EstererE` was made two-stage and the header still claims `invert-40-after-capillaries-clear`. A stale recipe string is worse than none |
+| ⭐⭐ **`temperatureC`** — the solvent/room temperature at the fill | ⛔ **added 2026-08-29.** §16.38 makes it the largest systematic in the data and it is recorded NOWHERE. §16.38.5 makes it a **product** requirement, not only a bench habit: the tracker compares January against July, a 15 °C difference, and needs 4–6 unit precision to do it |
 
 ⭐⭐ **WHY THIS BLOCKS THE σ_fill RUN AND NOT MERELY IMPROVES IT.** That run is also the **baseline for the
 history tracker** (§0a's ±20 question). A baseline is a claim about an oil *measured on a particular
