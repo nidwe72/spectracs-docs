@@ -152,10 +152,21 @@ is data.
 >
 > ⚠ **AND IT IS A LAB PROBLEM FOR THE VERDICT, A PRODUCT PROBLEM FOR THE TRACKER** (§16.38.5). Scaled to
 > the miller — one measurement, ~20 min — the drift is worth **~1.5 units against a 45-unit corridor**,
-> i.e. invisible. ⛔ But `SPEC_history_tracker.md` compares **January against July**, which is not a
-> 2½-hour drift but a 15 °C one, and it needs 4–6 unit precision. ⇒ **the shipped instrument will need to
-> record temperature with every measurement** — not to control it, but so the tracker can refuse or
-> correct a comparison across a large one. Add it to §0b's header list.
+> i.e. invisible.
+>
+> ⭐⭐ **AND THE OPERATING RANGE IS SPEC'D: 22–28 °C, bureau or office, NOT the mill floor** (Edwin,
+> 2026-08-29 — §16.38.6; it appeared nowhere in the docs before). ⛔ An earlier draft of this item argued
+> from "January in a cold mill against July", a 15 °C swing. **Wrong product.** The range is **6 °C**, and
+> at an estimated 1.5–3 `RvLin` units per °C that is **9–18 units**: ✅ fine against the verdict's 45-unit
+> corridor, ⛔ still a problem for a tracker needing 4–6.
+>
+> ⭐ A specified range is a **control**, not only a constraint: the instrument can **refuse outside
+> 22–28 °C** (a guard in the DN-guard family), the tracker can **refuse to compare across more than n °C**,
+> and any correction only has to span 6 °C. ⇒ still add `temperatureC` to §0b's header list.
+>
+> ⭐⭐ **And 2026-08-29 is close to a WORST case** — 03:30–06:00 in an unheated room, against a miller
+> measuring in working hours in a heated office. The drift measured is **larger than the product will
+> normally see.**
 
 ⭐ **If the evening runs short, protect step 2.** Every other fill can be repeated another night; a
 matched same-jar / two-jar pair on ONE oil in ONE evening is the only thing that resolves the blank
