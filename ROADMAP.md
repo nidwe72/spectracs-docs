@@ -121,13 +121,22 @@ question, and without it every number from the new recipe stays unplaceable agai
 > two DIFFERENT fills, so their difference is `drift + fill scatter`, and that same difference is already
 > the σ_fill estimate — using it for both would be circular. ⭐ **Step 4a is what makes the set solvable:**
 >
-> | comparison | terms |
-> |---|---|
-> | step 0 vs 5 — the reference runs | **instrument + blank**, clean |
-> | **step 1 vs 4a — fill 1 read twice** | + **sample ageing** |
-> | step 1 vs 4 — two fills of one oil | + **fill scatter** |
+> | | what is compared | what is allowed to differ |
+> |---|---|---|
+> | **X** | step 0 vs 5 — the reference runs | the clock only, **no oil anywhere** |
+> | **Y** | **step 1 vs 4a — fill 1 read twice** | the clock **+ the sample sitting there** |
+> | **Z** | step 1 vs 4 — two fills of one oil | + **the fill being made again** |
 >
-> Three comparisons, three unknowns, each recovered by subtracting the row above.
+> ⛔ **IN QUADRATURE, not linearly:** `σ_fill = √(Z² − Y²)`, not `Z − Y`. With `Z` = 4.44 and a
+> hypothetical `Y` = 3.0 those give **1.44** and **3.27** — a factor of two apart, on the number the whole
+> history-tracker case rests on. ⚠ Which form applies is itself a finding: a monotone trend subtracts
+> nearly linearly, random scatter in quadrature, and the shape of the two reference runs says which.
+>
+> ⭐⭐ **`Y` HAS NEVER BEEN MEASURED** — no run in the archive reads one jar at the start of an evening and
+> again at the end. If `Y` ≈ 0 then 4.44 is real fill scatter as assumed; if `Y` ≈ 4.4 then **σ_fill ≈ 0**,
+> the fills are essentially perfect, and everything called σ_fill for weeks is the session drifting.
+> ⛔ Not a silly hypothesis: `20260828EstererF/002` repeated to four decimals, and `A_valley` climbed
+> monotonically across ten runs and two oils the same night.
 > ⚠ Keep fill 1 **dark and capped** — §39 measured +1.34 `Rv` from light on a waiting aliquot — and note
 > its jar must survive the whole evening untouched, which competes with step 2 if jars are short.
 
