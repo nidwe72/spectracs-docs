@@ -113,6 +113,26 @@ to separate drift from oil. One extra fill turns that into a measurement.
 ⚠ **Two reads per fill, times logged, order kept and written down.** With a drift of this size the order
 is data.
 
+> ⭐⭐⭐ **AND LOG THE SOLVENT / ROOM TEMPERATURE WITH EVERY FILL. One number, a thermometer and a pen.**
+> `SPEC_capture_quality.md` **§16.38**: across 2026-08-29's six fills the scatter floor per unit pigment
+> **more than doubled in 2½ hours, linear against the clock (r = +0.981)** — straight through an oil
+> change, at constant dose, with the **reference leg flat**. Edwin ruled the jar, the bottle and the recipe
+> out from the bench, and a fresh jar every fill kills the residue mechanism outright.
+>
+> ⭐ What is left that varies linearly with the clock on a 03:30 → 06:00 session is **the room**, and this
+> system's temperature response is the best-measured effect in the whole spec: §16.36 — **heat CLEARS the
+> fill, cooling re-clouds it, cloud point 35–40 °C.** The sign is right, and it is the only candidate that
+> predicts a **falling sample leg with a flat blank**.
+>
+> ⛔⛔ **It is recorded NOWHERE** — not the header, not `monitorRecord`, not the archive. Every multi-hour
+> session since §16.36 has been running an uncontrolled temperature experiment underneath every fill.
+> ⇒ **`F`, `A_valley` and every σ_fill from a long session carry an unknown temperature term until it is
+> logged.**
+>
+> ⭐⭐ **The one-evening test, if you want it settled rather than watched:** two fills at the start and two
+> at the end, with the late pair's solvent **warmed back to the early pair's temperature** before dosing.
+> Ramp disappears ⇒ temperature. Ramp survives ⇒ the clock and something else.
+
 ⭐ **If the evening runs short, protect step 2.** Every other fill can be repeated another night; a
 matched same-jar / two-jar pair on ONE oil in ONE evening is the only thing that resolves the blank
 question, and without it every number from the new recipe stays unplaceable against the archive.
