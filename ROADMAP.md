@@ -469,7 +469,20 @@ evening of bench time.
    §16.24.8 already documents leakage from that line *unsaturated*. Take that gain **optically** (amber
    filter, or a lower blue drive) as part of `SPEC_lamp_rebuild.md`, where a full `Rv` re-validation is
    already budgeted under §6.7.
-5. ⭐⭐⭐ **PIN THE EXPOSURE AT 90, DECLARED BY THE PLUGIN — added 2026-08-30, Edwin's proposal.** Item 1
+5. ✅ **PIN THE EXPOSURE AT 90 — BUILT AND RIG-VERIFIED 2026-08-30.** `DevSpectralPlugin.exposure = 90`
+   seeds the slider and clears the auto-exposure checkbox, after which the existing capture path skips the
+   sweep by itself; the FOURCC is pinned to `YUYV` with a read-back and a guarded reopen; and
+   `exposureApplied` — the READ-BACK, not the declaration — rides in the report header as a transient field,
+   no Alembic revision. First rig run: `pixel format = YUYV`, `2592x1944` intact, no wedge, no AE sweep,
+   `exposure_applied=90`. `SPEC_capture_quality.md` **§16.39.5b** is the as-built.
+   ⭐ **And it found what it was not looking for:** the camera accepts **0–5000** where the slider offers
+   **1–500**, so the AE sweep has only ever searched the bottom tenth of the range. Not binding at 90, but
+   "the AE only ever landed on 90 or 104" is partly a statement about the sweep's own bounds.
+   ⛔ `SpectrometerSensorSettings.measurementExposure` is **retired, not filled** (Edwin, D21): one number,
+   one place. The cost is that a camera swap means editing the plugin.
+
+   *(The original proposal, kept because the reasoning is what earned the decision:)*
+   ⛔⛔ **PIN THE EXPOSURE AT 90, DECLARED BY THE PLUGIN — added 2026-08-30, Edwin's proposal.** Item 1
    above says *"do not change exposure during the σ_fill run"*; §16.39 shows the sweep **changed it by
    itself, inside that very run**, on fill `20260828LugitschE`. Item 1 cannot be honoured by intent alone.
    ⇒ `SPEC_capture_quality.md` **§16.39.5**: the plugin declares the exposure beside `frameCount` /
@@ -506,7 +519,7 @@ evening of bench time.
 | **P0** | promote the session scripts to `diagnostics/red_ratio_archive.py`; ✅ the `sorted(os.walk(...))` bug is already fixed | — |
 | **P1** | pull the raw frames of `20270729B/002` — the one archive run `Rv` misclassifies | — |
 | ⛔ **P1a** | ⭐⭐ **NEW 2026-08-29 — read `SPEC_metric_research.md` §16 BEFORE P1.** That run is not a raw-frame problem: it is a **baseline** problem. Under a fitted continuum it reads 65.5 against a cut of 58.6 and is classified correctly, and the same change takes `Rv`'s isopropanol corridor from **−11.5 (overlapping) to +18.0** with 0 errors on all 88 runs. ⇒ P1 may be looking in the wrong place | — |
-| **P2** | ⭐ **`Rv` + two metric rows + band marker (6) at 622–627 on `Absorption (bands)`. NO gauge.** Moves no verdict, so it can ship immediately | P0 |
+| ✅ **P2** | ⭐ **DONE 2026-08-30.** `RvLin` + `Rv` + `RvCont` as three rows at the HEAD of the metric block — **`RvLin` first** (Edwin) — plus the 624 nm band marker on `A(λ) — V bands`. One private `__rvTerms` computes all three, returning None per member rather than a clamped ratio. **NO gauge, no threshold, no verdict; `Q%` keeps the pill.** ⚠ `Rv`/`RvLin` reproduce `diagnostics/red_anchor_ab.py` exactly on seven archived fills; `RvCont` agrees to ≤0.6 % on greens and diverges 11 units on the extreme brown, where its numerator crosses zero. `tests/test_red_ratio_rows.py` | P0 |
 | **P3** | record the finding in `SPEC_metric_research.md` §12 as `R`'s valley-referenced sibling | P2 |
 | **P6** | the gauge and `RV_THRESHOLD`, **only after M9 (item 3) passes** | P4, P5 |
 
