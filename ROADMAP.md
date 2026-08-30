@@ -313,6 +313,15 @@ one session is how the 08-26 session ended with three explanations and no way to
 
 ### ⛔⛔ 0b — RECORD THE INSTRUMENT STATE IN THE REPORT HEADER. BEFORE THE σ_fill RUN.  *(2026-08-27)*
 
+> ⚠ **PARTLY DONE 2026-08-30 — AND THE PART THAT MATTERS MOST IS STILL OPEN.** Two header defects were
+> fixed (`spectracsPy` `60c5129`): `timestampIso` is now stamped at the **measurement** rather than at Save
+> — it had been `null` in *every report in the archive*, so runs could not be put in time order at all —
+> and `prepProtocol` is resolved **per run** by `PrepProtocolResolver` from `prepProtocol.txt` in the app
+> data directory instead of being compiled in. `SPEC_metric_research.md` §16.15.4 records both.
+> ⛔⛔ **THE EXPOSURE IS STILL NOT IN THE HEADER**, which is what this section actually asks for and the
+> one instrument setting known to move the verdict by −13.5 %. **§0b is NOT cleared, and it still gates
+> the σ_fill run of `SPEC_metric_research.md` §16.16.**
+
 **The exposure is not written down anywhere.** Verified today against `20260826EstererB/001` and
 `20260826EstererE/001`: the header carries `solvent`, `prepProtocol` and `captureDecode` — and nothing
 about the camera. Yet `SPEC_capture_quality.md` **§16.24.1** is the finding that a single exposure change
