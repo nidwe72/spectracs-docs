@@ -73,6 +73,70 @@ immediately before the second pour — §6.6 found the prep stratifies.
 across nine hours with oil perfectly confounded against time-of-evening, and afterwards there was no way
 to separate drift from oil. One extra fill turns that into a measurement.
 
+### ⭐⭐⭐ 0-DONE / 0-NEXT′ — THE σ_fill RUN IS ON DISK, AND THE NEXT EVENING IS DIFFERENT BECAUSE OF IT  *(Edwin, 2026-08-30)*
+
+> ✅ **§0's six-fill run RAN**: `20260828LugitschA…F`, one oil, one recipe family, two reads each.
+> `SPEC_history_tracker.md`'s **2026-08-30 POSITION** carries the result; `SPEC_capture_quality.md` §16.39
+> carries the instrument finding that reshapes the plan.
+>
+> ```
+> RvLin sigma_fill   all six 2.76   |   exposure-90 only 1.03   |   clean-609 only 0.82
+> 3-sigma on one new fill   8.96    |            3.40           |          2.74
+> ```
+>
+> ⭐ **The optimistic case is genuinely good** — 2.74 units beats this programme's own 4–6 requirement and is
+> 7× tighter than the ±20 band it was designed around: *a change one-sixth of the way from this oil to a
+> visibly different pumpkin oil, from a single 20-minute measurement.*
+> ⛔ **It is not established.** Both filters that produce it were chosen after seeing which fill they remove.
+
+**THE DECISION, Edwin 2026-08-30 — three steps, in this order:**
+
+1. ⭐⭐ **PIN THE EXPOSURE AT 90** (§0b item 5, `SPEC_capture_quality.md` §16.39.5), **and the FOURCC with
+   it** (§16.39.5a — MJPG sits at index 0 and we currently rely on OpenCV preferring uncompressed). One rig
+   session verifies both. ⛔ The *number* is a property of the CAMERA, so it belongs in
+   `SpectrometerSensorUtil` beside the VID/PID; the plugin declares *"pin, do not auto-expose"*, not the value.
+2. ⭐⭐⭐ **THE 90 / 104 / 90 RE-SEAT — three reads of ONE fill, ~8 minutes, and it must be the FIRST thing.**
+   `SPEC_capture_quality.md` §16.39.7. It is the only measurement that separates *"the exposure broke fill E"*
+   from *"`RvLin` throws 5.4-unit outliers on its own"*, and those point at opposite work. ⚠ **Cheapest
+   before the pin ships** — afterwards, running at 104 takes deliberate effort.
+3. **Then the reference set** — see the inventory below, which is why this is bigger than it looks.
+
+#### ⛔⛔ THE INVENTORY NOBODY HAD RUN — the reference set is one oil deep, and it has no brown end
+
+The AE-landed exposure is recoverable per run (`R530 > 140 ⇒ 104`, 8/8 against the log). On the same-jar fills:
+
+```
+                at exposure 90    at 104
+Lugitsch              5              1
+Steirerkraft          1              1
+Esterer               0              3
+Billa Clever          0              2      <-- BOTH browns
+```
+
+⛔ Under a pin-at-90 rule **Esterer and Billa Clever have ZERO usable fills.** "Then measure the other oils"
+is **starting three oils from scratch**, not topping up.
+⛔⛔ **AND THERE IS NO BROWN FILL AT 90 ANYWHERE**, so the green/brown corridor cannot be measured on the
+homogeneous set — every corridor figure in `SPEC_metric_research.md` §16.10.2 comes from a mixed-exposure
+corpus. ⇒ **a BROWN oil is the first thing to re-measure, not the last.** Bigger hole than σ_fill, and
+invisible until the exposure could be recovered.
+
+#### ⭐ THE EVENING, as it now stands
+
+| # | what | why |
+|---|---|---|
+| **1** | **Lugitsch, one fill, read 90 / 104 / 90** | step 2 above. Do it first or it does not get done |
+| **2** | **Billa Clever ×3 fills** | ⛔ the corridor has no brown end at 90. This is the gap, not Lugitsch |
+| **3** | **Lugitsch ×3 fills** | re-earn σ_fill on a FORWARD set at the pinned exposure |
+| 4 | Esterer / Steirerkraft ×3 each | per-oil thresholds (§8.3) need ≥3; a later evening is fine |
+
+⚠ **ALTERNATE THE OILS — L · B · L · B.** §0-NEXT's rule, and it still applies: on 2026-08-29 the order made
+"later" and "browner" the same axis and drift could not be told from oil. Costs nothing but the running order.
+⚠ **Three fills per oil, not two.** At σ_fill 1.03 three fills pin a mean to **±0.59**; two give a hint.
+⚠ **Log the temperature per fill** (§16.38) and keep two reads each, times written down.
+⛔ **Watch the DN guard on thin fills.** At a fixed 90, `20260828EstererC` already reads **50.4–51.2 DN,
+above the 20–50 window**. With the exposure pinned that cannot be rescued by exposure — the answer is
+§16.23.2b's volume rule. Decide it before you are at the bench.
+
 ### ⭐⭐⭐ 0-METRIC — `RvLin` IS THE WORKING CHOICE FOR THE CONTINUOUS NUMBER  *(Edwin, 2026-08-29)*
 
 > ⭐⭐ **`Rv` keeps the VERDICT. `RvLin` becomes the candidate for the NUMBER** — the history tracker, and
@@ -321,6 +385,18 @@ one session is how the 08-26 session ended with three explanations and no way to
 > ⛔⛔ **THE EXPOSURE IS STILL NOT IN THE HEADER**, which is what this section actually asks for and the
 > one instrument setting known to move the verdict by −13.5 %. **§0b is NOT cleared, and it still gates
 > the σ_fill run of `SPEC_metric_research.md` §16.16.**
+>
+> ⭐⭐⭐ **AND 2026-08-30 TURNED THE COST FROM HISTORICAL INTO CURRENT.** `SPEC_capture_quality.md` **§16.39**:
+> the AE sweep re-rolls before **every reference capture** and lands on 90 or 104 — nothing else, ever, in the
+> whole archive. It is chosen by the application, recorded nowhere, and it moved **inside the six-fill
+> Lugitsch σ_fill run**, on `20260828LugitschE`. ⇒ item 1 below — *"do not change exposure during the σ_fill
+> run"* — **cannot be honoured by intent**, which is the argument for pinning it (item 5).
+> ⛔ **WHAT IS NOT ESTABLISHED: that the step corrupted anything.** §16.39.3a retracts the first draft's
+> mechanism — the moved crossover shifts `RvLin`'s 612–615 anchor by **0.0013 A**, and `Δ` does not split by
+> exposure. `Rv` is confirmed invariant (§16.27.1a); `RvLin` is **untested**, and `E` being both the one
+> exp-104 fill and the one `RvLin` outlier is one fill's coincidence until §16.39.7's ten-minute
+> 90/104/90 re-seat says otherwise. **Pin and record the exposure because it is an uncontrolled unlogged
+> variable — not because it is a proven fault.**
 
 **The exposure is not written down anywhere.** Verified today against `20260826EstererB/001` and
 `20260826EstererE/001`: the header carries `solvent`, `prepProtocol` and `captureDecode` — and nothing
@@ -353,7 +429,7 @@ this is a travelling record and needs **no Alembic migration**:
 
 | field | why |
 |---|---|
-| **exposure** (and gain / white balance if separately settable) | §16.24.1's 13.5 %. Without it no run can be compared to another across a settings change |
+| **exposure** (and gain / white balance if separately settable) | §16.24.1's 13.5 %. Without it no run can be compared to another across a settings change. ⭐⭐ **AND §16.39's −6.19 σ on `RvLin`** — the sweep re-rolls before every reference and the archive cannot say which state a run used. Name the field `exposureApplied`, to match the `CAPTURE-SETTINGS` log line it comes from |
 | **`referencePeakDn` + its wavelength** | the headroom to clipping, in one number, on every run. A clipped reference is a ruined run and nothing currently says so. ⛔ **ENCODED DN, not the linear trace's peak** — reading one for the other is what produced the withdrawn item 3 below |
 | **`referenceRed` = mean 622–627 of the reference** | §0a / §53.5. `Rv`'s numerator is the only band with no reference channel in `monitorRecord` |
 | **`prepProtocol` must MOVE WITH THE RECIPE** | it is a hardcoded constant. `20260826EstererE` was made two-stage and the header still claims `invert-40-after-capillaries-clear`. A stale recipe string is worse than none |
@@ -393,6 +469,23 @@ evening of bench time.
    §16.24.8 already documents leakage from that line *unsaturated*. Take that gain **optically** (amber
    filter, or a lower blue drive) as part of `SPEC_lamp_rebuild.md`, where a full `Rv` re-validation is
    already budgeted under §6.7.
+5. ⭐⭐⭐ **PIN THE EXPOSURE AT 90, DECLARED BY THE PLUGIN — added 2026-08-30, Edwin's proposal.** Item 1
+   above says *"do not change exposure during the σ_fill run"*; §16.39 shows the sweep **changed it by
+   itself, inside that very run**, on fill `20260828LugitschE`. Item 1 cannot be honoured by intent alone.
+   ⇒ `SPEC_capture_quality.md` **§16.39.5**: the plugin declares the exposure beside `frameCount` /
+   `solvent` / `prepProtocol`; it is **resolver-backed** like `prepProtocol` (env → file → declaration), not
+   a bare constant; `CapturePanel` skips the sweep and seeds `__lockedExposure` from it; and
+   `exposure_applied` lands in the header **in the same change**.
+   ⭐ 90 is chosen because it holds the crossover at 608.1–609.1 nm, clear of `RvLin`'s anchor, and puts the
+   DN guard at 34.4–38.0 — mid-window.
+   ⛔ **Do not delete the sweep** (it is what *finds* the value when the lamp or camera changes, and
+   `SPEC_lamp_rebuild.md` will need it), and keep the calibration path on auto.
+   ⚠ **One priced cost:** at exposure 90, `20260828EstererC` reads a DN guard of **50.4–51.2, above the
+   20–50 window**. Pinning makes dose the only lever, which is §16.23.2b's volume rule — accepted
+   deliberately, not discovered later.
+   ⭐ **And the archive can be re-labelled retrospectively meanwhile**: `diagnostics/spar_three_oils.py`'s
+   `R530 > 140 ⇒ 104` rule is **8/8 correct** against the 2026-08-30 log and splits the whole 08-28 series
+   with no overlap. Worth running before any `RvLin` figure is quoted from the archive.
 
 ### ⭐⭐⭐ 1 — IMPLEMENT `Rv`  *(highest priority; desk work, no rig time)*
 
