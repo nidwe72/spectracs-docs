@@ -15,7 +15,7 @@
 > | **2** | **domain objects for product line / raw-material lot / production batch** | ⭐⭐⭐ ESSENTIAL | ⭐ **decided 2026-09-01** — objects, not free text, and **oil-agnostic**: Edwin, *"even other oils have the same concepts/usages"* | §0c |
 > | **3** | **`monitorRecord` gains a red reference channel at 622–627** | ⭐⭐⭐ ESSENTIAL | the one instrument fault that moves `Rv` with an identical sample is invisible to the live gate; worth **≈5 Rv**, the size of σ_fill itself | `SPEC_settled_measurement.md` §53.5 |
 > | **4** | **verify the `pow2.2` decode against a raw frame** | ⭐⭐⭐ ESSENTIAL | one grab. The whole DN budget — and every σ_fill reading of it — rests on it | `SPEC_capture_quality.md` §16.40.1 |
-> | **5** | **the green-vs-green run** (4 fills, 8 runs, pre-registered) | ⭐⭐ one evening | the eye label is already fixed; it is the first pre-registered green-vs-green the archive can have | §0a |
+> | **5** | **six fills of JA NATUERLICH** (⛔ *replaces* the retracted green-vs-green run) | ⭐⭐ one evening | its σ_fill rests on **1 df** and cannot be banked; six fills also take the green-vs-green gap from t = 5.5 to 7.8 — and ⛔ **no Lugitsch**, its six are already banked | §0a |
 > | **6** | **the σ_fill run, 6 fills of one oil** | ⭐⭐ one evening | σ_fill's CI is a factor of 3; it sets every alarm level and the tracker's whole fidelity | §0 |
 > | **7** | **counts on the brown 624 band** (is exposure 90 the right pin? frame integration?) | ⭐⭐ discuss | the brown band is **5 DN**; it caps brown-oil precision permanently and no metric change can help | §0b·1, `SPEC_capture_quality.md` §16.40.6 |
 > | **8** | **the low-signal guard for `Rv`** (numerator near zero ⇒ "no band") | ⭐ discuss | Billa Clever reads `Rv` −10 to +42 across six fills because its band crosses zero | §0b·2 |
@@ -136,20 +136,39 @@
 > 10×, renders "no band" as neutral grey — and is a picture of the number rather than of the spectrum, which
 > is the line Edwin drew. **Nothing is built.**
 
-### 📌⭐⭐⭐ 0a — THE GREEN-vs-GREEN RUN, PRE-REGISTERED  *(NEW 2026-08-31. One evening, 4 fills, 8 runs. Two dilutions are already on the bench.)*
+### 📌⭐⭐ 0a — SIX FILLS OF JA NATUERLICH  *(⛔ the pre-registered green-vs-green run of 2026-08-31 is RETRACTED — see below)*
 
-> ⭐⭐ **Edwin ranked two oils BY EYE BEFORE MEASURING THEM** — *"Lugitsch is yellowischer/brwoner than the
-> BillaJaNtürlich oil"* — which is the pre-registered green-vs-green label the archive has never had.
-> `SPEC_metric_research.md` **§16.17** is the registered design, read rule and cut, all written before the
-> run. Predictions are fixed: `Rv` passes, `RvLin` fails the margin, `Q%` is right but unresolved.
+> ⛔⛔ **THE REGISTERED RUN WAS REDUNDANT, and Edwin caught it in one sentence** (2026-09-01: *"in the suite
+> most measurements are Lugitsch ones, why other Lugitsch measurements?"*). The `20280831_suite` already
+> holds **six Lugitsch fills and two Ja Natuerlich fills under one method and one recipe** — the comparison,
+> already collected. The registered fresh 2+2 would have made it **worse**: standard error 3.42 against the
+> suite's 2.79, t = 4.5 against **5.52**. Full retraction in `SPEC_metric_research.md` §16.17.0.
 >
-> ⛔ **LUGITSCH MAY NOT BE THE GREEN BENCHMARK.** It is the oil on every by-day row and the dotted reference
-> line on all of them; the archive says Ja Natuerlich's `Rv` sits **8.47 above Lugitsch's highest of ten
-> fills**, and repeats to **0.26 across 19 days, two solvent eras and the exposure pin**.
+> ⭐⭐ **THE ANSWER, ALREADY ON DISK:** Lugitsch **107.45** (6 fills, sd 3.74) against Ja Natuerlich
+> **122.85** (2 fills) — gap **+15.40**, **t = 5.52** on 6 df, and the raw fills do not overlap: Lugitsch's
+> highest 111.72, Ja Natuerlich's lowest 122.75, **11.03 apart**. `Rv` reproduces Edwin's eye order with no
+> new measurement. `RvLin` does not (its ranges overlap; §16.15.6a).
 >
-> ⚠ **TWO fills per oil, not one** (§16.17.4: Lugitsch moves sd 3.74 between fills within a session, which is
-> the size of the gap being tested), **alternate the order**, keep the aliquots **dark**, and ⛔ **edit
-> `~/.spectracsPy/prepProtocol.txt` first** — 8 ml + 2 capillaries is not the corpus recipe.
+> ⚠ **The eye label is recorded with its real strength, not more.** Edwin ranked the two oils before any
+> number was computed — but the data already existed on disk, so what was fixed in advance is *his knowledge
+> of it*, not the data's existence. Worth having, weaker than a pre-registration, and §16.17.2 says so.
+>
+> ⭐ **WHAT TO RUN INSTEAD — six fills of Ja Natuerlich, and no Lugitsch.** Precision is set by the oil with
+> fewer fills, and Lugitsch's six are banked:
+>
+> | Ja Natuerlich fills | standard error | t |
+> |---|---|---|
+> | 2 (today) | 2.79 | 5.5 |
+> | 4 | 2.21 | 7.0 |
+> | **6** | **1.97** | **7.8** |
+>
+> Six of Ja Natuerlich alone reaches what a 6+6 session would, for half the work — **and it delivers the
+> σ_fill that §0 wants at the same time**, on the oil whose σ (0.15, 1 df) is the most consequential unknown
+> in the project. Current recipe, same-jar, two reads per fill, aliquots dark, nothing changed mid-evening.
+> ⛔ No cut is registered: this is an ESTIMATE, and inventing a threshold for it afterwards is §16.3a's trap.
+>
+> ⭐ **The reusable lesson:** *before registering a run, ask what is already on disk.* The design was written
+> against the archive as it stood a day earlier, and the archive had grown a controlled corpus that evening.
 
 ### ⭐⭐⭐ 0 — THE σ_fill RUN  *(NEXT. Set 2026-08-27. One evening. Everything below waits on it.)*
 
