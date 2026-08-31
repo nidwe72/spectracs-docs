@@ -20,6 +20,7 @@
 > | **7** | **counts on the brown 624 band** (is exposure 90 the right pin? frame integration?) | ⭐⭐ discuss | the brown band is **5 DN**; it caps brown-oil precision permanently and no metric change can help | §0b·1, `SPEC_capture_quality.md` §16.40.6 |
 > | **8** | **the low-signal guard for `Rv`** (numerator near zero ⇒ "no band") | ⭐ discuss | Billa Clever reads `Rv` −10 to +42 across six fills because its band crosses zero | §0b·2 |
 > | **9** | **the filterable history graph**, with provenance breaks drawn as vertical marks | ⭐ HIGH, not essential | a graph invites comparison across time; without the breaks a miller reads an instrument step as an oil change | `SPEC_history_tracker.md` 2026-09-01 §5 |
+> | **9a** | **the inspection colour, scheme `K`** — a false-colour swatch of the 624 band beside the reading | ⭐ nice to have | ✅ **chosen 2026-08-31**; measured, spec'd, **not built**. ⛔ NOT a verdict and NOT a metric — the caveat ships in the plugin's own metric description | `SPEC_metric_research.md` §16.15.8 |
 > | **10** | **`Rv` on the page / P6 gauge + threshold** | ⏸ gated on M9 | unchanged | `SPEC_red_ratio_metric.md` §7 |
 > | **11** | **the tracker itself** — frozen baseline, k-reading mean, per-oil thresholds | ⏸ optional | needs 3, 4, 6 and a physical standard first | `SPEC_history_tracker.md` |
 > | ✅ | the measurement clock; the stale plot test; the `*_suite` convention; scheme `K` chosen | done 08-31 / 09-01 | | §16.15.5, §16.15.7, §16.15.8 |
@@ -113,28 +114,40 @@
 > expectation was a week old. Now asserts WHICH four windows survive the guard rather than how many, so the
 > next window cannot break it silently. **70 plugin tests green.**
 >
-> **4 · ⭐ THE INSPECTION COLOUR — candidates measured, one to choose.**
+> **4 · ✅ THE INSPECTION COLOUR — DECIDED: scheme `K`.** *(Edwin, 2026-08-31: "think that K is the winner
+> and the plugin has descriptions of metric values so things can be explained there")*
 > `spectracs-references/tmp/20260831_rv_colour_candidates.pdf` (`diagnostics/rv_colour_candidates.py`).
-> ⛔ Edwin's framing: *"the 'new color' should be not a color for a verdict or a metric but only for a rough
-> inspection"*. Scored as ΔE between the oils ÷ worst ΔE between two fills of one oil:
+> ⛔ Edwin's framing throughout: *"the 'new color' should be not a color for a verdict or a metric but only
+> for a rough inspection"*. Nine schemes, scored as ΔE between the oils ÷ worst ΔE between two fills of one
+> oil:
 >
-> | scheme | ratio |
-> |---|---|
-> | A the real spectrum, path 3 — **what ships today** | **1.6×** |
-> | B only `Rv`'s windows vary | 1.8× |
-> | C two bands = `Rv`'s two terms | 2.6× |
-> | D the 624 band alone | 4.2× |
-> | F D with L\* pinned — dose leaves the swatch | 4.2× |
-> | G the RATIO as the band depth, L\* pinned | **10.2×** |
+> | scheme | ratio | |
+> |---|---|---|
+> | A the real measured absorbance, path 3 | **1.6×** | ⛔ what ships today |
+> | B only `Rv`'s windows vary | 1.8× | Edwin's first form |
+> | C two bands = `Rv`'s two terms | 2.6× | |
+> | D the 624 band alone | 4.2× | |
+> | E a **Planck radiator** in place of the flat baseline | 4.1–4.2× | ⛔ at EVERY temperature, 1800–10000 K |
+> | F D with L\* pinned | 4.2× | |
+> | **K — D on the MEASURED blue's shape, small peak, flat L\*** | **3.3×** | ⭐ **CHOSEN** |
+> | L — C on the measured blue | 2.1× | ⛔ inverts the order |
+> | G the RATIO as the band depth | 10.2× | a picture of the number, not the band |
 >
-> ⭐⭐ **THE PATTERN IS THE POINT: every step that removes DOSE buys discrimination, and changing the
-> ILLUMINANT buys none.** A Planck radiator swept 1800–10000 K in place of the flat baseline (Edwin's idea)
-> moves the hue a long way and leaves the score at 4.1–4.2× **at every temperature** — the illuminant is a
-> display choice, not an information channel. ⛔ And A's 1.6× is the phone-picture problem in numbers:
-> Ja Natuerlich (`Rv` 123.6) renders `179,211,96` and Billa Clever A (`Rv` −7.1) renders `211,191,103`.
-> ⚠ **The choice is D/F versus G**: D and F picture the BAND and cap at ~4×; G pictures the RATIO, reaches
-> 10×, renders "no band" as neutral grey — and is a picture of the number rather than of the spectrum, which
-> is the line Edwin drew. **Nothing is built.**
+> ⭐ **`K` costs 0.8× against `F` and buys a real BLUE CHANNEL (38–58) where the constant-Gaussian `H` clips
+> it to 0** — a three-channel colour rather than a two-channel ramp, and it looks like oil: green
+> `102,192,58` → olive `165,180,38`. That 0.8× **is** the fill-to-fill variation of the blue.
+>
+> ⭐⭐ **THE PATTERN IS THE FINDING:** every step that removes **DOSE** buys discrimination (A → D → G:
+> 1.6 → 4.2 → 10.2×), every step that adds a **second varying band** costs it (D → C, K → L), and changing
+> the **ILLUMINANT** buys nothing — Edwin's Planck idea, swept 1800–10000 K, moves the hue a long way and
+> leaves the score flat.
+> ⛔ And A's **1.6×** is the phone-picture problem in numbers: Ja Natuerlich (`Rv` 123.6) renders
+> `179,211,96` and Billa Clever A (`Rv` −7.1) renders `211,191,103` — two oils at opposite ends of the
+> metric, near-identical yellow-greens.
+>
+> ⚠ **NOT BUILT.** `K`'s blue is measured but carries about a twentieth of the weight it appears to, and its
+> amplitude is a display constant — the caveat ships with the swatch, in the plugin's own description text.
+> Priority: item **9a**, the nice-to-have tier, below the graph.
 
 ### 📌⭐⭐ 0a — SIX FILLS OF JA NATUERLICH  *(⛔ the pre-registered green-vs-green run of 2026-08-31 is RETRACTED — see below)*
 
