@@ -2,6 +2,28 @@
 
 ## ▶▶▶▶▶▶▶▶▶ WHAT TO DO NEXT  *(the standing TODO list — RESET 2026-08-25. Ask "what to do next?" and start here.)*
 
+### 📋📋 THE PRIORITISED LIST — set 2026-09-01, read this first
+
+> ⭐⭐⭐ **THE TIERS ARE EDWIN'S, 2026-09-01, and they order everything below.** A correct, fully-provenanced
+> **single measurement is the product**; the history **graph** is high priority and *not* essential
+> (*"the user could also put things in an Excel table"*); the **tracker** is optional on top of the graph
+> and ⛔ **must never be part of a single oil's measurement**.
+>
+> | # | item | tier | why now | where |
+> |---|---|---|---|---|
+> | **1** | **the reference method as a header field** (same-jar / two-jar), resolver-backed | ⭐⭐⭐ ESSENTIAL | recorded NOWHERE; supplied by hand 3× on 08-31 to read one evening, and it decides whether two runs are comparable at all | §0c |
+> | **2** | **domain objects for product line / raw-material lot / production batch** | ⭐⭐⭐ ESSENTIAL | ⭐ **decided 2026-09-01** — objects, not free text, and **oil-agnostic**: Edwin, *"even other oils have the same concepts/usages"* | §0c |
+> | **3** | **`monitorRecord` gains a red reference channel at 622–627** | ⭐⭐⭐ ESSENTIAL | the one instrument fault that moves `Rv` with an identical sample is invisible to the live gate; worth **≈5 Rv**, the size of σ_fill itself | `SPEC_settled_measurement.md` §53.5 |
+> | **4** | **verify the `pow2.2` decode against a raw frame** | ⭐⭐⭐ ESSENTIAL | one grab. The whole DN budget — and every σ_fill reading of it — rests on it | `SPEC_capture_quality.md` §16.40.1 |
+> | **5** | **the green-vs-green run** (4 fills, 8 runs, pre-registered) | ⭐⭐ one evening | the eye label is already fixed; it is the first pre-registered green-vs-green the archive can have | §0a |
+> | **6** | **the σ_fill run, 6 fills of one oil** | ⭐⭐ one evening | σ_fill's CI is a factor of 3; it sets every alarm level and the tracker's whole fidelity | §0 |
+> | **7** | **counts on the brown 624 band** (is exposure 90 the right pin? frame integration?) | ⭐⭐ discuss | the brown band is **5 DN**; it caps brown-oil precision permanently and no metric change can help | §0b·1, `SPEC_capture_quality.md` §16.40.6 |
+> | **8** | **the low-signal guard for `Rv`** (numerator near zero ⇒ "no band") | ⭐ discuss | Billa Clever reads `Rv` −10 to +42 across six fills because its band crosses zero | §0b·2 |
+> | **9** | **the filterable history graph**, with provenance breaks drawn as vertical marks | ⭐ HIGH, not essential | a graph invites comparison across time; without the breaks a miller reads an instrument step as an oil change | `SPEC_history_tracker.md` 2026-09-01 §5 |
+> | **10** | **`Rv` on the page / P6 gauge + threshold** | ⏸ gated on M9 | unchanged | `SPEC_red_ratio_metric.md` §7 |
+> | **11** | **the tracker itself** — frozen baseline, k-reading mean, per-oil thresholds | ⏸ optional | needs 3, 4, 6 and a physical standard first | `SPEC_history_tracker.md` |
+> | ✅ | the measurement clock; the stale plot test; the `*_suite` convention; scheme `K` chosen | done 08-31 / 09-01 | | §16.15.5, §16.15.7, §16.15.8 |
+
 > ⭐⭐⭐ **`Rv` IS THE VERDICT METRIC. Edwin's decision, 2026-08-25.** Implementing it is the single
 > highest-priority item on this page. `SPEC_red_ratio_metric.md` is the contract.
 >
@@ -24,6 +46,110 @@
 > ⛔ **CHOSEN, NOT MIGRATED.** Isopropanol is still the recipe. §4A.5 lists the three things that must
 > happen first — record solvent + bottle in every report, run the preparation arm, and re-run the
 > pre-registered test **in sunflower**.
+
+> ⭐⭐⭐ **CORROBORATED 2026-08-31, on evidence of a new kind.** The first exposure-pinned session
+> (`20260831*`, six fills of two oils) lets the question be asked in **camera counts** rather than corpus
+> scores — `SPEC_capture_quality.md` §16.40. On raw DN **no single band separates green from brown**
+> (1.5 σ on the 624 window, 4.7 σ at best on the Q band), yet `Rv` separates them **33.4 σ**, because the
+> instrument's dominant error is **common-mode** (`r(Q, 624) = +0.943` within one oil) while the oil signal
+> is **anti-correlated** (Q +12.7 DN, 624 −3.3 DN, opposite directions). ⇒ `Rv` divides out the error and
+> multiplies the signal, and that argument uses **no threshold, no window fit and no class label** — so it
+> sits outside M9's circularity concern. Edwin, same evening: *"i now also tend to Rv"*.
+>
+> ⛔ **IT DOES NOT WAIVE M9 AND IT DOES NOT SET `T`.** Two oils, one evening.
+>
+> ⛔⛔ **AND IT NAMES A NEW BINDING CONSTRAINT, WHICH IS NOT A METRIC PROBLEM.** The brown oil's 624 band is
+> **5.0 DN tall** (the green's is 12.8), which is why `Rv`'s fill-to-fill scatter is 4.11 on the brown and
+> 0.19 on the green — and why **every σ_fill figure in this archive is a 1–3 count effect**. §16.40.6 has
+> the ordered follow-ups; the first is **verifying the `pow2.2` decode round-trip against a raw frame**,
+> which costs one grab and which all of the above depends on.
+
+### ⭐⭐⭐ 0c — MEASUREMENT PROVENANCE: THE ESSENTIAL TIER  *(Edwin, 2026-09-01 — HIGH PRIORITY)*
+
+> ⭐⭐ **THE STANCE, IN EDWIN'S WORDS.** *"There are a lot of devices out there that are pure measurement
+> devices. So only things like exposure, lab recipe etc., that are bound to the device and the measurement
+> itself are essential!"* ⇒ **Spectracs is a measurement device first.** A correct, fully-provenanced
+> single measurement is the product. The history graph is *nice to have*; the tracker is optional on top of
+> the graph. ⛔ Nothing in the tracker's design may become a precondition for shipping a measurement.
+>
+> **⛔ HIGH PRIORITY — the fields that are still missing or were wrong:**
+>
+> | | |
+> |---|---|
+> | ⛔ **the reference method** | same-jar vs two-jar is recorded **NOWHERE**. It had to be supplied by hand three times on 2026-08-31 to interpret one evening's runs, and it decides whether two measurements are comparable at all. ⇒ a header field beside `solvent` and `prepProtocol`, resolved per run the way `PrepProtocolResolver` resolves the recipe |
+> | ✅ **the measurement clock** | *fixed 2026-08-31* — `timestampIso` was stamped once at engine construction (the bench view opening), so every run of a session shared it: four fills of 08-30 and six of 08-31 all carried one stamp. Now read per capture, both capture paths. `SPEC_metric_research.md` §16.15.5 |
+> | ⭐⭐ **product line / raw-material lot / production batch** | ✅ **DECIDED 2026-09-01: DOMAIN OBJECTS, not free text** — and **oil-agnostic**, because *"even other oils have the same concepts/usages"* (Edwin). ⇒ a **lot** is the comparison unit and needs an identity that survives a two-month gap between pressings; a **batch** is one pressing; a **product line** is what the miller sells. ⛔ Name them for the concept, not the crop: `RawMaterialLot` / `ProductionBatch`, with the pumpkin seed lot as one instantiation. A measurement references the batch, and reaches the lot and the line through it. ⚠ The exact entity shape and where they live (app DB vs server) is still design |
+> | ✅ already carried | `solvent`, `prepProtocol` (resolver-backed), `exposureApplied`, `captureDecode`, plugin codeRef + version, user |
+>
+> ⭐ **THE SEED LOT IS THE UNIT.** From `SPEC_wirtschaftliches.md` §3: one pressing ≈ **10 L = 25 kg seed**,
+> a small mill's day ≈ 8 pressings = 80 L. A grower's lot of 1–10 ha therefore becomes **28 to ~280
+> pressings spread over months** — up to ~3,000 L, i.e. ~6,000 × 500 ml or ~12,000 × 250 ml bottles.
+> ⇒ **comparison WITHIN a seed lot is the essential comparison** (Edwin), and lot-against-lot is the second.
+> Not the day, not the bottle.
+>
+> ⚠ **The graph is HIGH PRIORITY BUT NOT ESSENTIAL** — *"the user/miller could also put things in an Excel
+> table"*. It is worth building and it must never gate the measurement.
+
+### 📋 0b — DESK ITEMS RAISED 2026-08-31, TO DISCUSS  *(Edwin: "will be discussed, put it on the next-todo-list")*
+
+> **1 · ⛔ BILLA CLEVER AND THE DN FLOOR — the oil the archive cannot measure.** Its 624 band wanders from
+> **−0.1 to +9 DN** across six fills and three weeks: `Rv` −10.05 / 7.76 / 26.21 / 30.21 / 36.65 / 42.33.
+> ⭐ **Not exposure** — the control is in the archive: on one evening five Lugitsch fills at exposure 90 read
+> `Rv` 107.46 (sd 4.18) and the one fill at 104 read **107.42**, a difference of 0.04. §16.27.1a predicted it
+> and it holds. ⇒ this is the oil sitting on the instrument floor (`SPEC_capture_quality.md` §16.40), and
+> `Rv` is a ratio whose *relative* precision blows up as its numerator crosses zero even though its absolute
+> precision is the same ±1.5 DN as everywhere else. **What to decide: is Billa Clever measurable at all on
+> this rig, or is it the first oil that needs more counts before it gets a number?**
+>
+> **2 · ⏸ THE LOW-SIGNAL GUARD for `Rv`.** `__rvTerms` already returns `None` rather than a clamped ratio
+> when its DENOMINATOR dies; the Billa Clever case says the NUMERATOR needs the same discipline. A candidate
+> rule: if `A624 − A_valley` is under ~2 DN (≈0.02 A) report "no band" instead of a number. ⛔ Not designed,
+> not agreed — a threshold in DN is a threshold fitted on one session, and §16.3a is the standing lesson.
+> ⚠ Related: in colour scheme D (below) that same fill renders **grey**, because the converter refuses a
+> negative band. "No band ⇒ neutral" may be the honest rendering of the same decision.
+>
+> **3 · ✅ DONE — the stale plot test.** `test_v_metric.py::testTheGuardStripsEveryAnnotationButKeepsTheWindows`
+> asserted `len(bands) == 3` and broke when `b2cad43` added the 624 nm marker. The plot was right, the
+> expectation was a week old. Now asserts WHICH four windows survive the guard rather than how many, so the
+> next window cannot break it silently. **70 plugin tests green.**
+>
+> **4 · ⭐ THE INSPECTION COLOUR — candidates measured, one to choose.**
+> `spectracs-references/tmp/20260831_rv_colour_candidates.pdf` (`diagnostics/rv_colour_candidates.py`).
+> ⛔ Edwin's framing: *"the 'new color' should be not a color for a verdict or a metric but only for a rough
+> inspection"*. Scored as ΔE between the oils ÷ worst ΔE between two fills of one oil:
+>
+> | scheme | ratio |
+> |---|---|
+> | A the real spectrum, path 3 — **what ships today** | **1.6×** |
+> | B only `Rv`'s windows vary | 1.8× |
+> | C two bands = `Rv`'s two terms | 2.6× |
+> | D the 624 band alone | 4.2× |
+> | F D with L\* pinned — dose leaves the swatch | 4.2× |
+> | G the RATIO as the band depth, L\* pinned | **10.2×** |
+>
+> ⭐⭐ **THE PATTERN IS THE POINT: every step that removes DOSE buys discrimination, and changing the
+> ILLUMINANT buys none.** A Planck radiator swept 1800–10000 K in place of the flat baseline (Edwin's idea)
+> moves the hue a long way and leaves the score at 4.1–4.2× **at every temperature** — the illuminant is a
+> display choice, not an information channel. ⛔ And A's 1.6× is the phone-picture problem in numbers:
+> Ja Natuerlich (`Rv` 123.6) renders `179,211,96` and Billa Clever A (`Rv` −7.1) renders `211,191,103`.
+> ⚠ **The choice is D/F versus G**: D and F picture the BAND and cap at ~4×; G pictures the RATIO, reaches
+> 10×, renders "no band" as neutral grey — and is a picture of the number rather than of the spectrum, which
+> is the line Edwin drew. **Nothing is built.**
+
+### 📌⭐⭐⭐ 0a — THE GREEN-vs-GREEN RUN, PRE-REGISTERED  *(NEW 2026-08-31. One evening, 4 fills, 8 runs. Two dilutions are already on the bench.)*
+
+> ⭐⭐ **Edwin ranked two oils BY EYE BEFORE MEASURING THEM** — *"Lugitsch is yellowischer/brwoner than the
+> BillaJaNtürlich oil"* — which is the pre-registered green-vs-green label the archive has never had.
+> `SPEC_metric_research.md` **§16.17** is the registered design, read rule and cut, all written before the
+> run. Predictions are fixed: `Rv` passes, `RvLin` fails the margin, `Q%` is right but unresolved.
+>
+> ⛔ **LUGITSCH MAY NOT BE THE GREEN BENCHMARK.** It is the oil on every by-day row and the dotted reference
+> line on all of them; the archive says Ja Natuerlich's `Rv` sits **8.47 above Lugitsch's highest of ten
+> fills**, and repeats to **0.26 across 19 days, two solvent eras and the exposure pin**.
+>
+> ⚠ **TWO fills per oil, not one** (§16.17.4: Lugitsch moves sd 3.74 between fills within a session, which is
+> the size of the gap being tested), **alternate the order**, keep the aliquots **dark**, and ⛔ **edit
+> `~/.spectracsPy/prepProtocol.txt` first** — 8 ml + 2 capillaries is not the corpus recipe.
 
 ### ⭐⭐⭐ 0 — THE σ_fill RUN  *(NEXT. Set 2026-08-27. One evening. Everything below waits on it.)*
 
