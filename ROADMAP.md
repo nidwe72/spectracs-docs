@@ -32,6 +32,7 @@
 > | **10** | **`Rv` on the page / P6 gauge + threshold** | ⏸ gated on M9 | unchanged | `SPEC_red_ratio_metric.md` §7 |
 > | **11** | **the tracker itself** — frozen baseline, k-reading mean, per-oil thresholds | ⏸ optional | needs 3, 4, 6 and a physical standard first | `SPEC_history_tracker.md` |
 > | ✅ | the measurement clock; the stale plot test; the `*_suite` convention; scheme `K` chosen | done 08-31 / 09-01 | | §16.15.5, §16.15.7, §16.15.8 |
+> | ✅ | **packaging — standalone Linux AppImages (app + server) + a one-command build**, and the whole code base frozen at one tag | **done 09-09, LINUX** | not a lab item, but it is what the presentation runs on | `spectracsPy/docs/SPEC_linux_appimage.md`, §7 below |
 
 > ⭐⭐⭐ **`Rv` IS THE VERDICT METRIC. Edwin's decision, 2026-08-25.** Implementing it is the single
 > highest-priority item on this page. `SPEC_red_ratio_metric.md` is the contract.
@@ -2800,6 +2801,34 @@ as "good — green" on every run (`SPEC_roast_ampel.md` §2b).
 
 **Still open and unchanged:** `r_Q`'s mechanism (§16.19 ruled out both scattering and the far anchor, leaving
 ≥80 % unexplained); §16.10.8 dilution invariance; brown σ_fill post-rebuild, never measured.
+
+## 7. Packaging — standalone Linux AppImages  *(**✅ IMPLEMENTED 2026-09-09 — LINUX ONLY**; spec `spectracsPy/docs/SPEC_linux_appimage.md`)*
+
+**Done.** Two AppImages, built from git worktrees of one tag across all seven repos:
+
+| artefact | size | what it is |
+|---|---|---|
+| `Spectracs-presentation-2026-09-12-x86_64.AppImage` | **191 MB** | the app — `runApp.sh` in one double-click. No venv, no `PYTHONPATH`, no checkout |
+| `Spectracs-Server-presentation-2026-09-12-x86_64.AppImage` | **16 MB** | the Pyro server. No argument → loopback `127.0.0.1:8091` (no network at all); any argument → the stock `spectracsPyServer` CLI, verbatim |
+| `spectracsPy/tools/buildAppImages.sh` | — | rebuilds and **self-verifies** both in ~2 min (`--app`/`--server`, `--tag`, `--out`, `--keep`, `--no-verify`) |
+
+**Freeze.** All seven repos carry the annotated tag **`presentation-2026-09-12`** (the *event* date, not the
+build date — the build date lives in each image's `RELEASE_MANIFEST.txt`). ⭐ **The tag is only the label:**
+the demo also rests on two files in **no repo** — the authored ELP calibration and the 154-workflow archive —
+so both DBs were snapshot into `spectracs-references/releases/presentation-2026-09-12/` alongside the images.
+
+**Verified by build, not by reading:** Alembic-as-data works frozen (app DB comes up stamped at head); a real
+login through the *frozen* server returns `MASTER_USER` / `ELP-0001` / a real calibration; and the pair is
+proven by the app's fresh catalogue coming back with the **server's exact spectrometer UUIDs**.
+
+⛔ **Not done, and unchanged non-goals:** Windows, macOS, the Android APKs, auto-update, code signing, any
+`.deb`/Flatpak. ⚠ **Owed on the rig:** the ELP click-through, one PDF export, a WLAN-off cold start, and
+plugging in the projector once (spec §18.4).
+
+⚠ **Two post-freeze one-liners it surfaced** (deliberately *not* fixed during freeze week): `spectracsPyServer.py`
+dies if its nameserver binds loopback (`rs=[broadcastServer]` with `broadcastServer=None` →
+`select.select` `TypeError`), which is why `runServer.sh --local` is unreliable with no WLAN; and
+`ApplicationSpectrometerUtil.isSensorConnected` guards `ImportError` but not `NoBackendError`.
 
 ## Dependencies / suggested order
 - **#1, #2, #4 — done.** The measurement/evaluation concept + Pipeline Playground PoC — done.
